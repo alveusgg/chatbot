@@ -1,0 +1,42 @@
+{
+  "name": "alveuscontroller",
+  "version": "1.0.0",
+  "description": "alveus livestream chat bot",
+  "main": "src/index.js",
+  "scripts": {
+	 "prettify": "prettier -l --write \"**/*.js\"",
+    "dev": "cross-env NODE_ENV=development node src/index.js",
+	  "dev2": "nodemon --inspect=0.0.0.0:9229 -L src/index.js",
+    "test": "node src/test.js",
+	"start": "node src/index.js"
+  },
+  "author": "SpaceVoyage",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@trycourier/courier": "^4.1.0",
+    "@twurple/api": "^5.2.7",
+    "@twurple/auth": "^5.2.7",
+    "@twurple/chat": "^5.2.7",
+    "@twurple/eventsub": "^5.2.7",
+    "digest-fetch": "^2.0.1",
+    "dotenv": "^16.0.3",
+    "obs-websocket-js": "^5.0.2",
+    "obs-websocket-js-27": "npm:obs-websocket-js@^4.0.3",
+    "on-change": "^4.0.2",
+    "osc": "^2.4.4",
+    "unifi-client": "^0.11.0"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "prettier": "^3.0.1",
+	  "nodemon": "^3.0.1"
+  }
+}
