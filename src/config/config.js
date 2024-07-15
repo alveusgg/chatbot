@@ -18,13 +18,15 @@ const globalMusicSource = "Music Playlist Global";
 let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
-    commandSuperUsers: ["geologyrocks01", "dionysus1911", "dannyDV", "maxzillaJr", "illjx", "kayla_alveus", "alex_b_patrick", "lindsay_alveus", "strickknine","tarantulizer","SpiderdayNightLive"],
+    commandSuperUsers: ["geologyrocks01", "dionysus1911", "dannyDV", "maxzillaJr", "illjx", "kayla_alveus", "alex_b_patrick", 
+                        "lindsay_alveus", "strickknine","tarantulizer","SpiderdayNightLive"],
     commandMods: ["mods"],
-    commandOperator: ["96allskills", "stolenarmy_", "berlac", "knayte_", "dansza", "loganrx_", "merger3", "nitelitedf", "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz"],
-    commandVips: ["vips", "tfries_", "sivvii_", "ghandii_", "axialmars", "wolfone_", "dohregard", "shutupleonard",
+    commandOperator: ["96allskills", "stolenarmy_", "berlac", "knayte_", "dansza", "loganrx_", "merger3", "nitelitedf", 
+                    "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1"],
+    commandVips: ["vips", "tfries_", "sivvii_", "ghandii_", "axialmars", "wolfone_", "dohregard",
         "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","MadCharlieKelly",
         "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "lakel1", "user_11_11", "huniebeeXD","kurtyykins",
-        "breacherman", "bryceisrightjr","sumaxu","mariemellie","darkrow_","ewok_626","quokka64","lumberaxe1","minipurrl","taizun"],
+        "breacherman", "bryceisrightjr","sumaxu","mariemellie","darkrow_","ewok_626","quokka64","minipurrl"],
     commandUsers: ["subs"]
 }
 
@@ -305,7 +307,7 @@ const commandSceneAlias = {
     georgiewatercam: ["georgieunderwatercam"],
     nuthousecambackup: ["nutcam"],
     servernuthousecam: ["servernutcam", "remotenutcam", "remotenuthousecam"],
-    crowcam: ["crowcamindoor", "crowindoorcam","crowincam"],
+    crowcam: ["crowcamindoor", "crowindoorcam","crowincam","crowinsidecam"],
     crowcam2: ["crowcamoutdoor", "crowcamoutdoors", "crowoutdoorcam","crowoutcam"],
     crowcam3: ["crowcammulti", "crowmulticam"],
     foxcam: ["foxcam", "foxescam"],
@@ -331,11 +333,11 @@ const commandSceneAlias = {
     connorintro: ["penis"],
     chatchat: ["bugmic","chatchatmic"],
     phonemic: ["phoneaudio","phonemic","mobilemic"],
-    wolfcam: ["wolvescam","timbercam","awacam"],
-    wolfcam2: ["wolvescornercam","wolfcornercam"],
-    wolfcam3: ["wolvesdencam","wolfdencam"],
-    wolfcam4: ["wolvesden2cam","wolfden2cam"],
-    wolfcam5: ["wolvesindoorcam","wolfindoorcam"],
+    wolfcam: ["wolvescam","timbercam","awacam","wolfocam","wolfoutcam","wolfoutdoorcam","wolfoutsidecam","wolfcamout","wolfcamoutdoor"],
+    wolfcam2: ["wolvescornercam","wolfcornercam","wolfsidecam","wolfdeckcam","wolf2cam"],
+    wolfcam3: ["wolvesdencam","wolfdencam","wolfponddencam"],
+    wolfcam4: ["wolvesden2cam","wolfden2cam","wolfdeckdencam"],
+    wolfcam5: ["wolvesindoorcam","wolfindoorcam","wolfinsidecam","wolfincam","wolficam","wolfcamindoor","wolfcamin","wolfcaminside"],
     wolfcam6: ["wolvesmulticam","wolfmulticam"],
 }
 
