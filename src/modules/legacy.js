@@ -120,8 +120,8 @@ const onSceneChange = async (controller, name, oldName) => {
 
 	if (!config.pauseNotify) {
 		let now = new Date();
-		// var minutes = now.getMinutes();
-		var hour = now.getHours();
+		// var minutes = now.getUTCMinutes();
+		var hour = now.getUTCHours();
 		//logger.log("scene change current time",hour,now);
 		//if ((hour >= 19 && minutes >= 30) || hour >= 20 || hour < 8){
 		if ( hour >= config.notifyHours.start && hour < config.notifyHours.end ) {
@@ -421,8 +421,8 @@ function checkTimeAccess(controller, userCommand, accessProfile, channel, messag
 		if (!hasAccess) {
 			//check time
 			let now = new Date();
-			// var minutes = now.getMinutes();
-			var hour = now.getHours();
+			// var minutes = now.getUTCMinutes();
+			var hour = now.getUTCHours();
 			// console.log("check time",now,hour,config.restrictedHours);
 			if (hour >= config.restrictedHours.start && hour < config.restrictedHours.end) {
 				//restricted time
@@ -1929,8 +1929,8 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 				if (config.timeRestrictedScenes.includes(camName)) {
 					//check time
 					let now = new Date();
-					var minutes = now.getMinutes();
-					var hour = now.getHours();
+					var minutes = now.getUTCMinutes();
+					var hour = now.getUTCHours();
 					if (hour >= config.restrictedHours.start && hour < config.restrictedHours.end) {
 						//restricted time
 						hasAccess = false;
