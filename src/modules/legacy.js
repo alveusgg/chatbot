@@ -731,7 +731,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			//absolute pos, pan tilt zoom autofocus focus 
 			let customPtz = { pan: arg1};
 
-			let customTilt = parseInt(arg2);
+			let customTilt = parseFloat(arg2);
 			if (!isNaN(customTilt)) {
 				customPtz.tilt = customTilt;
 			}
