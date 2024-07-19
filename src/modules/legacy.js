@@ -52,18 +52,18 @@ const main = async controller => {
 		}
 	});
 
-	for (let hour = 1; hour < 5; hour++) {
-		for (let min = 0; min < 60; min += 10) {
-			runAtSpecificTimeOfDay(hour, min, () => {
-				try {
-					logger.log(`Running Commerical ${hour}:${min}`);
-					controller.connections.twitch.runCommercial(config.alveusTwitchID, 180);
-				} catch (e) {
-					logger.log(`Error: Failed to run commerical - ${e}`);
-				}
-			});
-		}
-	}
+	// for (let hour = 1; hour < 5; hour++) {
+	// 	for (let min = 0; min < 60; min += 10) {
+	// 		runAtSpecificTimeOfDay(hour, min, () => {
+	// 			try {
+	// 				logger.log(`Running Commerical ${hour}:${min}`);
+	// 				controller.connections.twitch.runCommercial(config.alveusTwitchID, 180);
+	// 			} catch (e) {
+	// 				logger.log(`Error: Failed to run commerical - ${e}`);
+	// 			}
+	// 		});
+	// 	}
+	// }
 }
 
 module.exports = main;

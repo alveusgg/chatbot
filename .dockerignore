@@ -6,8 +6,8 @@
 
 **/.classpath
 **/.dockerignore
-**/.env
-**/.git
+**/.env*
+**/.git*
 **/.gitignore
 **/.project
 **/.settings
@@ -30,6 +30,5 @@
 **/values.dev.yaml
 **/build
 **/dist
-.editorconfig
-LICENSE
-README.md
+**/*.md
+**/*.bak

@@ -62,7 +62,7 @@ const throttleCommandLength = 30000;
 const commandPermissionsCustomCam = {
     commandAdmins: [],
     commandSuperUsers: ["nuthousecam", "localpccam", "backpackcam", "phonecam"],
-    commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","parrotcam", "pasturecam", "crowcam", "crowcam2", "crowcam3",
+    commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","parrotcam", "pasturecam", "crowcam", "crowcam2", "crowcam3",
         "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam"],
     commandOperator: ["constructioncam"],
@@ -74,7 +74,7 @@ const commandPermissionsCustomCam = {
 
 //customcam lowercase, no spaces, no s/es
 const multiCustomCamScenes = {
-    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti"],
+    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4"],
     fox: ["fox", "foxcorner", "foxmulti", "foxden", "foxmulti2", "foxmulti3"],
     crow: ["crow", "crowmulti", "crowoutdoor"],
     marmoset: ["marmoset", "marmosetindoor", "marmosetmulti", "marmosetmulti"],
@@ -93,7 +93,7 @@ let onewayCommands = {
 let multiCommands = {
     crow: ["crowcam", "crowcam2", "crowcam3"],
     fox: ["foxcam", "foxcam2", "foxcam3", "foxcam4"],
-    wolf: ["wolfcam", "wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6"],
+    wolf: ["wolfcam", "wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9"],
     marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
     // rat: ["ratcam","ratcam2","ratcam3","ratcam4","ratcamall"]
 }
@@ -103,7 +103,7 @@ let multiCommands = {
 //lowercase, no spaces, no s/es
 const multiScenes = {
     crow: ["crow", "crowoutdoor", "crowmulticam"],
-    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti"],
+    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4"],
     fox: ["fox", "foxden", "foxmulticam", "foxcorner"],
     marmoset: ["marmoset", "marmosetindoor", "marmosetmulti"],
     // rat: ["ratcam","ratcam2","ratcam3","ratcam4"]
@@ -150,6 +150,9 @@ const sceneAudioSource = {
     "wolfden": "wolf den2 camera",
     "wolfden2": "wolf den2 camera",
     "wolfmulti": "wolf mic",
+    "wolfmulti2": "wolf mic",
+    "wolfmulti3": "wolf mic",
+    "wolfmulti4": "wolf mic",
     "chatchat": "chat chats audio",
     "phonemic": "alveus rtmp mobile mic",
     "chicken": "Chicken Camera"
@@ -192,7 +195,10 @@ const axisCameraCommandMapping = {
     "wolfcam3":"wolfden", 
     "wolfcam4":"wolfden2", 
     "wolfcam5":"wolfindoor", 
-    "wolfcam6":"wolfmulti", 
+    "wolfcam6":"wolf",
+    "wolfcam7":"wolf",
+    "wolfcam8":"wolfcorner",
+    "wolfcam9":"wolf",
     "georgie":"georgie", 
     "georgiewater":"georgiewater", 
     "noodle":"noodle", 
@@ -290,6 +296,9 @@ const customCamCommandMapping = {
     "wolfcam4":"wolfden2", 
     "wolfcam5":"wolfindoor", 
     "wolfcam6":"wolfmulti", 
+    "wolfcam7":"wolfmulti2", 
+    "wolfcam8":"wolfmulti3", 
+    "wolfcam9":"wolfmulti4", 
 }
 
 const commandSceneAlias = {
@@ -315,7 +324,7 @@ const commandSceneAlias = {
     foxcam3: ["foxwideangle", "foxcornercam"],
     foxcam4: ["foxdencam", "foxcamden"],
     marmosetcam: ["marmosetoutdoorcam", "marmosetscam", "marmcam", "marmscam", "marmsoutdoorcam", "marmsoutcam", "marmoutdoorcam", "marmoutcam"],
-    marmosetcam2: ["marmosetindoorcam", "marmosetsindoorcam", "marmsindoorcam", "marmsincam", "marmindoorcam", "marmincam"],
+    marmosetcam2: ["marmosetindoorcam", "marmosetsindoorcam", "marmsindoorcam", "marminsidecam","marmsincam", "marmindoorcam", "marmincam"],
     marmosetcam3: ["marmosetmulticam", "marmosetsmulticam", "marmsmulticam", "marmmulticam"],
     "4camoutdoor": ["4camoutdoors", "multioutdoor"],
     nightcams: ["nightcam", "outdoorcams", "outdoorcam", "outsidecam", "outsidecams", "livecams", "livecam"],
@@ -338,7 +347,10 @@ const commandSceneAlias = {
     wolfcam3: ["wolvesdencam","wolfdencam","wolfponddencam"],
     wolfcam4: ["wolvesden2cam","wolfden2cam","wolfdeckdencam"],
     wolfcam5: ["wolvesindoorcam","wolfindoorcam","wolfinsidecam","wolfincam","wolficam","wolfcamindoor","wolfcamin","wolfcaminside"],
-    wolfcam6: ["wolvesmulticam","wolfmulticam"],
+    wolfcam6: ["wolvesmulticam","wolfmulticam","wolfoutmulticam"],
+    wolfcam7: ["wolfindoormulticam","wolfinmulticam","wolfinsidemulticam"],
+    wolfcam8: ["wolfdenmulticam"],
+    wolfcam9: ["wolfden2multicam"],
 }
 
 const commandControlAlias = {
@@ -622,14 +634,14 @@ function setupCustomCamAlias(aliasList) {
     for (const baseCommand in aliasList) {
 
         let newBaseCommand = baseCommand.toLowerCase();
-        newBaseCommand = newBaseCommand.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|wideangle|corner|den)/g, "$1");
+        newBaseCommand = newBaseCommand.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|inside|wideangle|corner|den)/g, "$1");
         newBaseCommand = newBaseCommand.replaceAll(/(?:full)?cams?/g, "");
         // newBaseCommand = newBaseCommand.replaceAll(" ", "");
 
         let convertedBaseCommand = customCamCommandMapping[baseCommand] || baseCommand;
 
         let newConvertedBaseCommand = convertedBaseCommand.toLowerCase();
-        newConvertedBaseCommand = newConvertedBaseCommand.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|wideangle|corner|den)/g, "$1");
+        newConvertedBaseCommand = newConvertedBaseCommand.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|inside|wideangle|corner|den)/g, "$1");
         newConvertedBaseCommand = newConvertedBaseCommand.replaceAll(/(?:full)?cams?/g, "");
 
 
@@ -637,7 +649,7 @@ function setupCustomCamAlias(aliasList) {
 
         for (const aliasCommand of aliasList[baseCommand]) {
             let newAliasCommand = aliasCommand.toLowerCase();
-            newAliasCommand = newAliasCommand.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|wideangle|corner|den)/g, "$1");
+            newAliasCommand = newAliasCommand.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|inside|wideangle|corner|den)/g, "$1");
             newAliasCommand = newAliasCommand.replaceAll(/(?:full)?cams?/g, "");
             newAliasCommand = newAliasCommand.replaceAll(" ", "");
             if (!isNaN(parseInt(newAliasCommand))) {

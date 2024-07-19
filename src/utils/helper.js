@@ -75,7 +75,7 @@ function cleanName(input){
     let newInput = input;
     try{
         newInput = newInput.toLowerCase();
-        newInput = newInput.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|wideangle|corner|den)/g, "$1");
+        newInput = newInput.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|inside|wideangle|corner|den)/g, "$1");
         newInput = newInput.replaceAll(/(?:full)?cams?/g, "");
         newInput = newInput.replaceAll(" ", "");
         return newInput;
