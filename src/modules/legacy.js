@@ -41,9 +41,9 @@ const main = async controller => {
 		setPTZRoamMode(controller, currentScene);
 	}
 
-	runAtSpecificTimeOfDay(7, 55, () => {
+	runAtSpecificTimeOfDay(config.restrictedHours-1, 55, () => {
 		try {
-			logger.log(`Timer (7:55am) - Send !nightcams !mute fox`);
+			logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
 			controller.connections.twitch.send("alveusgg", `!nightcams`);
 			controller.connections.obs.local.setMute(config.sceneAudioSource["fox"], true);
 			switchToCustomCams(controller, "alveusgg", { allowed: true, accessLevel: 'commandAdmins' }, "customcamsbig", config.customCamCommandMapping["nightcams"]);

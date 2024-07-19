@@ -11,8 +11,8 @@ const pauseTwitchMarker = true;
 const pauseCloudSceneChange = false;
 const announceChatSceneChange = false;
 //UTC TIME
-const notifyHours = {start:13,end:23};
-const restrictedHours = {start:13,end:23};
+const notifyHours = {start:14,end:23};
+const restrictedHours = {start:14,end:23};
 const globalMusicSource = "Music Playlist Global";
 
 let userPermissions = {
