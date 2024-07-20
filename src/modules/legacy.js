@@ -759,8 +759,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			break;
 		case "ptzgetinfo":
 			let cpos = await camera.getPosition();
+		    let fov = await camera.getCameraFOV();
 			if (cpos && cpos.pan != null) {
-				controller.connections.twitch.send(channel, `PTZ Info (${currentScene}): ${cpos.pan}p |${cpos.tilt}t |${cpos.zoom}z |af ${cpos.autofocus || "n/a"} |${cpos.focus || "n/a"}f`);
+			        controller.connections.twitch.send(channel, `PTZ Info (${currentScene}): ${cpos.pan}p | ${cpos.tilt}t | ${cpos.zoom}z | af ${cpos.autofocus || "n/a"} | ${cpos.focus || "n/a"}f | hFOV: ${fov.hFOV || "n/a"} | vFOV: ${fov.vFOV || "n/a"}`);
 			} else {
 				logger.log("Failed to get ptz position");
 			}

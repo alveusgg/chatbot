@@ -382,6 +382,29 @@ class Axis {
   }
 
   /**
+   * Get the current FOV of the camera 
+   * 
+   * @returns {Promise<{ hFOV: number, vFOV: number } | null>}
+   */
+  async getCameraFOV() {
+    // Get the raw FOV data
+    const resp = await this.#get("/axis-cgi/view/param.cgi?action=list&group=root.ImageSource.I0.HorizontalFOV,root.ImageSource.I0.VerticalFOV");
+    if (resp === null) return null;
+  
+    // Parse the data (<key>=<value>\r\n...)
+    const fov = {};
+    resp.replace(/\r/g, "").split('\n').forEach(line => {
+      const [key, value] = line.split('=');
+      if (key && value) {
+        fov[key.trim()] = parseFloat(value.trim());
+      }
+    });
+    const hFOV = fov['root.ImageSource.I0.HorizontalFOV'];
+    const vFOV = fov['root.ImageSource.I0.VerticalFOV'];
+    return { hFOV, vFOV };
+  }
+
+  /**
    * Get the current movement speed of the camera
    *
    * @returns {Promise<number | null>}
