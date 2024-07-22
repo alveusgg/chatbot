@@ -292,6 +292,7 @@ const customCamCommandMapping = {
     "ratcam4": "ratmulti",
     "ratcamall": "rat rat2 rat3",
     "localpccam": "pc",
+    "serverpccam": "pc",
     "orangeisopodcam": "orangeisopod",
     "roachcam":"roaches",
     "constructioncam":"construction",
