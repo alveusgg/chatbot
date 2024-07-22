@@ -41,7 +41,7 @@ const main = async controller => {
 		setPTZRoamMode(controller, currentScene);
 	}
 
-	runAtSpecificTimeOfDay(config.restrictedHours-1, 55, () => {
+	runAtSpecificTimeOfDay(config.restrictedHours.start-1, 55, () => {
 		try {
 			logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
 			controller.connections.twitch.send("alveusgg", `!nightcams`);

@@ -46,14 +46,14 @@ const commandPermissionsScenes = {
     commandUsers: []
 }
 
-let timeRestrictedCommands = ["parrotcam", "pasturecam", "crowcam", "crowcam2", "crowcam3", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor",
+let timeRestrictedCommands = ["parrotcam", "pasturecam", "crowcam", "crowcam2", "crowcam3","crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor",
     "marmosetcam", "marmosetcam2", "marmosetcam3",
     "parrotcambackup", "pasturecambackup", "crowcambackup", "crowcam2backup", "crowcam3backup",
     "foxcambackup", "foxcam2backup", "foxcam3backup", "foxcam4backup", "4camoutdoorbackup",
     "marmosetcambackup", "marmosetcam2backup", "marmosetcam3backup"];
 
 
-let timeRestrictedScenes = ["parrot", "fox", "foxcorner", "foxmulti", "pasture", "crow", "crowmulti", "crowoutdoor", "marmoset", "marmosetindoor", "marmosetmulti"];
+let timeRestrictedScenes = ["parrot", "fox", "foxcorner", "foxmulti", "pasture", "crow", "crowmulti", "crowmulti2","crowoutdoor", "marmoset", "marmosetindoor", "marmosetmulti"];
 let throttledCommands = [];
 
 const throttleCommandLength = 30000;
@@ -62,8 +62,8 @@ const throttleCommandLength = 30000;
 const commandPermissionsCustomCam = {
     commandAdmins: [],
     commandSuperUsers: ["nuthousecam", "localpccam", "backpackcam", "phonecam"],
-    commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","parrotcam", "pasturecam", "crowcam", "crowcam2", "crowcam3",
-        "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
+    commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","parrotcam", "pasturecam",
+         "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam"],
     commandOperator: ["constructioncam"],
     commandVips: ["georgiecam", "noodlecam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
@@ -76,7 +76,7 @@ const commandPermissionsCustomCam = {
 const multiCustomCamScenes = {
     wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4"],
     fox: ["fox", "foxcorner", "foxmulti", "foxden", "foxmulti2", "foxmulti3"],
-    crow: ["crow", "crowmulti", "crowoutdoor"],
+    crow: ["crow", "crowmulti", "crowoutdoor","crowmulti2"],
     marmoset: ["marmoset", "marmosetindoor", "marmosetmulti", "marmosetmulti"],
     // rat: ["rat","rat2","rat3","ratmulti"]
 }
@@ -91,7 +91,7 @@ let onewayCommands = {
 //key names are same as multiscenes
 //links command to obs scene names
 let multiCommands = {
-    crow: ["crowcam", "crowcam2", "crowcam3"],
+    crow: ["crowcam", "crowcam2", "crowcam3","crowcam4"],
     fox: ["foxcam", "foxcam2", "foxcam3", "foxcam4"],
     wolf: ["wolfcam", "wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9"],
     marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
@@ -102,7 +102,7 @@ let multiCommands = {
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
 const multiScenes = {
-    crow: ["crow", "crowoutdoor", "crowmulticam"],
+    crow: ["crow", "crowoutdoor", "crowmulticam", "crowmulti2cam"],
     wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4"],
     fox: ["fox", "foxden", "foxmulticam", "foxcorner"],
     marmoset: ["marmoset", "marmosetindoor", "marmosetmulti"],
@@ -134,6 +134,7 @@ const sceneAudioSource = {
     "crowoutdoor": "crow mic",
     "crowindoor": "crow mic",
     "crowmulticam": "crow mic",
+    "crowmulti2cam": "crow mic",
     "marm": "marmoset mic",
     "marmoset": "marmoset mic",
     "marmosetindoor": "marmoset mic",
@@ -205,6 +206,8 @@ const axisCameraCommandMapping = {
     "roach":"roach", 
     "crow":"crow", 
     "crowcam2":"crowoutdoor", 
+    "crowcam3":"crowmulti", 
+    "crowcam4":"crowmulti2", 
     "fox":"fox", 
     "foxcam4":"foxden",
     "foxcam3":"foxcorner", 
@@ -267,6 +270,7 @@ const customCamCommandMapping = {
     "crowcam": "crow",
     "crowcam2": "crowoutdoor",
     "crowcam3": "crowmulti",
+    "crowcam4": "crowmulti2",
     "foxcam": "fox",
     "foxcam2": "foxmulti",
     "foxcam3": "foxcorner",
@@ -319,6 +323,7 @@ const commandSceneAlias = {
     crowcam: ["crowcamindoor", "crowindoorcam","crowincam","crowinsidecam"],
     crowcam2: ["crowcamoutdoor", "crowcamoutdoors", "crowoutdoorcam","crowoutcam"],
     crowcam3: ["crowcammulti", "crowmulticam"],
+    crowcam4: ["crowcammulti2", "crowmulti2cam"],
     foxcam: ["foxcam", "foxescam"],
     foxcam2: ["foxmulticam", "foxcammulti"],
     foxcam3: ["foxwideangle", "foxcornercam"],
