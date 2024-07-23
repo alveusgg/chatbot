@@ -723,6 +723,14 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.setSpeed(arg1);
 			controller.connections.database[currentScene].speed = arg1;
 			break;
+		case "ptzcenter":
+			//x-cord y-cord rzoom 
+			camera.ptz({ center: `${arg1},${arg2}`, rzoom: arg3 });
+			break;
+		case "ptzareazoom":
+			//x-cord y-cord zoom 
+			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
+			break;
 		case "ptzset":
 			//pan tilt zoom relative pos
 			camera.ptz({ rpan: arg1, rtilt: arg2, rzoom: arg3 * 100, autofocus: "on" });
