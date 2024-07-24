@@ -600,7 +600,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	arg4 = arg4.trim().toLowerCase();
 	arg5 = arg5.trim().toLowerCase();
 
-
+	let currentCamList = controller.connections.database["customcam"];
 	let camera = controller.connections.cameras[currentScene] || null;
 	if (camera == null) {
 		//multiscene/extra scene
@@ -833,7 +833,14 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (userCommand == "ptzhome"){
 				arg1 = "home";
 			}
-			if (specificCamera != "") {
+			if (arg2 == "all"){
+				for (let cam of currentCamList){
+					let preset = controller.connections.database[cam].presets["home"];
+					if (preset != null) {
+						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
+					} 
+				}
+			} else if (specificCamera != "") {
 				//used camera name
 				if (arg1 != "") {
 					//2nd argument provided
