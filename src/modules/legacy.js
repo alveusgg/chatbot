@@ -784,7 +784,12 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			}
 
 			camName = currentCamList[zone]
+			// if there's no cam in the slot, return false
+			if (camName == undefined) {
+				return false
+			}
 
+			undefined
 			ptzcamName = helper.cleanName(camName);
 			baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
 			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
