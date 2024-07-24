@@ -789,7 +789,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				return false
 			}
 
-			undefined
 			ptzcamName = helper.cleanName(camName);
 			baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
 			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
