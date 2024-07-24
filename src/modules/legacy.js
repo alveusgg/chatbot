@@ -770,7 +770,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			let y = 540
 			for (let i = 0; i < zones.length; i++) {
 			z = zones[i]
-				if (x_unscaled > z.min_x && x_unscaled < z.max_x && y_unscaled > z.min_y && y_unscaled < z.max_y) {
+				if (x_unscaled >= z.min_x && x_unscaled < z.max_x && y_unscaled >= z.min_y && y_unscaled < z.max_y) {
 					zone = z.zone
 					x = (x_unscaled - z.offset_x) * z.scale_x
 					y = (y_unscaled - z.offset_y) * z.scale_y
