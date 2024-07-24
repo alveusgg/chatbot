@@ -1488,6 +1488,31 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs);
 			}
 			break;
+		case "scenecams":
+			if (currentScene != "custom") {
+				return false;
+			}
+
+			let output = "";
+			if (arg1 == "json") {
+				output = JSON.stringify(currentCamList);
+			} else if (arg1 == "jsonmap") {
+				const jsonobj = {};
+				for (let i = 0; i < currentCamList.length; i++) {
+					jsonobj[i + 1] = currentCamList[i];
+				}
+				output = JSON.stringify(jsonobj);
+			} else {
+				for (let i = 0; i < currentCamList.length; i++) {
+					output = `${output}${i + 1}: ${currentCamList[i]}`;
+					if (i != currentCamList.length - 1) {
+						output = `${output}, `;
+					}
+				}
+			}
+
+			controller.connections.twitch.send(channel, output)
+			break;
 		case "swapcam":
 			if (currentScene != "custom") {
 				return false;

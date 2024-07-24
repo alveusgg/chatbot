@@ -244,7 +244,7 @@ const commandPermissionsExtra = {
     commandMods: ["testmodextra", "resetsource","resetsourcef","camload", "camlist", "camsave", "camrename", "campresetremove", "customcams", "customcamsbig", "customcamstl", "customcamstr", "customcamsbl", "customcamsbr",
         "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam"],
     commandOperator: [],
-    commandVips: ["getvolume", "setvolume", "resetvolume", "removecam","swapcam", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetpc", "resetlivecam", "resetbackpackf", "resetpcf", "resetlivecamf", "resetcam", "resetextra","resetphone", "resetphonef"],
+    commandVips: ["getvolume", "setvolume", "resetvolume", "removecam", "swapcam", "scenecams", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetpc", "resetlivecam", "resetbackpackf", "resetpcf", "resetlivecamf", "resetcam", "resetextra","resetphone", "resetphonef"],
     commandUsers: []
 }
 timeRestrictedCommands = timeRestrictedCommands.concat(["unmutecam", "unmuteallcams"]);
