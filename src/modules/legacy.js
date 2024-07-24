@@ -788,14 +788,10 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (camName == undefined) {
 				return false
 			}
+			
+			camera = controller.connections.cameras[camName]
 
-			ptzcamName = helper.cleanName(camName);
-			baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
-			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
-	
-			camera = controller.connections.cameras[ptzcamName]
-
-			camera.ptz({ areazoom: `${x},${y},${zoom}` });
+			camera.ptz({ areazoom: `${Math.round(x)},${Math.round(y)},${Math.round(zoom)}` });
 			break;
 		case "ptzset":
 			//pan tilt zoom relative pos
