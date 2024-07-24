@@ -732,6 +732,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
 			break;
 		case "ptzclick":
+			// Currently only works on the 6 cam scene, although this is easy to expand
 			if (currentScene != "custom") {
 				return false;
 			}
