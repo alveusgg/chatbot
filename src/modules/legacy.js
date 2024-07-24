@@ -763,6 +763,10 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				{ min_x: x2, max_x: width, min_y: y2, max_y: height, scale_x: 3, scale_y: 3, offset_x: x2, offset_y: y2, zone: 6 }
 			];
 
+			// Defaults to the center of the screen, although it should never matter
+			let zone = -1
+			let x = 960
+			let y = 540
 			for (let i = 0; i < zones.length; i++) {
 			z = zones[i]
 				if (x_unscaled > z.min_x && x_unscaled < z.max_x && y_unscaled > z.min_y && y_unscaled < z.max_y) {
@@ -771,6 +775,11 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 					y = (y_unscaled - z.offset_y) * z.scale_y
 					break
 				}
+			}
+
+			// if invalid coordinates are given and no match is found, don't bother continuing
+			if (zone == -1) {
+				return false
 			}
 
 			camName = currentCamList[zone]
