@@ -731,6 +731,58 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			//x-cord y-cord zoom 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
 			break;
+		case "ptzclick":
+			if (currentScene != "custom") {
+				return false;
+			}
+
+			//x-cord y-cord zoom 
+			x_unscaled = arg1
+			y_unscaled = arg2
+			zoom = arg3 
+			
+			// These should be set dynamically from a video source, that information probably exists 
+			// All these values are static and could be moved out of the function
+			width = 1920
+			height = 1080
+			grid_area = width * height
+
+			x1 = width / 3
+			x2 = width / 1.5
+
+			y1 = height / 3
+			y2 = height / 1.5
+
+
+			const zones = [
+				{ min_x: x1, max_x: width, min_y: 0, max_y: y2, scale_x: 1.5, scale_y: 1.5, offset_x: x1, offset_y: 0, zone: 1 },
+				{ min_x: 0, max_x: x1, min_y: 0, max_y: y1, scale_x: 3, scale_y: 3, offset_x: 0, offset_y: 0, zone: 2 },
+				{ min_x: 0, max_x: x1, min_y: y1, max_y: y2, scale_x: 3, scale_y: 3, offset_x: 0, offset_y: y1, zone: 3 },
+				{ min_x: 0, max_x: x1, min_y: y2, max_y: height, scale_x: 3, scale_y: 3, offset_x: 0, offset_y: y2, zone: 4 },
+				{ min_x: x1, max_x: x2, min_y: y2, max_y: height, scale_x: 3, scale_y: 3, offset_x: x1, offset_y: y2, zone: 5 },
+				{ min_x: x2, max_x: width, min_y: y2, max_y: height, scale_x: 3, scale_y: 3, offset_x: x2, offset_y: y2, zone: 6 }
+			];
+
+			for (let i = 0; i < zones.length; i++) {
+			z = zones[i]
+				if (x_unscaled > z.min_x && x_unscaled < z.max_x && y_unscaled > z.min_y && y_unscaled < z.max_y) {
+					zone = z.zone
+					x = (x_unscaled - z.offset_x) * z.scale_x
+					y = (y_unscaled - z.offset_y) * z.scale_y
+					break
+				}
+			}
+
+			camName = currentCamList[zone]
+
+			ptzcamName = helper.cleanName(camName);
+			baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+	
+			camera = controller.connections.cameras[ptzcamName]
+
+			camera.ptz({ areazoom: `${x},${y},${zoom}` });
+			break;
 		case "ptzset":
 			//pan tilt zoom relative pos
 			camera.ptz({ rpan: arg1, rtilt: arg2, rzoom: arg3 * 100, autofocus: "on" });
