@@ -1504,7 +1504,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				output = JSON.stringify(jsonobj);
 			} else {
 				for (let i = 0; i < currentCamList.length; i++) {
-					output = `${output}${i + 1}: ${currentCamList[i]}, `;
+					output = `${output}${i + 1}: ${currentCamList[i]}`;
 					if (i != currentCamList.length - 1) {
 						output = `${output}, `;
 					}
