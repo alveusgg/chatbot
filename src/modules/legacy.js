@@ -732,15 +732,10 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
 			break;
 		case "ptzclick":
-			// Currently only works on the 6 cam scene, although this is easy to expand
-			if (currentScene != "custom") {
-				return false;
-			}
-
 			//x-cord y-cord zoom 
 			x_unscaled = arg1
 			y_unscaled = arg2
-			zoom = arg3 
+			zoom = arg3 == ""? 0 : arg3;
 			
 			// These should be set dynamically from a video source, that information probably exists 
 			// All these values are static and could be moved out of the function
@@ -789,7 +784,11 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				return false
 			}
 			
-			camera = controller.connections.cameras[camName]
+			ptzcamName = helper.cleanName(camName);
+			baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+
+			camera = controller.connections.cameras[ptzcamName]
 
 			camera.ptz({ areazoom: `${Math.round(x)},${Math.round(y)},${Math.round(zoom)}` });
 			break;
