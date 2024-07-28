@@ -18,8 +18,8 @@ const globalMusicSource = "Music Playlist Global";
 let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
-    commandSuperUsers: ["geologyrocks01", "dionysus1911", "dannyDV", "maxzillaJr", "illjx", "kayla_alveus", "alex_b_patrick", 
-                        "lindsay_alveus", "strickknine","tarantulizer","SpiderdayNightLive"],
+    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannyDV", "maxzillaJr", "illjx", "kayla_alveus", "alex_b_patrick", 
+                        "lindsay_alveus", "strickknine","tarantulizer","SpiderdayNightLive","srutiloops"],
     commandMods: ["mods"],
     commandOperator: ["96allskills", "stolenarmy_", "berlac", "knayte_", "dansza", "loganrx_", "merger3", "nitelitedf", 
                     "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1"],
@@ -147,7 +147,7 @@ const sceneAudioSource = {
     "pc": "local rtmp desktop",
     "wolf": "wolf mic",
     "wolfcorner": "wolf mic",
-    "wolfindoor": "wolf mic",
+    "wolfindoor": "wolf camera indoor",
     "wolfden": "wolf den2 camera",
     "wolfden2": "wolf den2 camera",
     "wolfmulti": "wolf mic",
@@ -164,7 +164,7 @@ const micGroups = {
         pasture: { name: sceneAudioSource.pasture, volume: -2.4 }, parrot: { name: sceneAudioSource.parrot, volume: -7.9 },
         crow: { name: sceneAudioSource.crow, volume: -7.6 }, marmoset: { name: sceneAudioSource.marm, volume: -7.6 },
         wolf: { name: sceneAudioSource.wolf, volume: -7.9 }, wolfden: { name: sceneAudioSource.wolfden2, volume: -7.9 },
-        chicken: { name: sceneAudioSource.chicken, volume: -7.9 }
+        wolfindoor: { name: sceneAudioSource.wolfindoor, volume: -7.9 }
     },
     restrictedcams: {
         fox: { name: sceneAudioSource.fox, volume: -2.4 }
@@ -229,8 +229,10 @@ const ptzPrefix = "ptz";
 const commandPermissionsCamera = {
     commandAdmins: ["testadmincamera"],
     commandSuperUsers: ["testsupercamera", "ptzcontrol", "ptzoverride", "ptzclear"],
-    commandMods: ["testmodcamera", "ptztracking", "ptzspeed", "ptzspin", "ptzirlight", "ptzwake"],
-    commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry", "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick"],
+    commandMods: ["testmodcamera", "ptztracking", "ptzirlight", "ptzwake"],
+    commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
+                     "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick",
+                     "ptzspeed", "ptzspin"],
     commandVips: ["ptzhome", "ptzpreset", "ptzzoom", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus"],
     commandUsers: []
 }
