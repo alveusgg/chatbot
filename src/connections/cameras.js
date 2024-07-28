@@ -281,8 +281,8 @@ class Axis {
    * @param {number} tilt Tilt speed (-100 to 100)
    * @returns {Promise<boolean>}
    */
-  async continousPanTilt(pan, tilt) {
-    return this.ptz({ continuouspantiltmove: `${pan},${tilt}` });
+  async continousPanTilt(pan, tilt, zoom) {
+    return this.ptz({ continuouspantiltmove: `${pan},${tilt}`, continuouszoommove: `${zoom}` });
   }
 
   /**

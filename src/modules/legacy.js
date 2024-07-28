@@ -835,7 +835,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			}
 			break;
 		case "ptzspin":
-			camera.continousPanTilt(arg1, arg2);
+			camera.continousPanTilt(arg1, arg2, arg3);
 			break;
 		case "ptzstop":
 			camera.continousPanTilt(0, 0);
