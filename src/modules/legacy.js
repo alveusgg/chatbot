@@ -787,13 +787,19 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			zone = -1;
 			x = 960;
 			y = 540;
+
+			// We want to select zone based on the midpoint of the rectangle, not the origin
+			xMid = x_unscaled + (width_unscaled / 2);
+			yMid = y_unscaled + (height_unscaled / 2);
 	
 			for (let i = 0; i < zones.length; i++) {
 				z = zones[i];
-				if ((x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width) && (y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height)) {
+				if ((xMid >= z.positionX && xMid < z.positionX + z.width) && (yMid >= z.positionY && yMid < z.positionY + z.height)) {
 					zone = i;
 					x = (x_unscaled - z.positionX) / z.scaleX;
 					y = (y_unscaled - z.positionY) / z.scaleY;
+					xMid = (xMid - z.positionX) / z.scaleX;
+					yMid = (yMid - z.positionY) / z.scaleY;
 					box_width = width_unscaled / z.scaleX;
 					box_height = height_unscaled / z.scaleY;
 					break;
@@ -803,9 +809,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			zoomWidth = width / box_width 
 			zoomHeight = height / box_height 
 			zoom = Math.min(zoomWidth, zoomHeight) * 100;
-	
-			xMid = x + (box_width / 2);
-			yMid = y + (box_height / 2);
 
 			// if invalid coordinates are given and no match is found, don't bother continuing
 			if (zone == -1) {
