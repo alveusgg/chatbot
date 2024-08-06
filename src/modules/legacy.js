@@ -564,6 +564,21 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	const width = 1920
 	const height = 1080
 
+
+	function findZone(xIn, yIn) {
+		z = undefined;
+		zone = -1;
+		for (let i = 0; i < zones.length; i++) {
+			z = zones[i];
+			if ((xIn >= z.positionX && xIn < z.positionX + z.width) && (yIn >= z.positionY && yIn < z.positionY + z.height)) {
+				zone = i; // Assuming zones are 1-based index
+				break;
+			}
+		}
+		return [z, zone];
+	}
+	
+	
 	let specificCamera = "";
 	let ptzcamName = helper.cleanName(arg1);
 	//convert to clean base command
@@ -742,25 +757,18 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			x_unscaled = arg1
 			y_unscaled = arg2
 			zoom = arg3 == ""? 0 : arg3;
-		
-			// Defaults to the center of the screen, although it should never matter
-			zone = -1;
-			x = 960;
-			y = 540;
-			for (let i = 0; i < zones.length; i++) {
-				z = zones[i];
-				if ((x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width) && (y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height)) {
-					zone = i; // Assuming zones are 1-based index
-					x = (x_unscaled - z.positionX) / z.scaleX;
-					y = (y_unscaled - z.positionY) / z.scaleY;
-					break;
-				}
-			}
+			
+			zoneInfo = findZone(x_unscaled, y_unscaled);
+			z = zoneInfo[0];
+			zone = zoneInfo[1];
 
-			// if invalid coordinates are given and no match is found, don't bother continuing
-			if (zone == -1) {
+			// if invalid coordinates are given and no match was found, don't bother continuing
+			if (zone == undefined) {
 				return false
 			}
+
+			x = (x_unscaled - z.positionX) / z.scaleX;
+			y = (y_unscaled - z.positionY) / z.scaleY;
 
 			camName = currentCamList[zone]
 			// if there's no cam in the slot, return false
@@ -775,7 +783,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera = controller.connections.cameras[ptzcamName]
 
 			camera.ptz({ areazoom: `${Math.round(x)},${Math.round(y)},${Math.round(zoom)}` });
-			controller.connections.twitch.send(channel, `Command send to ${ptzcamName}`);
+			controller.connections.twitch.send(channel, `Clicked on ${ptzcamName}`);
 			break;
 		case "ptzdraw":
 			x_unscaled = arg1;
@@ -783,37 +791,29 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			width_unscaled = arg3;
 			height_unscaled = arg4;
 	
-			// Defaults to the center of the screen, although it should never matter
-			zone = -1;
-			x = 960;
-			y = 540;
-
-			// We want to select zone based on the midpoint of the rectangle, not the origin
+			// We want to use the center of the box, rather than the corner
 			xMid = x_unscaled + (width_unscaled / 2);
 			yMid = y_unscaled + (height_unscaled / 2);
 	
-			for (let i = 0; i < zones.length; i++) {
-				z = zones[i];
-				if ((xMid >= z.positionX && xMid < z.positionX + z.width) && (yMid >= z.positionY && yMid < z.positionY + z.height)) {
-					zone = i;
-					x = (x_unscaled - z.positionX) / z.scaleX;
-					y = (y_unscaled - z.positionY) / z.scaleY;
-					xMid = (xMid - z.positionX) / z.scaleX;
-					yMid = (yMid - z.positionY) / z.scaleY;
-					box_width = width_unscaled / z.scaleX;
-					box_height = height_unscaled / z.scaleY;
-					break;
-				}
+			zoneInfo = findZone(xMid, yMid);
+			z = zoneInfo[0];
+			zone = zoneInfo[1];
+	
+			if (zone == undefined) {
+				return false
 			}
 
+			x = (x_unscaled - z.positionX) / z.scaleX;
+			y = (y_unscaled - z.positionY) / z.scaleY;
+			xMid = (xMid - z.positionX) / z.scaleX;
+			yMid = (yMid - z.positionY) / z.scaleY;
+			box_width = width_unscaled / z.scaleX;
+			box_height = height_unscaled / z.scaleY;
+	
 			zoomWidth = width / box_width 
 			zoomHeight = height / box_height 
 			zoom = Math.min(zoomWidth, zoomHeight) * 100;
 
-			// if invalid coordinates are given and no match is found, don't bother continuing
-			if (zone == -1) {
-				return false
-			}
 
 			camName = currentCamList[zone]
 			// if there's no cam in the slot, return false
@@ -828,7 +828,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera = controller.connections.cameras[ptzcamName]
 
 			camera.ptz({ areazoom: `${Math.round(xMid)},${Math.round(yMid)},${Math.round(zoom)}` });
-			controller.connections.twitch.send(channel, `Command send to ${ptzcamName}`);
+			controller.connections.twitch.send(channel, `Drawn on ${ptzcamName}`);
 			break;
 		case "ptzset":
 			//pan tilt zoom relative pos
