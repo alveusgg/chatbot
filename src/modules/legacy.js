@@ -747,10 +747,12 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		case "ptzcenter":
 			//x-cord y-cord rzoom 
 			camera.ptz({ center: `${arg1},${arg2}`, rzoom: arg3 });
+			camera.enableAutoFocus();
 			break;
 		case "ptzareazoom":
 			//x-cord y-cord zoom 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
+			camera.enableAutoFocus();
 			break;
 		case "ptzclick":
 			//x-cord y-cord zoom 
@@ -783,6 +785,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera = controller.connections.cameras[ptzcamName]
 
 			camera.ptz({ areazoom: `${Math.round(x)},${Math.round(y)},${Math.round(zoom)}` });
+			camera.enableAutoFocus();
 			controller.connections.twitch.send(channel, `Clicked on ${ptzcamName}`);
 			break;
 		case "ptzdraw":
@@ -828,6 +831,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera = controller.connections.cameras[ptzcamName]
 
 			camera.ptz({ areazoom: `${Math.round(xMid)},${Math.round(yMid)},${Math.round(zoom)}` });
+			camera.enableAutoFocus();
 			controller.connections.twitch.send(channel, `Drawn on ${ptzcamName}`);
 			break;
 		case "ptzset":
