@@ -806,8 +806,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				return false
 			}
 
-			x = (x_unscaled - z.positionX) / z.scaleX;
-			y = (y_unscaled - z.positionY) / z.scaleY;
 			xMid = (xMid - z.positionX) / z.scaleX;
 			yMid = (yMid - z.positionY) / z.scaleY;
 			box_width = width_unscaled / z.scaleX;
