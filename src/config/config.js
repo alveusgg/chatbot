@@ -234,7 +234,7 @@ const commandPermissionsCamera = {
     commandSuperUsers: ["testsupercamera", "ptzcontrol", "ptzoverride", "ptzclear"],
     commandMods: ["testmodcamera", "ptztracking", "ptzirlight", "ptzwake"],
     commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
-                     "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick",
+                     "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick", "ptzdraw",
                      "ptzspeed", "ptzspin"],
     commandVips: ["ptzhome", "ptzpreset", "ptzzoom", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus"],
     commandUsers: []
