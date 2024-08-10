@@ -557,27 +557,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	let arg3 = messageArgs[3] ?? "";
 	let arg4 = messageArgs[4] ?? "";
 	let arg5 = messageArgs[5] ?? "";
-
-	const zones = Object.values(config. scenePositions["6boxbig"]);
-
-	// These should be set dynamically from a video source, that information probably exists 
-	const width = 1920
-	const height = 1080
-
-
-	function findZone(xIn, yIn) {
-		z = undefined;
-		zone = -1;
-		for (let i = 0; i < zones.length; i++) {
-			z = zones[i];
-			if ((xIn >= z.positionX && xIn < z.positionX + z.width) && (yIn >= z.positionY && yIn < z.positionY + z.height)) {
-				zone = i; // Assuming zones are 1-based index
-				break;
-			}
-		}
-		return [z, zone];
-	}
-	
 	
 	let specificCamera = "";
 	let ptzcamName = helper.cleanName(arg1);
@@ -755,83 +734,44 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.enableAutoFocus();
 			break;
 		case "ptzclick":
-			//x-cord y-cord zoom 
-			x_unscaled = arg1
-			y_unscaled = arg2
-			zoom = arg3 == ""? 0 : arg3;
-			
-			zoneInfo = findZone(x_unscaled, y_unscaled);
-			z = zoneInfo[0];
-			zone = zoneInfo[1];
-
-			// if invalid coordinates are given and no match was found, don't bother continuing
-			if (zone == undefined) {
-				return false
-			}
-
-			x = (x_unscaled - z.positionX) / z.scaleX;
-			y = (y_unscaled - z.positionY) / z.scaleY;
-
-			camName = currentCamList[zone]
-			// if there's no cam in the slot, return false
-			if (camName == undefined) {
-				return false
-			}
-			
-			ptzcamName = helper.cleanName(camName);
-			baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
-			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
-
-			camera = controller.connections.cameras[ptzcamName]
-
-			camera.ptz({ areazoom: `${Math.round(x)},${Math.round(y)},${Math.round(zoom)}` });
-			camera.enableAutoFocus();
-			controller.connections.twitch.send(channel, `Clicked on ${ptzcamName}`);
-			break;
+                        // Use x and y coordinates to find the camera box the click occured in
+                        let xcord = parseInt(arg1, 10);
+                        let ycord = parseInt(arg2, 10);
+                        const clickbox = findBox(xcord, ycord);
+                        // Set the camera
+                        camera = controller.connections.cameras[clickbox.ptzcamName];
+                        await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(clickbox.zoom)}` });
+                        await camera.enableAutoFocus();
+                        controller.connections.twitch.send(controller, channel, `Clicked on ${ptzcamName}`);
+                        break;
 		case "ptzdraw":
-			x_unscaled = arg1;
-			y_unscaled = arg2;
-			width_unscaled = arg3;
-			height_unscaled = arg4;
-	
-			// We want to use the center of the box, rather than the corner
-			xMid = x_unscaled + (width_unscaled / 2);
-			yMid = y_unscaled + (height_unscaled / 2);
-	
-			zoneInfo = findZone(xMid, yMid);
-			z = zoneInfo[0];
-			zone = zoneInfo[1];
-	
-			if (zone == undefined) {
-				return false
-			}
+                        // assign user inputs as integers.
+                        let source_x = parseInt(arg1, 10);
+                        let source_y = parseInt(arg2, 10); 
+                        let source_rectwidth = parseInt(arg3, 10);
+                        let source_rectheight = parseInt(arg4, 10);
+                                
+                        // calculate the x and y coordinates for the center of the rectangle.
+                        let xdrawcord = source_x + source_rectwidth / 2;
+                        let ydrawcord = source_y + source_rectheight / 2;
+                        
+                        // call findBox to determine which box the rectangle is in and assign the relevant camera.
+                        const drawbox = findBox(xdrawcord, ydrawcord);
+                        
+                        //scale the rectangle to 1920x1080
+                        let scaledRectWidth = source_rectwidth / drawbox.scaleX;
+                        let scaledRectHeight = source_rectheight / drawbox.scaleY;
 
-			xMid = (xMid - z.positionX) / z.scaleX;
-			yMid = (yMid - z.positionY) / z.scaleY;
-			box_width = width_unscaled / z.scaleX;
-			box_height = height_unscaled / z.scaleY;
-	
-			zoomWidth = width / box_width 
-			zoomHeight = height / box_height 
-			zoom = Math.min(zoomWidth, zoomHeight) * 100;
+                        let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
+                        let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
+                        let zoom = Math.floor(Math.min(zoomWidth, zoomHeight) * 100);
 
-
-			camName = currentCamList[zone]
-			// if there's no cam in the slot, return false
-			if (camName == undefined) {
-				return false
-			}
-			
-			ptzcamName = helper.cleanName(camName);
-			baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
-			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
-
-			camera = controller.connections.cameras[ptzcamName]
-
-			camera.ptz({ areazoom: `${Math.round(xMid)},${Math.round(yMid)},${Math.round(zoom)}` });
-			camera.enableAutoFocus();
-			controller.connections.twitch.send(channel, `Drawn on ${ptzcamName}`);
-			break;
+                        // Set the camera
+                        camera = controller.connections.cameras[drawbox.ptzcamName];
+                        await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
+                        await camera.enableAutoFocus();
+                        controller.connections.twitch.send(controller, channel, `Clicked on ${ptzcamName}`);
+                        break;
 		case "ptzset":
 			//pan tilt zoom relative pos
 			camera.ptz({ rpan: arg1, rtilt: arg2, rzoom: arg3 * 100, autofocus: "on" });
@@ -1129,6 +1069,102 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			return false;
 	}
 	return true;
+
+       function findBox(xcord, ycord) {
+                        let camLayout = controller.connections.database["customcamscommand"];
+                        let sceneLayout;
+                
+                        if (currentCamList.length >= 5) {
+                                sceneLayout = "6boxbig";
+                        } else if (currentCamList.length >= 4) {
+                                sceneLayout = "4boxbig";
+                        } else if (currentCamList.length >= 3) {
+                                sceneLayout = "3boxbig";
+                        } else if (currentCamList.length >= 2) {
+                                sceneLayout = "2boxbig";
+                        } else if (currentCamList.length >= 2 && camLayout == "customcamstl") {
+                                sceneLayout = "2boxtl";
+                        } else if (currentCamList.length >= 2 && camLayout == "customcamstr") {
+                                sceneLayout = "2boxtr";
+                        } else if (currentCamList.length >= 2 && camLayout == "customcamsbl") {
+                                sceneLayout = "2boxbl";
+                        } else if (currentCamList.length >= 2 && camLayout == "customcamsbr") {
+                                sceneLayout = "2boxbr";
+                        } else if (currentCamList.length >= 1) {
+                                sceneLayout = "1box";
+                        }
+                        // Use the configuration data to determine zones
+                        const zones = Object.values(config.scenePositions[sceneLayout]);
+                        x_unscaled = xcord
+                        y_unscaled = ycord
+                        zoom = arg3
+                        // Initialize zone to -1
+                        let zone = -1;
+                        let x = 960;
+                        let y = 540;
+                        let sourceWidth;
+                        let sourceHeight;
+                        let scaleX;
+                        let scaleY;
+                        // Determine the zone and scaled coordinates
+                        for (let i = 0; i < zones.length; i++) {
+                                const z = zones[i];
+                                if (x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width &&
+                                        y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
+                                        zone = i; // Use 0-based index for zones
+                                        x = (x_unscaled - z.positionX) / z.scaleX;
+                                        y = (y_unscaled - z.positionY) / z.scaleY;
+                                        sourceWidth = z.sourceWidth;
+                                        sourceHeight = z.sourceHeight;
+                                        scaleX = z.scaleX
+                                        scaleY = z.scaleY
+                                        break;
+                                }
+                        }
+
+                        // If invalid coordinates or no matching zone, return false
+                        if (zone === -1) {
+                                return false;
+                        }
+
+                        // Determine camera name using 0-based index
+                        camName = currentCamList[zone];
+                        if (camName === undefined) {
+                                return false;
+                        }
+
+                        ptzcamName = helper.cleanName(camName);
+                        baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+                        ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+
+                        // Check if camName contains "multi" and find the parent scene if it does
+                        if (ptzcamName.includes("multi")) {
+                                let parentScene = "";
+                                // Iterate through the multiScenes to find the parent scene
+                                for (let multiScene in config.multiScenes) {
+                                        let sceneList = config.multiScenes[multiScene];
+
+                                        for (let i = 0; i < sceneList.length; i++) {
+                                                let sceneName = sceneList[i] || "";
+                                                sceneName = helper.cleanName(sceneName);
+                                                if (ptzcamName == sceneName) {
+                                                        // Found match
+                                                        parentScene = multiScene;
+                                                        break;
+                                                }
+                                        }
+                                        // Exit outer loop if parentScene is found
+                                        if (parentScene != "") {
+                                                break;
+                                        }
+                                }
+                                // Set camName to parentScene if a match was found
+                                if (parentScene != "") {
+                                        ptzcamName = parentScene;
+                                }
+                        }
+                        return {x, y, zoom, sourceWidth, sourceHeight, scaleX, scaleY,  ptzcamName};
+        }  
 }
 
 async function checkNuthouseCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
