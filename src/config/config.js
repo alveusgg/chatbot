@@ -22,11 +22,14 @@ let userPermissions = {
                         "lindsay_alveus", "strickknine","tarantulizer","SpiderdayNightLive","srutiloops"],
     commandMods: ["mods"],
     commandOperator: ["96allskills", "stolenarmy_", "berlac", "knayte_", "dansza", "loganrx_", "merger3", "nitelitedf", 
-                    "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1"],
-    commandVips: ["vips", "tfries_", "sivvii_", "ghandii_", "axialmars", "wolfone_", "dohregard",
-        "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","MadCharlieKelly",
-        "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "lakel1", "user_11_11", "huniebeeXD","kurtyykins",
-        "breacherman", "bryceisrightjr","sumaxu","mariemellie","darkrow_","ewok_626","quokka64","minipurrl"],
+                    "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
+                    "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl"],
+    commandVips: ["vips", "tfries_", "sivvii_", "ghandii_", "axialmars",
+        "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","madcharliekelly",
+        "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeeXD","kurtyykins",
+        "breacherman", "bryceisrightjr","sumaxu","mariemellie","ewok_626","quokka64",
+        "casualruffian","likethecheesebri","viphippo","bagel_deficient","otsargh","just_some_donkus","fiveacross",
+        "itszalndrin","nicoleeverleigh","hunnybeehelen","fishymeep"],
     commandUsers: ["subs"]
 }
 
