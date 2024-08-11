@@ -679,7 +679,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -687,7 +687,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         }
     },
     "2box": {
@@ -760,7 +760,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -768,7 +768,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topleft
             cropBottom: 0,
@@ -792,7 +792,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -800,7 +800,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topright
             cropBottom: 0,
@@ -824,7 +824,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -832,7 +832,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topright
             cropBottom: 0,
@@ -856,7 +856,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -864,7 +864,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //bottomright
             cropBottom: 0,
