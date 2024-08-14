@@ -733,6 +733,11 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
 			camera.enableAutoFocus();
 			break;
+		case "getcam":
+						let xCord = parseInt(arg1, 10);
+						let yCord = parseInt(arg2, 10);
+						const clickedcam = findBox(xCord, yCord);
+						controller.connections.twitch.send(controller, channel, `${clickedcam.ptzcamName}`);
 		case "ptzclick":
                         // Use x and y coordinates to find the camera box the click occured in
                         let xcord = parseInt(arg1, 10);
@@ -742,7 +747,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                         camera = controller.connections.cameras[clickbox.ptzcamName];
                         await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(clickbox.zoom)}` });
                         await camera.enableAutoFocus();
-                        controller.connections.twitch.send(controller, channel, `Clicked on ${ptzcamName}`);
+                        controller.connections.twitch.send(controller, channel, `Clicked on ${clickbox.ptzcamName}`);
                         break;
 		case "ptzdraw":
                         // assign user inputs as integers.
@@ -770,7 +775,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                         camera = controller.connections.cameras[drawbox.ptzcamName];
                         await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
                         await camera.enableAutoFocus();
-                        controller.connections.twitch.send(controller, channel, `Clicked on ${ptzcamName}`);
+                        controller.connections.twitch.send(controller, channel, `Clicked on ${drawbox.ptzcamName}`);
                         break;
 		case "ptzset":
 			//pan tilt zoom relative pos
@@ -1633,10 +1638,6 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			}
 			break;
 		case "scenecams":
-			if (currentScene != "custom") {
-				return false;
-			}
-
 			let output = "";
 			if (arg1 == "json") {
 				output = JSON.stringify(currentCamList);
@@ -1648,7 +1649,10 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				output = JSON.stringify(jsonobj);
 			} else {
 				for (let i = 0; i < currentCamList.length; i++) {
-					output = `${output}${i + 1}: ${currentCamList[i]}`;
+					ptzcamName = helper.cleanName(currentCamList[i]);
+					baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+					ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+					output = `${output}${i + 1}: ${ptzcamName}`;
 					if (i != currentCamList.length - 1) {
 						output = `${output}, `;
 					}
