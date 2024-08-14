@@ -530,6 +530,7 @@ userBlacklist.forEach(user => {
 
 for (const permission of userPermissions.commandPriority) {
     userPermissions[permission].forEach(user => {
+        if (typeof user === "symbol") return;
         user = user.toLowerCase().trim();
     });
 }
