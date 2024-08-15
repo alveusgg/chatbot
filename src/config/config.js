@@ -243,7 +243,7 @@ const commandPermissionsCamera = {
     commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
                      "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick", "ptzdraw",
                      "ptzspeed", "ptzspin"],
-    commandVips: ["ptzhome", "ptzpreset", "ptzzoom", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "getcam"],
+    commandVips: ["ptzhome", "ptzpreset", "ptzzoom", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "ptzgetcam"],
     commandUsers: []
 }
 //timeRestrictedCommands = timeRestrictedCommands.concat(["ptzclear"]);
