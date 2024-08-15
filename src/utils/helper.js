@@ -35,13 +35,13 @@ function isAllowed(userCommand,userProfile){
                     let userRank = getUserRank(userProfile);
                     if (config.userPermissions[priority].includes(userProfile.userName.toLowerCase())){
                         return {allowed:true,accessLevel:priority};
-                    } else if (config.userPermissions[priority].includes("mods") && userRank >= 4){
+                    } else if (config.userPermissions[priority].includes(config.userRanks.mods) && userRank >= 4){
                         return {allowed:true,accessLevel:priority};
-                    } else if (config.userPermissions[priority].includes("vips") && userRank >= 3){
+                    } else if (config.userPermissions[priority].includes(config.userRanks.vips) && userRank >= 3){
                         return {allowed:true,accessLevel:priority};
-                    } else if (config.userPermissions[priority].includes("subs") && userRank >= 2){
+                    } else if (config.userPermissions[priority].includes(config.userRanks.subs) && userRank >= 2){
                         return {allowed:true,accessLevel:priority};
-                    } else if (config.userPermissions[priority].includes("all")){
+                    } else if (config.userPermissions[priority].includes(config.userRanks.all)){
                         return {allowed:true,accessLevel:priority};
                     } 
                     if (priority == permission){

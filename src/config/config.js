@@ -15,22 +15,29 @@ const notifyHours = {start:14,end:23};
 const restrictedHours = {start:14,end:23};
 const globalMusicSource = "Music Playlist Global";
 
+const userRanks = {
+    mods: Symbol("mods"),
+    vips: Symbol("vips"),
+    subs: Symbol("subs"),
+    all: Symbol("all"),
+}
+
 let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
-    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannyDV", "maxzillaJr", "illjx", "kayla_alveus", "alex_b_patrick", 
-                        "lindsay_alveus", "strickknine","tarantulizer","SpiderdayNightLive","srutiloops"],
-    commandMods: ["mods"],
-    commandOperator: ["96allskills", "stolenarmy_", "berlac", "knayte_", "dansza", "loganrx_", "merger3", "nitelitedf", 
+    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick", 
+                        "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology"],
+    commandMods: [userRanks.mods],
+    commandOperator: ["96allskills", "stolenarmy_", "berlac", "dansza", "loganrx_", "merger3", "nitelitedf", 
                     "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
                     "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl"],
-    commandVips: ["vips", "tfries_", "sivvii_", "ghandii_", "axialmars",
+    commandVips: [userRanks.vips, "tfries_", "sivvii_", "ghandii_", "axialmars",
         "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","madcharliekelly",
         "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeeXD","kurtyykins",
         "breacherman", "bryceisrightjr","sumaxu","mariemellie","ewok_626","quokka64",
         "casualruffian","likethecheesebri","viphippo","bagel_deficient","otsargh","just_some_donkus","fiveacross",
         "itszalndrin","nicoleeverleigh","hunnybeehelen","fishymeep"],
-    commandUsers: ["subs"]
+    commandUsers: [userRanks.subs]
 }
 
 let userBlacklist = ["RestreamBot"];
@@ -523,6 +530,7 @@ userBlacklist.forEach(user => {
 
 for (const permission of userPermissions.commandPriority) {
     userPermissions[permission].forEach(user => {
+        if (typeof user === "symbol") return;
         user = user.toLowerCase().trim();
     });
 }
@@ -679,7 +687,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -687,7 +695,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         }
     },
     "2box": {
@@ -760,7 +768,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -768,7 +776,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topleft
             cropBottom: 0,
@@ -792,7 +800,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -800,7 +808,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topright
             cropBottom: 0,
@@ -824,7 +832,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -832,7 +840,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topright
             cropBottom: 0,
@@ -856,7 +864,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -864,7 +872,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //bottomright
             cropBottom: 0,
@@ -1197,6 +1205,7 @@ const scenePositions = {
 module.exports = {
     commandPrefix,
     ptzPrefix,
+    userRanks,
     userPermissions,
     commandPermissions,
     commandAlias,

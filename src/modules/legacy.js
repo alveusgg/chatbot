@@ -1098,15 +1098,19 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
        function findBox(xcord, ycord) {
                         let camLayout = controller.connections.database["customcamscommand"];
                         let sceneLayout;
-                
-                        if (currentCamList.length >= 5) {
+
+			 if (currentCamList.length >= 5 && camLayout == "customcamsbig") {
                                 sceneLayout = "6boxbig";
-                        } else if (currentCamList.length >= 4) {
+                        } else if (currentCamList.length >= 4 && camLayout == "customcams") {
+                                sceneLayout = "4box";
+                        } else if (currentCamList.length >= 4 && camLayout == "customcamsbig") {
                                 sceneLayout = "4boxbig";
-                        } else if (currentCamList.length >= 3) {
+                        } else if (currentCamList.length >= 3 && camLayout == "customcams") {
+                                sceneLayout = "3box";
+                        } else if (currentCamList.length >= 3 && camLayout == "customcamsbig") {
                                 sceneLayout = "3boxbig";
-                        } else if (currentCamList.length >= 2) {
-                                sceneLayout = "2boxbig";
+                        } else if (currentCamList.length >= 2 && camLayout == "customcamsbig") {
+                                sceneLayout = "2boxbig"; 
                         } else if (currentCamList.length >= 2 && camLayout == "customcamstl") {
                                 sceneLayout = "2boxtl";
                         } else if (currentCamList.length >= 2 && camLayout == "customcamstr") {
@@ -1115,9 +1119,11 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                                 sceneLayout = "2boxbl";
                         } else if (currentCamList.length >= 2 && camLayout == "customcamsbr") {
                                 sceneLayout = "2boxbr";
-                        } else if (currentCamList.length >= 1) {
+                        } else if (currentCamList.length >= 1 && camLayout == "customcamsbig") {
                                 sceneLayout = "1box";
                         }
+                
+
                         // Use the configuration data to determine zones
                         const zones = Object.values(config.scenePositions[sceneLayout]);
                         x_unscaled = xcord
@@ -1131,20 +1137,51 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                         let sourceHeight;
                         let scaleX;
                         let scaleY;
+
+			
                         // Determine the zone and scaled coordinates
-                        for (let i = 0; i < zones.length; i++) {
-                                const z = zones[i];
+                        if (sceneLayout === "2boxtl" || sceneLayout === "2boxtr" ||
+                            sceneLayout === "2boxbl" || sceneLayout === "2boxbr") {
+
+                            // Define the zones with PiP prioritized
+                            const zones = [
+                                { ...config.scenePositions[sceneLayout][2], index: 2 }, // PiP (zone2)
+                                { ...config.scenePositions[sceneLayout][1], index: 1 }  // Main (zone1)
+                            ];
+
+                            // Check if the click is within any of the zones
+                            for (const z of zones) {
                                 if (x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width &&
-                                        y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
-                                        zone = i; // Use 0-based index for zones
-                                        x = (x_unscaled - z.positionX) / z.scaleX;
-                                        y = (y_unscaled - z.positionY) / z.scaleY;
-                                        sourceWidth = z.sourceWidth;
-                                        sourceHeight = z.sourceHeight;
-                                        scaleX = z.scaleX
-                                        scaleY = z.scaleY
-                                        break;
+                                    y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
+
+                                    // Click is within this zone
+                                    zone = z.index - 1; // Use the zone index (1 for fullscreen, 2 for PiP)
+                                    x = (x_unscaled - z.positionX) / z.scaleX;
+                                    y = (y_unscaled - z.positionY) / z.scaleY;
+                                    sourceWidth = z.sourceWidth;
+                                    sourceHeight = z.sourceHeight;
+                                    scaleX = z.scaleX;
+                                    scaleY = z.scaleY;
+                                    logger.log("pip zone hit number:", zone);
+                                    break;
                                 }
+                            }
+                        } else {
+			     for (let i = 0; i < zones.length; i++) {
+                                const z = zones[i];
+
+                                if (x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width &&
+                                    y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
+                                    zone = i; // Use 0-based index for zones
+                                    x = (x_unscaled - z.positionX) / z.scaleX;
+                                    y = (y_unscaled - z.positionY) / z.scaleY;
+                                    sourceWidth = z.sourceWidth;
+                                    sourceHeight = z.sourceHeight;
+                                    scaleX = z.scaleX
+                                    scaleY = z.scaleY
+                                    break;
+                                }
+                            }
                         }
 
                         // If invalid coordinates or no matching zone, return false
