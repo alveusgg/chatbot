@@ -25,10 +25,10 @@ const userRanks = {
 let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
-    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannyDV", "maxzillaJr", "illjx", "kayla_alveus", "alex_b_patrick", 
-                        "lindsay_alveus", "strickknine","tarantulizer","SpiderdayNightLive","srutiloops"],
+    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick", 
+                        "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology"],
     commandMods: [userRanks.mods],
-    commandOperator: ["96allskills", "stolenarmy_", "berlac", "knayte_", "dansza", "loganrx_", "merger3", "nitelitedf", 
+    commandOperator: ["96allskills", "stolenarmy_", "berlac", "dansza", "loganrx_", "merger3", "nitelitedf", 
                     "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
                     "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl"],
     commandVips: [userRanks.vips, "tfries_", "sivvii_", "ghandii_", "axialmars",
@@ -687,7 +687,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -695,7 +695,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         }
     },
     "2box": {
@@ -768,7 +768,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -776,7 +776,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topleft
             cropBottom: 0,
@@ -800,7 +800,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -808,7 +808,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topright
             cropBottom: 0,
@@ -832,7 +832,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -840,7 +840,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //topright
             cropBottom: 0,
@@ -864,7 +864,7 @@ const scenePositions = {
             cropLeft: 0,
             cropRight: 0,
             cropTop: 0,
-            height: 1920,
+            height: 1080,
             positionX: 0,
             positionY: 0,
             rotation: 0,
@@ -872,7 +872,7 @@ const scenePositions = {
             scaleY: 1,
             sourceHeight: 1080,
             sourceWidth: 1920,
-            width: 1080
+            width: 1920
         },
         2: { //bottomright
             cropBottom: 0,
