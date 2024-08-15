@@ -734,10 +734,18 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.enableAutoFocus();
 			break;
 		case "getcam":
-						let xCord = parseInt(arg1, 10);
-						let yCord = parseInt(arg2, 10);
-						const clickedcam = findBox(xCord, yCord);
-						controller.connections.twitch.send(controller, channel, `${clickedcam.ptzcamName}`);
+			let xCord = parseInt(arg1, 10);
+			let yCord = parseInt(arg2, 10);
+			let clickedCam = findBox(xCord, yCord);
+			let strOutput;
+			if (arg3 == "json") {
+				let camObj = {cam: clickedCam.ptzcamName};
+				strOutput = JSON.stringify(camObj);
+			} else {
+				strOutput = clickedCam.ptzcamName;
+			}
+						
+			controller.connections.twitch.send(controller, channel, strOutput);
 		case "ptzclick":
                         // Use x and y coordinates to find the camera box the click occured in
                         let xcord = parseInt(arg1, 10);
@@ -1642,7 +1650,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			if (arg1 == "json") {
 				output = JSON.stringify(currentCamList);
 			} else if (arg1 == "jsonmap") {
-				const jsonobj = {};
+				let jsonobj = {};
 				for (let i = 0; i < currentCamList.length; i++) {
 					jsonobj[i + 1] = currentCamList[i];
 				}
