@@ -777,7 +777,19 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 
                         let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
                         let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
-                        let zoom = Math.floor(Math.min(zoomWidth, zoomHeight) * 100);
+						
+                        let zoom = Math.floor(Math.min(zoomWidth, zoomHeight));
+						// Optional argument that will cause zoom to be reduced at high zoom levels
+						if (arg5 != "") {
+							let cutOff = parseFloat(arg4, 10);
+							if (zoom < cutOff) {
+								zoom = zoom * 75;
+							} else {
+								zoom = zoom * 100;
+							}
+						} else {
+							zoom = zoom * 100;
+						}
 
                         // Set the camera
                         camera = controller.connections.cameras[drawbox.ptzcamName];
