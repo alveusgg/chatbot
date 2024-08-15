@@ -733,6 +733,19 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
 			camera.enableAutoFocus();
 			break;
+		case "getcam":
+			let xCord = parseInt(arg1, 10);
+			let yCord = parseInt(arg2, 10);
+			let clickedCam = findBox(xCord, yCord);
+			let strOutput;
+			if (arg3 == "json") {
+				let camObj = {cam: clickedCam.ptzcamName};
+				strOutput = JSON.stringify(camObj);
+			} else {
+				strOutput = clickedCam.ptzcamName;
+			}
+						
+			controller.connections.twitch.send(channel, strOutput);
 		case "ptzclick":
                         // Use x and y coordinates to find the camera box the click occured in
                         let xcord = parseInt(arg1, 10);
@@ -742,7 +755,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                         camera = controller.connections.cameras[clickbox.ptzcamName];
                         await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(clickbox.zoom)}` });
                         await camera.enableAutoFocus();
-                        controller.connections.twitch.send(channel, `Clicked on ${ptzcamName}`);
+                        controller.connections.twitch.send(channel, `Clicked on ${clickbox.ptzcamName}`);
                         break;
 		case "ptzdraw":
                         // assign user inputs as integers.
@@ -764,13 +777,25 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 
                         let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
                         let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
-                        let zoom = Math.floor(Math.min(zoomWidth, zoomHeight) * 100);
+						
+                        let zoom = Math.floor(Math.min(zoomWidth, zoomHeight));
+						// Optional argument that will cause zoom to be reduced at high zoom levels
+						if (arg5 != "") {
+							let cutOff = parseFloat(arg4, 10);
+							if (zoom < cutOff) {
+								zoom = zoom * 75;
+							} else {
+								zoom = zoom * 100;
+							}
+						} else {
+							zoom = zoom * 100;
+						}
 
                         // Set the camera
                         camera = controller.connections.cameras[drawbox.ptzcamName];
                         await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
                         await camera.enableAutoFocus();
-                        controller.connections.twitch.send(channel, `Clicked on ${ptzcamName}`);
+                        controller.connections.twitch.send(channel, `Clicked on ${drawbox.ptzcamName}`);
                         break;
 		case "ptzset":
 			//pan tilt zoom relative pos
@@ -1670,22 +1695,21 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			}
 			break;
 		case "scenecams":
-			if (currentScene != "custom") {
-				return false;
-			}
-
 			let output = "";
 			if (arg1 == "json") {
 				output = JSON.stringify(currentCamList);
 			} else if (arg1 == "jsonmap") {
-				const jsonobj = {};
+				let jsonobj = {};
 				for (let i = 0; i < currentCamList.length; i++) {
 					jsonobj[i + 1] = currentCamList[i];
 				}
 				output = JSON.stringify(jsonobj);
 			} else {
 				for (let i = 0; i < currentCamList.length; i++) {
-					output = `${output}${i + 1}: ${currentCamList[i]}`;
+					ptzcamName = helper.cleanName(currentCamList[i]);
+					baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+					ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+					output = `${output}${i + 1}: ${ptzcamName}`;
 					if (i != currentCamList.length - 1) {
 						output = `${output}, `;
 					}

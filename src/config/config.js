@@ -203,8 +203,8 @@ const axisCameraCommandMapping = {
     "parrot":"parrot", 
     "wolf":"wolf", 
     "wolfcam2":"wolfcorner", 
-    "wolfcam3":"wolfden", 
-    "wolfcam4":"wolfden2", 
+    "wolfcam3":"wolfden2", 
+    "wolfcam4":"wolfden", 
     "wolfcam5":"wolfindoor", 
     "wolfcam6":"wolf",
     "wolfcam7":"wolf",
@@ -243,7 +243,7 @@ const commandPermissionsCamera = {
     commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
                      "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick", "ptzdraw",
                      "ptzspeed", "ptzspin"],
-    commandVips: ["ptzhome", "ptzpreset", "ptzzoom", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus"],
+    commandVips: ["ptzhome", "ptzpreset", "ptzzoom", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "getcam"],
     commandUsers: []
 }
 //timeRestrictedCommands = timeRestrictedCommands.concat(["ptzclear"]);
