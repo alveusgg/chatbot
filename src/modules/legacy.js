@@ -745,7 +745,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				strOutput = clickedCam.ptzcamName;
 			}
 						
-			controller.connections.twitch.send(controller, channel, strOutput);
+			controller.connections.twitch.send(channel, strOutput);
 		case "ptzclick":
                         // Use x and y coordinates to find the camera box the click occured in
                         let xcord = parseInt(arg1, 10);
@@ -755,7 +755,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                         camera = controller.connections.cameras[clickbox.ptzcamName];
                         await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(clickbox.zoom)}` });
                         await camera.enableAutoFocus();
-                        controller.connections.twitch.send(controller, channel, `Clicked on ${clickbox.ptzcamName}`);
+                        controller.connections.twitch.send(channel, `Clicked on ${clickbox.ptzcamName}`);
                         break;
 		case "ptzdraw":
                         // assign user inputs as integers.
@@ -783,7 +783,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                         camera = controller.connections.cameras[drawbox.ptzcamName];
                         await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
                         await camera.enableAutoFocus();
-                        controller.connections.twitch.send(controller, channel, `Clicked on ${drawbox.ptzcamName}`);
+                        controller.connections.twitch.send(channel, `Clicked on ${drawbox.ptzcamName}`);
                         break;
 		case "ptzset":
 			//pan tilt zoom relative pos
