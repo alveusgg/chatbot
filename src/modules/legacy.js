@@ -733,7 +733,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
 			camera.enableAutoFocus();
 			break;
-		case "getcam":
+		case "ptzgetcam":
 			let xCord = parseInt(arg1, 10);
 			let yCord = parseInt(arg2, 10);
 			let clickedCam = findBox(xCord, yCord);
