@@ -746,57 +746,58 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			}
 						
 			controller.connections.twitch.send(channel, strOutput);
+			break;
 		case "ptzclick":
-                        // Use x and y coordinates to find the camera box the click occured in
-                        let xcord = parseInt(arg1, 10);
-                        let ycord = parseInt(arg2, 10);
-                        const clickbox = findBox(xcord, ycord);
-                        // Set the camera
-                        camera = controller.connections.cameras[clickbox.ptzcamName];
-                        await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(clickbox.zoom)}` });
-                        await camera.enableAutoFocus();
-                        controller.connections.twitch.send(channel, `Clicked on ${clickbox.ptzcamName}`);
-                        break;
+			// Use x and y coordinates to find the camera box the click occured in
+			let xcord = parseInt(arg1, 10);
+			let ycord = parseInt(arg2, 10);
+			const clickbox = findBox(xcord, ycord);
+			// Set the camera
+			camera = controller.connections.cameras[clickbox.ptzcamName];
+			await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(clickbox.zoom)}` });
+			await camera.enableAutoFocus();
+			controller.connections.twitch.send(channel, `Clicked on ${clickbox.ptzcamName}`);
+			break;
 		case "ptzdraw":
-                        // assign user inputs as integers.
-                        let source_x = parseInt(arg1, 10);
-                        let source_y = parseInt(arg2, 10); 
-                        let source_rectwidth = parseInt(arg3, 10);
-                        let source_rectheight = parseInt(arg4, 10);
-                                
-                        // calculate the x and y coordinates for the center of the rectangle.
-                        let xdrawcord = source_x + source_rectwidth / 2;
-                        let ydrawcord = source_y + source_rectheight / 2;
-                        
-                        // call findBox to determine which box the rectangle is in and assign the relevant camera.
-                        const drawbox = findBox(xdrawcord, ydrawcord);
-                        
-                        //scale the rectangle to 1920x1080
-                        let scaledRectWidth = source_rectwidth / drawbox.scaleX;
-                        let scaledRectHeight = source_rectheight / drawbox.scaleY;
+			// assign user inputs as integers.
+			let source_x = parseInt(arg1, 10);
+			let source_y = parseInt(arg2, 10); 
+			let source_rectwidth = parseInt(arg3, 10);
+			let source_rectheight = parseInt(arg4, 10);
+					
+			// calculate the x and y coordinates for the center of the rectangle.
+			let xdrawcord = source_x + source_rectwidth / 2;
+			let ydrawcord = source_y + source_rectheight / 2;
+			
+			// call findBox to determine which box the rectangle is in and assign the relevant camera.
+			const drawbox = findBox(xdrawcord, ydrawcord);
+			
+			//scale the rectangle to 1920x1080
+			let scaledRectWidth = source_rectwidth / drawbox.scaleX;
+			let scaledRectHeight = source_rectheight / drawbox.scaleY;
 
-                        let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
-                        let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
-						
-                        let zoom = Math.floor(Math.min(zoomWidth, zoomHeight));
-						// Optional argument that will cause zoom to be reduced at high zoom levels
-						if (arg5 != "") {
-							let cutOff = parseFloat(arg4, 10);
-							if (zoom < cutOff) {
-								zoom = zoom * 75;
-							} else {
-								zoom = zoom * 100;
-							}
-						} else {
-							zoom = zoom * 100;
-						}
+			let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
+			let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
+			
+			let zoom = Math.floor(Math.min(zoomWidth, zoomHeight));
+			// Optional argument that will cause zoom to be reduced at high zoom levels
+			if (arg5 != "") {
+				let cutOff = parseFloat(arg4, 10);
+				if (zoom < cutOff) {
+					zoom = zoom * 75;
+				} else {
+					zoom = zoom * 100;
+				}
+			} else {
+				zoom = zoom * 100;
+			}
 
-                        // Set the camera
-                        camera = controller.connections.cameras[drawbox.ptzcamName];
-                        await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
-                        await camera.enableAutoFocus();
-                        controller.connections.twitch.send(channel, `Clicked on ${drawbox.ptzcamName}`);
-                        break;
+			// Set the camera
+			camera = controller.connections.cameras[drawbox.ptzcamName];
+			await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
+			await camera.enableAutoFocus();
+			controller.connections.twitch.send(channel, `Clicked on ${drawbox.ptzcamName}`);
+			break;
 		case "ptzset":
 			//pan tilt zoom relative pos
 			camera.ptz({ rpan: arg1, rtilt: arg2, rzoom: arg3 * 100, autofocus: "on" });
