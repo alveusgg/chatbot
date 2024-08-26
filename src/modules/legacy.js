@@ -665,6 +665,10 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.zoomCamera(zscaledAmount);
 			camera.enableAutoFocus();
 			break;
+		case "ptzzoomr":
+			camera.ptz({ areazoom: `960,540,${arg1}` });
+			camera.enableAutoFocus();
+			break;
 		case "ptzfocus":
 			if (arg1 == "on" || arg1 == "yes") {
 				camera.enableAutoFocus();
