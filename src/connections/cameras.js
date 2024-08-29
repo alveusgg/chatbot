@@ -273,15 +273,28 @@ class Axis {
   }
 
   /**
+   * Enable a continuous focus motion
+   *
+   * Set the focus speed to 0 to stop
+   *
+   * @param {number} focus Focus speed (-100 to 100)
+   * @returns {Promise<boolean>}
+   */
+  async continuousFocus(focus) {
+    return this.ptz({ continuousfocusmove: `${focus}` });
+  }
+
+  /**
    * Enable a continuous pan/tilt movement
    *
    * Set the pan/tilt speed to 0 to stop
    *
    * @param {number} pan Pan speed (-100 to 100)
    * @param {number} tilt Tilt speed (-100 to 100)
+   * @param {number} zoom Zoom speed (-100 to 100)
    * @returns {Promise<boolean>}
    */
-  async continousPanTilt(pan, tilt, zoom) {
+  async continuousPanTilt(pan, tilt, zoom) {
     return this.ptz({ continuouspantiltmove: `${pan},${tilt}`, continuouszoommove: `${zoom}` });
   }
 

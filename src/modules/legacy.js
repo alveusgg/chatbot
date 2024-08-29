@@ -690,6 +690,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				camera.focusCamera(fscaledAmount);
 			}
 			break;
+		case "ptzcfocus":
+			camera.continuousFocus(arg1);
+			break;
 		case "ptzautofocus":
 			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
 				camera.enableAutoFocus();
@@ -860,10 +863,10 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			}
 			break;
 		case "ptzspin":
-			camera.continousPanTilt(arg1, arg2, arg3);
+			camera.continuousPanTilt(arg1, arg2, arg3);
 			break;
 		case "ptzstop":
-			camera.continousPanTilt(0, 0);
+			camera.continuousPanTilt(0, 0, 0);
 			break;
 		case "ptzdry":
 			camera.speedDry();
