@@ -1480,6 +1480,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "resetcam":
 			let camname = arg1Clean;
 			//remove possible cam wording
+			camname  = customCommandAlias[camname] || camname; // allow for cam name aliases
 			camname = "fullcam " + camname;
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, camname);
 			break;
