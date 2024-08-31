@@ -670,27 +670,29 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.enableAutoFocus();
 			break;
 		case "ptzfocus":
-			if (arg1 == "on" || arg1 == "yes") {
+			if (Number(arg1) >= 1 && Number(arg1) <= 9999) {
+				camera.focusCameraExact(arg1);
+			} else if (arg1 == "on" || arg1 == "yes") {
 				camera.enableAutoFocus();
 			} else if (arg1 == "off" || arg1 == "no") {
 				camera.disableAutoFocus();
-			} else {
-				let fscaledAmount = arg1 * 50 || 0;
-				camera.focusCameraExact(fscaledAmount);
 			}
 			break;
 		case "ptzfocusr":
-			if (arg1 == "on" || arg1 == "yes") {
+			if (Number(arg1) >= -9999 && Number(arg1) <= 9999) {
+				camera.focusCamera(arg1);
+			} else if (arg1 == "on" || arg1 == "yes") {
 				camera.enableAutoFocus();
 			} else if (arg1 == "off" || arg1 == "no") {
 				camera.disableAutoFocus();
-			} else {
-				let fscaledAmount = arg1 * 50 || 0;
-				camera.focusCamera(fscaledAmount);
 			}
 			break;
 		case "ptzcfocus":
-			camera.continuousFocus(arg1);
+			if (Number(arg1) !== 0 && Number(arg1) >= -100 && Number(arg1) <= 100) {
+				camera.continuousFocus(arg1);
+			} else if (arg1 == "off" || Number(arg1) == 0) {
+				camera.continuousFocus(0);
+			}
 			break;
 		case "ptzautofocus":
 			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
@@ -1020,9 +1022,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (!isNaN(currentFocus)) {
 				//is number
 				try {
-					currentFocus = currentFocus / 50;
-					currentFocus.toFixed(2);
-					controller.connections.twitch.send(channel, `PTZ Focus (0-200): ${currentFocus}`)
+					controller.connections.twitch.send(channel, `PTZ Focus (1-9999): ${currentFocus}`)
 				} catch (e) {
 					//logger.log("Error getting focus")
 				}
