@@ -30,13 +30,13 @@ let userPermissions = {
     commandMods: [userRanks.mods],
     commandOperator: ["96allskills", "stolenarmy_", "berlac", "dansza", "loganrx_", "merger3", "nitelitedf", 
                     "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
-                    "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl","gnomechildboi","danman149"],
+                    "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl","gnomechildboi","danman149","hunnybeehelen"],
     commandVips: [userRanks.vips, "tfries_", "sivvii_", "ghandii_", "axialmars",
         "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","madcharliekelly",
         "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeexd","kurtyykins",
         "breacherman", "bryceisrightjr","sumaxu","mariemellie","ewok_626","quokka64",
         "casualruffian","likethecheesebri","viphippo","bagel_deficient","otsargh","just_some_donkus","fiveacross",
-        "itszalndrin","nicoleeverleigh","hunnybeehelen","fishymeep","ponchobee"],
+        "itszalndrin","nicoleeverleigh","fishymeep","ponchobee"],
     commandUsers: [userRanks.subs]
 }
 
