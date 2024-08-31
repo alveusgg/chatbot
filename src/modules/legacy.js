@@ -2198,7 +2198,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 					hasAccess = false;
 					break;
 				}
-				else if (config.timeRestrictedScenes.includes(camName) && controller.connections.database.timeRestrictionDisabled == true) {
+				else if (config.timeRestrictedScenes.includes(camName) && controller.connections.database.timeRestrictionDisabled == false) {
 					//check time
 					let now = new Date();
 					var minutes = now.getUTCMinutes();
