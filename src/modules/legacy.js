@@ -557,7 +557,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	let arg3 = messageArgs[3] ?? "";
 	let arg4 = messageArgs[4] ?? "";
 	let arg5 = messageArgs[5] ?? "";
-	
+
 	let specificCamera = "";
 	let ptzcamName = helper.cleanName(arg1);
 	//convert to clean base command
@@ -650,6 +650,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		controller.connections.database[currentScene].isRoaming = false;
 	}
 
+	let zoom = 100;
 	switch (userCommand) {
 		case "ptzpan":
 			// logger.log('ptzpan',arg1);
@@ -693,6 +694,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			} else if (arg1 == "off" || Number(arg1) == 0) {
 				camera.continuousFocus(0);
 			}
+			break;
+		case "ptzcfocus":
+			camera.continuousFocus(arg1);
 			break;
 		case "ptzautofocus":
 			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
@@ -745,27 +749,38 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		case "ptzgetcam":
 			let xCord = parseInt(arg1, 10);
 			let yCord = parseInt(arg2, 10);
+
+			if (isNaN(xCord) || isNaN(yCord)) {
+				return;
+			}
+
 			let clickedCam = findBox(xCord, yCord);
 			let strOutput;
 			if (arg3 == "json") {
-				let camObj = {cam: clickedCam.ptzcamName};
+				let camObj = {cam: clickedCam.ptzcamName, position: clickedCam.zone + 1};
 				strOutput = JSON.stringify(camObj);
 			} else {
 				strOutput = clickedCam.ptzcamName;
 			}
-						
+			
 			controller.connections.twitch.send(channel, strOutput);
 			break;
 		case "ptzclick":
 			// Use x and y coordinates to find the camera box the click occured in
 			let xcord = parseInt(arg1, 10);
 			let ycord = parseInt(arg2, 10);
+			zoom = parseInt(arg3, 10);
+
+			if (isNaN(xcord) || isNaN(ycord) || isNaN(zoom)) {
+				return;
+			}
+
 			const clickbox = findBox(xcord, ycord);
 			// Set the camera
 			camera = controller.connections.cameras[clickbox.ptzcamName];
-			await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(clickbox.zoom)}` });
+			await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(zoom)}` });
 			await camera.enableAutoFocus();
-			controller.connections.twitch.send(channel, `Clicked on ${clickbox.ptzcamName}`);
+			controller.connections.twitch.send(channel, `Clicked on ${clickbox.zone + 1}: ${clickbox.ptzcamName}`);
 			break;
 		case "ptzdraw":
 			// assign user inputs as integers.
@@ -773,7 +788,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			let source_y = parseInt(arg2, 10); 
 			let source_rectwidth = parseInt(arg3, 10);
 			let source_rectheight = parseInt(arg4, 10);
-					
+			
 			// calculate the x and y coordinates for the center of the rectangle.
 			let xdrawcord = source_x + source_rectwidth / 2;
 			let ydrawcord = source_y + source_rectheight / 2;
@@ -788,10 +803,13 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
 			let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
 			
-			let zoom = Math.floor(Math.min(zoomWidth, zoomHeight));
+			zoom = Math.min(zoomWidth, zoomHeight);
 			// Optional argument that will cause zoom to be reduced at high zoom levels
 			if (arg5 != "") {
 				let cutOff = parseFloat(arg4, 10);
+				if (isNaN(cutOff)) {
+					return;
+				}
 				if (zoom < cutOff) {
 					zoom = zoom * 75;
 				} else {
@@ -805,7 +823,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera = controller.connections.cameras[drawbox.ptzcamName];
 			await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
 			await camera.enableAutoFocus();
-			controller.connections.twitch.send(channel, `Clicked on ${drawbox.ptzcamName}`);
+			controller.connections.twitch.send(channel, `Clicked on ${drawbox.zone + 1}: ${drawbox.ptzcamName}`);
 			break;
 		case "ptzset":
 			//pan tilt zoom relative pos
@@ -1136,7 +1154,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                         const zones = Object.values(config.scenePositions[sceneLayout]);
                         x_unscaled = xcord
                         y_unscaled = ycord
-                        zoom = arg3
                         // Initialize zone to -1
                         let zone = -1;
                         let x = 960;
@@ -1233,7 +1250,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
                                         ptzcamName = parentScene;
                                 }
                         }
-                        return {x, y, zoom, sourceWidth, sourceHeight, scaleX, scaleY,  ptzcamName};
+                        return {x, y, sourceWidth, sourceHeight, scaleX, scaleY, ptzcamName, zone};
         }  
 }
 
