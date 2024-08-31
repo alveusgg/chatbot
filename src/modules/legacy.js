@@ -418,20 +418,20 @@ function checkTimeAccess(controller, userCommand, accessProfile, channel, messag
 			hasAccess = true;
 		}
 		//not directly allowed
-		if (!hasAccess) {
-			//check time
-			let now = new Date();
-			// var minutes = now.getUTCMinutes();
-			var hour = now.getUTCHours();
-			// console.log("check time",now,hour,config.restrictedHours);
-			if (hour >= config.restrictedHours.start && hour < config.restrictedHours.end) {
-				//restricted time
-				hasAccess = false;
-			} else {
-				//allow access to mods
-				hasAccess = true;
-			}
-		}
+		// if (!hasAccess) {
+		// 	//check time
+		// 	let now = new Date();
+		// 	// var minutes = now.getUTCMinutes();
+		// 	var hour = now.getUTCHours();
+		// 	// console.log("check time",now,hour,config.restrictedHours);
+		// 	if (hour >= config.restrictedHours.start && hour < config.restrictedHours.end) {
+		// 		//restricted time
+		// 		hasAccess = false;
+		// 	} else {
+		// 		//allow access to mods
+		// 		hasAccess = true;
+		// 	}
+		// }
 	} else {
 		hasAccess = true;
 	}
@@ -1654,6 +1654,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 						camName = overrideArgs;
 					}
 
+
+					controller.connections.database[camName].blacklist = true;
 					//camName = "fullcam"+camName;
 
 					//remove cam
@@ -2177,9 +2179,11 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 			//Admin
 			if (config.userPermissions.commandPriority[0] == accessProfile.accessLevel) {
 				hasAccess = true;
+				controller.connections.database[camName].blacklist = false;
 				//Superuser
 			} else if (config.userPermissions.commandPriority[1] == accessProfile.accessLevel) {
 				hasAccess = true;
+				controller.connections.database[camName].blacklist = false;
 				//Mod
 			} else if (!config.timeRestrictedScenes.includes(camName)) {
 				logger.log("Reached Regular Access", "Non time restricted", camName);
@@ -2189,7 +2193,12 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 				//not directly allowed
 				//check if allowed access to cam
 				//specific mod time restrictions
-				if (config.timeRestrictedScenes.includes(camName)) {
+				if (controller.connections.database[camName].blacklist == true){
+					// Cam is blacklisted and can't be swapped too
+					hasAccess = false;
+					break;
+				}
+				else if (config.timeRestrictedScenes.includes(camName) && controller.connections.database.timeRestrictionDisabled == true) {
 					//check time
 					let now = new Date();
 					var minutes = now.getUTCMinutes();
