@@ -1631,6 +1631,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			if (currentScene != "custom") {
 				return false;
 			}
+			
+			userCommand = controller.connections.database["customcamscommand"] ?? "customcams";
 
 			let newListRemoveCam = currentCamList.slice();
 
@@ -1682,6 +1684,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			if (currentScene != "custom") {
 				return false;
 			}
+
+			userCommand = controller.connections.database["customcamscommand"] ?? "customcams";
 
 			let newListAddCam = currentCamList.slice();
 
