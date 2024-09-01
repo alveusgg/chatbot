@@ -41,7 +41,7 @@ const main = async controller => {
 		setPTZRoamMode(controller, currentScene);
 	}
 
-	runAtSpecificTimeOfDay(config.restrictedHours.start-1, 55, () => {
+	runAtSpecificTimeOfDay(config.restrictedHours.start - 1, 55, () => {
 		try {
 			logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
 			controller.connections.twitch.send("alveusgg", `!nightcams`);
@@ -124,7 +124,7 @@ const onSceneChange = async (controller, name, oldName) => {
 		var hour = now.getUTCHours();
 		//logger.log("scene change current time",hour,now);
 		//if ((hour >= 19 && minutes >= 30) || hour >= 20 || hour < 8){
-		if ( hour >= config.notifyHours.start && hour < config.notifyHours.end ) {
+		if (hour >= config.notifyHours.start && hour < config.notifyHours.end) {
 			let continueCheck = true;
 
 			if (newScene == "customcam" || oldScene == "customcam") {
@@ -348,7 +348,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 	// 		return;
 	// 	}
 	// }
-	
+
 	let currentScene = controller.connections.obs.local.currentScene || "";
 	currentScene = helper.cleanName(currentScene);
 
@@ -370,7 +370,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 			return
 		}
 
-		
+
 
 		//logger.log("current scene",currentScene);
 
@@ -395,7 +395,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 }
 
 //Check if Time Restricted Command
-function checkTimeAccess(controller, userCommand, accessProfile, channel, message, currentScene)  {
+function checkTimeAccess(controller, userCommand, accessProfile, channel, message, currentScene) {
 	let hasAccess = false;
 
 	if (controller.connections.database.timeRestrictionDisabled == true) {
@@ -405,7 +405,7 @@ function checkTimeAccess(controller, userCommand, accessProfile, channel, messag
 	let messageArgs = message.split(" ");
 	let arg1 = messageArgs[1] ?? "";
 	arg1 = arg1.trim().toLowerCase();
-	if (arg1 == "music"){
+	if (arg1 == "music") {
 		return true;
 	}
 	//specific mod time restrictions
@@ -438,7 +438,7 @@ function checkTimeAccess(controller, userCommand, accessProfile, channel, messag
 	return hasAccess;
 }
 
-async function checkLocalSceneCommand(controller, userCommand, accessProfile, channel, message, currentScene)  {
+async function checkLocalSceneCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
 	let sceneCommand = false;
 
 	if (
@@ -503,7 +503,7 @@ async function checkLocalSceneCommand(controller, userCommand, accessProfile, ch
 	return sceneCommand;
 }
 
-async function checkServerSceneCommand(controller, userCommand, accessProfile, channel, message, currentScene)  {
+async function checkServerSceneCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
 	let sceneCommand = false;
 
 	if (config.pauseCloudSceneChange) {
@@ -629,7 +629,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	}
 
 	//cant find camera client
-        if (camera == null && !(userCommand.includes("ptzdraw") || userCommand.includes("ptzclick"))) {
+	if (camera == null && !(userCommand.includes("ptzdraw") || userCommand.includes("ptzclick"))) {
 		return false;
 	}
 
@@ -757,12 +757,12 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			let clickedCam = findBox(xCord, yCord);
 			let strOutput;
 			if (arg3 == "json") {
-				let camObj = {cam: clickedCam.ptzcamName, position: clickedCam.zone + 1};
+				let camObj = { cam: clickedCam.ptzcamName, position: clickedCam.zone + 1 };
 				strOutput = JSON.stringify(camObj);
 			} else {
 				strOutput = clickedCam.ptzcamName;
 			}
-			
+
 			controller.connections.twitch.send(channel, strOutput);
 			break;
 		case "ptzclick":
@@ -785,24 +785,24 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		case "ptzdraw":
 			// assign user inputs as integers.
 			let source_x = parseInt(arg1, 10);
-			let source_y = parseInt(arg2, 10); 
+			let source_y = parseInt(arg2, 10);
 			let source_rectwidth = parseInt(arg3, 10);
 			let source_rectheight = parseInt(arg4, 10);
-			
+
 			// calculate the x and y coordinates for the center of the rectangle.
 			let xdrawcord = source_x + source_rectwidth / 2;
 			let ydrawcord = source_y + source_rectheight / 2;
-			
+
 			// call findBox to determine which box the rectangle is in and assign the relevant camera.
 			const drawbox = findBox(xdrawcord, ydrawcord);
-			
+
 			//scale the rectangle to 1920x1080
 			let scaledRectWidth = source_rectwidth / drawbox.scaleX;
 			let scaledRectHeight = source_rectheight / drawbox.scaleY;
 
 			let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
 			let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
-			
+
 			zoom = Math.min(zoomWidth, zoomHeight);
 			// Optional argument that will cause zoom to be reduced at high zoom levels
 			if (arg5 != "") {
@@ -831,7 +831,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			break;
 		case "ptzseta":
 			//absolute pos, pan tilt zoom autofocus focus 
-			let customPtz = { pan: arg1};
+			let customPtz = { pan: arg1 };
 
 			let customTilt = parseFloat(arg2);
 			if (!isNaN(customTilt)) {
@@ -924,15 +924,15 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			break;
 		case "ptzhome":
 		case "ptzload":
-			if (userCommand == "ptzhome"){
+			if (userCommand == "ptzhome") {
 				arg1 = "home";
 			}
-			if (arg2 == "all"){
-				for (let cam of currentCamList){
+			if (arg2 == "all") {
+				for (let cam of currentCamList) {
 					let preset = controller.connections.database[cam].presets["home"];
 					if (preset != null) {
 						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-					} 
+					}
 				}
 			} else if (specificCamera != "") {
 				//used camera name
@@ -1121,137 +1121,139 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	}
 	return true;
 
-       function findBox(xcord, ycord) {
-                        let camLayout = controller.connections.database["customcamscommand"];
-                        let sceneLayout;
+	function findBox(xcord, ycord) {
+		let camLayout = controller.connections.database["customcamscommand"];
+		let sceneLayout;
 
-			 if (currentCamList.length >= 5 && camLayout == "customcamsbig") {
-                                sceneLayout = "6boxbig";
-                        } else if (currentCamList.length >= 4 && camLayout == "customcams") {
-                                sceneLayout = "4box";
-                        } else if (currentCamList.length >= 4 && camLayout == "customcamsbig") {
-                                sceneLayout = "4boxbig";
-                        } else if (currentCamList.length >= 3 && camLayout == "customcams") {
-                                sceneLayout = "3box";
-                        } else if (currentCamList.length >= 3 && camLayout == "customcamsbig") {
-                                sceneLayout = "3boxbig";
-                        } else if (currentCamList.length >= 2 && camLayout == "customcamsbig") {
-                                sceneLayout = "2boxbig"; 
-                        } else if (currentCamList.length >= 2 && camLayout == "customcamstl") {
-                                sceneLayout = "2boxtl";
-                        } else if (currentCamList.length >= 2 && camLayout == "customcamstr") {
-                                sceneLayout = "2boxtr";
-                        } else if (currentCamList.length >= 2 && camLayout == "customcamsbl") {
-                                sceneLayout = "2boxbl";
-                        } else if (currentCamList.length >= 2 && camLayout == "customcamsbr") {
-                                sceneLayout = "2boxbr";
-                        } else if (currentCamList.length >= 1 && camLayout == "customcamsbig") {
-                                sceneLayout = "1box";
-                        }
-                
+		if (currentCamList.length >= 5) {
+			sceneLayout = "6boxbig";
+		} else if (currentCamList.length >= 4 && camLayout == "customcams") {
+			sceneLayout = "4box";
+		} else if (currentCamList.length >= 4 && camLayout == "customcamsbig") {
+			sceneLayout = "4boxbig";
+		} else if (currentCamList.length >= 3 && camLayout == "customcams") {
+			sceneLayout = "3box";
+		} else if (currentCamList.length >= 3 && camLayout == "customcamsbig") {
+			sceneLayout = "3boxbig";
+		} else if (currentCamList.length >= 2 && camLayout == "customcams") {
+			sceneLayout = "2box";
+		} else if (currentCamList.length >= 2 && camLayout == "customcamsbig") {
+			sceneLayout = "2boxbig";
+		} else if (currentCamList.length >= 2 && camLayout == "customcamstl") {
+			sceneLayout = "2boxtl";
+		} else if (currentCamList.length >= 2 && camLayout == "customcamstr") {
+			sceneLayout = "2boxtr";
+		} else if (currentCamList.length >= 2 && camLayout == "customcamsbl") {
+			sceneLayout = "2boxbl";
+		} else if (currentCamList.length >= 2 && camLayout == "customcamsbr") {
+			sceneLayout = "2boxbr";
+		} else if (currentCamList.length >= 1) {
+			sceneLayout = "1box";
+		}
 
-                        // Use the configuration data to determine zones
-                        const zones = Object.values(config.scenePositions[sceneLayout]);
-                        x_unscaled = xcord
-                        y_unscaled = ycord
-                        // Initialize zone to -1
-                        let zone = -1;
-                        let x = 960;
-                        let y = 540;
-                        let sourceWidth;
-                        let sourceHeight;
-                        let scaleX;
-                        let scaleY;
 
-			
-                        // Determine the zone and scaled coordinates
-                        if (sceneLayout === "2boxtl" || sceneLayout === "2boxtr" ||
-                            sceneLayout === "2boxbl" || sceneLayout === "2boxbr") {
+		// Use the configuration data to determine zones
+		const zones = Object.values(config.scenePositions[sceneLayout]);
+		x_unscaled = xcord
+		y_unscaled = ycord
+		// Initialize zone to -1
+		let zone = -1;
+		let x = 960;
+		let y = 540;
+		let sourceWidth;
+		let sourceHeight;
+		let scaleX;
+		let scaleY;
 
-                            // Define the zones with PiP prioritized
-                            const zones = [
-                                { ...config.scenePositions[sceneLayout][2], index: 2 }, // PiP (zone2)
-                                { ...config.scenePositions[sceneLayout][1], index: 1 }  // Main (zone1)
-                            ];
 
-                            // Check if the click is within any of the zones
-                            for (const z of zones) {
-                                if (x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width &&
-                                    y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
+		// Determine the zone and scaled coordinates
+		if (sceneLayout === "2boxtl" || sceneLayout === "2boxtr" ||
+			sceneLayout === "2boxbl" || sceneLayout === "2boxbr") {
 
-                                    // Click is within this zone
-                                    zone = z.index - 1; // Use the zone index (1 for fullscreen, 2 for PiP)
-                                    x = (x_unscaled - z.positionX) / z.scaleX;
-                                    y = (y_unscaled - z.positionY) / z.scaleY;
-                                    sourceWidth = z.sourceWidth;
-                                    sourceHeight = z.sourceHeight;
-                                    scaleX = z.scaleX;
-                                    scaleY = z.scaleY;
-                                    logger.log("pip zone hit number:", zone);
-                                    break;
-                                }
-                            }
-                        } else {
-			     for (let i = 0; i < zones.length; i++) {
-                                const z = zones[i];
+			// Define the zones with PiP prioritized
+			const zones = [
+				{ ...config.scenePositions[sceneLayout][2], index: 2 }, // PiP (zone2)
+				{ ...config.scenePositions[sceneLayout][1], index: 1 }  // Main (zone1)
+			];
 
-                                if (x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width &&
-                                    y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
-                                    zone = i; // Use 0-based index for zones
-                                    x = (x_unscaled - z.positionX) / z.scaleX;
-                                    y = (y_unscaled - z.positionY) / z.scaleY;
-                                    sourceWidth = z.sourceWidth;
-                                    sourceHeight = z.sourceHeight;
-                                    scaleX = z.scaleX
-                                    scaleY = z.scaleY
-                                    break;
-                                }
-                            }
-                        }
+			// Check if the click is within any of the zones
+			for (const z of zones) {
+				if (x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width &&
+					y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
 
-                        // If invalid coordinates or no matching zone, return false
-                        if (zone === -1) {
-                                return false;
-                        }
+					// Click is within this zone
+					zone = z.index - 1; // Use the zone index (1 for fullscreen, 2 for PiP)
+					x = (x_unscaled - z.positionX) / z.scaleX;
+					y = (y_unscaled - z.positionY) / z.scaleY;
+					sourceWidth = z.sourceWidth;
+					sourceHeight = z.sourceHeight;
+					scaleX = z.scaleX;
+					scaleY = z.scaleY;
+					logger.log("pip zone hit number:", zone);
+					break;
+				}
+			}
+		} else {
+			for (let i = 0; i < zones.length; i++) {
+				const z = zones[i];
 
-                        // Determine camera name using 0-based index
-                        camName = currentCamList[zone];
-                        if (camName === undefined) {
-                                return false;
-                        }
+				if (x_unscaled >= z.positionX && x_unscaled < z.positionX + z.width &&
+					y_unscaled >= z.positionY && y_unscaled < z.positionY + z.height) {
+					zone = i; // Use 0-based index for zones
+					x = (x_unscaled - z.positionX) / z.scaleX;
+					y = (y_unscaled - z.positionY) / z.scaleY;
+					sourceWidth = z.sourceWidth;
+					sourceHeight = z.sourceHeight;
+					scaleX = z.scaleX
+					scaleY = z.scaleY
+					break;
+				}
+			}
+		}
 
-                        ptzcamName = helper.cleanName(camName);
-                        baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
-                        ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+		// If invalid coordinates or no matching zone, return false
+		if (zone === -1) {
+			return false;
+		}
 
-                        // Check if camName contains "multi" and find the parent scene if it does
-                        if (ptzcamName.includes("multi")) {
-                                let parentScene = "";
-                                // Iterate through the multiScenes to find the parent scene
-                                for (let multiScene in config.multiScenes) {
-                                        let sceneList = config.multiScenes[multiScene];
+		// Determine camera name using 0-based index
+		camName = currentCamList[zone];
+		if (camName === undefined) {
+			return false;
+		}
 
-                                        for (let i = 0; i < sceneList.length; i++) {
-                                                let sceneName = sceneList[i] || "";
-                                                sceneName = helper.cleanName(sceneName);
-                                                if (ptzcamName == sceneName) {
-                                                        // Found match
-                                                        parentScene = multiScene;
-                                                        break;
-                                                }
-                                        }
-                                        // Exit outer loop if parentScene is found
-                                        if (parentScene != "") {
-                                                break;
-                                        }
-                                }
-                                // Set camName to parentScene if a match was found
-                                if (parentScene != "") {
-                                        ptzcamName = parentScene;
-                                }
-                        }
-                        return {x, y, sourceWidth, sourceHeight, scaleX, scaleY, ptzcamName, zone};
-        }  
+		ptzcamName = helper.cleanName(camName);
+		baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+		ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+
+		// Check if camName contains "multi" and find the parent scene if it does
+		if (ptzcamName.includes("multi")) {
+			let parentScene = "";
+			// Iterate through the multiScenes to find the parent scene
+			for (let multiScene in config.multiScenes) {
+				let sceneList = config.multiScenes[multiScene];
+
+				for (let i = 0; i < sceneList.length; i++) {
+					let sceneName = sceneList[i] || "";
+					sceneName = helper.cleanName(sceneName);
+					if (ptzcamName == sceneName) {
+						// Found match
+						parentScene = multiScene;
+						break;
+					}
+				}
+				// Exit outer loop if parentScene is found
+				if (parentScene != "") {
+					break;
+				}
+			}
+			// Set camName to parentScene if a match was found
+			if (parentScene != "") {
+				ptzcamName = parentScene;
+			}
+		}
+		return { x, y, sourceWidth, sourceHeight, scaleX, scaleY, ptzcamName, zone };
+	}
 }
 
 async function checkNuthouseCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
@@ -1480,7 +1482,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "resetcam":
 			let camname = arg1Clean;
 			//remove possible cam wording
-			camname  = config.customCommandAlias[camname] || camname; // allow for cam name aliases
+			camname = config.customCommandAlias[camname] || camname; // allow for cam name aliases
 			camname = "fullcam " + camname;
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, camname);
 			break;
@@ -1631,7 +1633,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			if (currentScene != "custom") {
 				return false;
 			}
-			
+
 			userCommand = controller.connections.database["customcamscommand"] ?? "customcams";
 
 			let newListRemoveCam = currentCamList.slice();
@@ -1916,7 +1918,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					audioSource = config.globalMusicSource;
 				}
 				controller.connections.obs.local.setInputVolume(audioSource, scaledVol2);
-				if (audioSource == config.globalMusicSource){
+				if (audioSource == config.globalMusicSource) {
 					controller.connections.obs.cloud.setInputVolume(config.globalMusicSource, scaledVol2);
 				}
 			}
