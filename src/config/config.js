@@ -114,8 +114,8 @@ let multiCommands = {
 const multiScenes = {
     crow: ["crow", "crowoutdoor", "crowmulti2cam"],
     crowoutdoor: ["crowmulticam"],
-    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4"],
-    wolfcorner: ["wolfmulti5"],
+    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3"],
+    wolfcorner: ["wolfmulti4", "wolfmulti5"],
     fox: ["fox", "foxden", "foxmulticam", "foxcorner"],
     marmoset: ["marmoset", "marmosetindoor", "marmosetmulti"],
     // rat: ["ratcam","ratcam2","ratcam3","ratcam4"]
