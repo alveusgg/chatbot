@@ -112,8 +112,10 @@ let multiCommands = {
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
 const multiScenes = {
-    crow: ["crow", "crowoutdoor", "crowmulticam", "crowmulti2cam"],
-    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4","wolfmulti5"],
+    crow: ["crow", "crowoutdoor", "crowmulti2cam"],
+    crowoutdoor: ["crowmulticam"],
+    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4"],
+    wolfcorner: ["wolfmulti5"],
     fox: ["fox", "foxden", "foxmulticam", "foxcorner"],
     marmoset: ["marmoset", "marmosetindoor", "marmosetmulti"],
     // rat: ["ratcam","ratcam2","ratcam3","ratcam4"]
