@@ -405,7 +405,8 @@ class Axis {
     if (resp === null) return null;
 
     // Parse the data, ensuring we got back a number
-    return isNaN(resp) ? null : parseFloat(resp);
+    const [key, value] = resp.trim().split("=");
+    return isNaN(value) ? null : parseFloat(value);
   }
 }
 
