@@ -77,7 +77,7 @@ const commandPermissionsCustomCam = {
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam"],
     commandOperator: ["constructioncam"],
-    commandVips: ["georgiecam", "noodlecam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
+    commandVips: ["georgiecam", "noodlecam","patchycam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
         "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "ratcam","ratcam2","ratcam3","ratcam4","orangeisopodcam"],
     commandUsers: []
 }
@@ -198,7 +198,7 @@ const micGroups = {
 //ADD IP INFO IN ENV
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
-const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfden2","wolfden","georgie", "georgiewater", "noodle", "roach", "crow", "crowoutdoor", "fox", "foxden",
+const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "roach", "crow", "crowoutdoor", "fox", "foxden",
     "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "puppy", "marty", "bb","construction","chicken"];
 
 //Axis Camera Mapping to Command. Converting base to source name
@@ -218,6 +218,7 @@ const axisCameraCommandMapping = {
     "georgie":"georgie", 
     "georgiewater":"georgiewater", 
     "noodle":"noodle", 
+    "patchy":"patchy", 
     "roach":"roach", 
     "crow":"crow", 
     "crowcam2":"crowoutdoor", 
