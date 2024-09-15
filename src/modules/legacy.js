@@ -730,8 +730,13 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			camera.enableAutoFocus();
 			break;
 		case "ptzspeed":
-			camera.setSpeed(arg1);
-			controller.connections.database[currentScene].speed = arg1;
+			if (arg1 != "") {
+				camera.setSpeed(arg1);
+				controller.connections.database[currentScene].speed = arg1;
+			} else {
+				let camSpeed = await camera.getSpeed();
+				controller.connections.twitch.send(channel, `PTZ Speed: ${camSpeed}`)
+			}
 			break;
 		case "ptzgetspeed":
 			let camSpeed = await camera.getSpeed();
