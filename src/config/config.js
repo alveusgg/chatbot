@@ -48,7 +48,7 @@ const commandPermissionsScenes = {
     commandSuperUsers: ["testsuperscene", "backpackcam", "localbackpackcam", "serverpccam", "localpccam", "servernuthousecam", "phonecam"],
     commandMods: ["testmodscene", "alveusserver", "brbscreen", "georgiecambackup", "noodlecambackup", "hankcambackup", "hankcam2backup", "roachcambackup", "isopodcambackup",
         "noodlegeorgiecambackup", "georgienoodlecambackup", "3cambackup", "4cambackup", "ellaintro", "kaylaintro", "connorintro","intro","poboxintro","aqintro",
-        "accintro","accbrb","accending","nickintro","nickbrb","nickending",
+        "accintro","accbrb","accending","ccintro","ccbrb","ccending","nickintro","nickbrb","nickending",
         "noodlehidecambackup", "georgiewatercambackup", "parrotcambackup", "pasturecambackup", "crowcambackup", "crowcam2backup", "crowcam3backup",
         "foxcambackup", "foxcam2backup", "foxcam3backup", "foxcam4backup",
         "4camoutdoorbackup", "marmosetcambackup", "marmosetcam2backup", "marmosetcam3backup"],
@@ -77,11 +77,11 @@ const commandPermissionsCustomCam = {
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam"],
     commandOperator: ["constructioncam"],
-    commandVips: ["georgiecam", "noodlecam","patchycam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
+    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
         "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "ratcam","ratcam2","ratcam3","ratcam4","orangeisopodcam"],
     commandUsers: []
 }
-
+    
 
 //customcam lowercase, no spaces, no s/es
 const multiCustomCamScenes = {
@@ -198,7 +198,7 @@ const micGroups = {
 //ADD IP INFO IN ENV
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
-const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "roach", "crow", "crowoutdoor", "fox", "foxden",
+const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "toast","roach", "crow", "crowoutdoor", "fox", "foxden",
     "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "puppy", "marty", "bb","construction","chicken"];
 
 //Axis Camera Mapping to Command. Converting base to source name
@@ -219,6 +219,7 @@ const axisCameraCommandMapping = {
     "georgiewater":"georgiewater", 
     "noodle":"noodle", 
     "patchy":"patchy", 
+    "toast":"toast", 
     "roach":"roach", 
     "crow":"crow", 
     "crowcam2":"crowoutdoor", 
@@ -369,6 +370,9 @@ const commandSceneAlias = {
     accintro: ["acintro"],
     accbrb: ["acbrb"],
     accending: ["acending","accend","acend"],
+    ccintro: ["cintro"],
+    ccbrb: ["cbrb"],
+    ccending: ["cending","ccend","cend"],
     nickending: ["nickend"],
     chatchat: ["bugmic","chatchatmic"],
     phonemic: ["phoneaudio","phonemic","mobilemic"],
@@ -444,6 +448,9 @@ let commandScenes = {
     accintro: "ACCIntro",
     accbrb: "ACCBRB",
     accending: "ACCEnding",
+    ccintro: "CCIntro",
+    ccbrb: "CCBRB",
+    ccending: "CCEnding",
     nickintro: "NickIntro",
     nickbrb: "NickBRB",
     nickending: "NickEnding",
@@ -492,6 +499,9 @@ let commandScenesCloud = {
     accintro: "ACCIntro",
     accbrb: "ACCBRB",
     accending: "ACCEnding",
+    ccintro: "CCIntro",
+    ccbrb: "CCBRB",
+    ccending: "CCEnding",
     nickintro: "NickIntro",
     nickbrb: "NickBRB",
     nickending: "NickEnding",
