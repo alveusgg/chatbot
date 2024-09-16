@@ -629,7 +629,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	}
 
 	//cant find camera client
-	if (camera == null && !(userCommand.includes("ptzdraw") || userCommand.includes("ptzclick"))) {
+	if (camera == null && !(userCommand.includes("ptzdraw") || userCommand.includes("ptzclick") || userCommand.includes("ptzgetcam"))) {
 		return false;
 	}
 
