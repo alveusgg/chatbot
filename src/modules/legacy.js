@@ -785,7 +785,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			// Set the camera
 			camera = controller.connections.cameras[clickbox.ptzcamName];
 			await camera.ptz({ areazoom: `${Math.round(clickbox.x)},${Math.round(clickbox.y)},${Math.round(zoom)}` });
-			await camera.enableAutoFocus();
+			if (arg4 != 'off') {
+				await camera.enableAutoFocus();
+			}
 			controller.connections.twitch.send(channel, `Clicked on ${clickbox.zone + 1}: ${clickbox.ptzcamName}`);
 			break;
 		case "ptzdraw":
@@ -809,26 +811,14 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
 			let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
 
-			zoom = Math.min(zoomWidth, zoomHeight);
-			// Optional argument that will cause zoom to be reduced at high zoom levels
-			if (arg5 != "") {
-				let cutOff = parseFloat(arg4, 10);
-				if (isNaN(cutOff)) {
-					return;
-				}
-				if (zoom < cutOff) {
-					zoom = zoom * 75;
-				} else {
-					zoom = zoom * 100;
-				}
-			} else {
-				zoom = zoom * 100;
-			}
+			zoom = Math.min(zoomWidth, zoomHeight) * 100;
 
 			// Set the camera
 			camera = controller.connections.cameras[drawbox.ptzcamName];
 			await camera.ptz({ areazoom: `${Math.round(drawbox.x)},${Math.round(drawbox.y)},${Math.round(zoom)}` });
-			await camera.enableAutoFocus();
+			if (arg5 != 'off') {
+				await camera.enableAutoFocus();
+			}
 			controller.connections.twitch.send(channel, `Clicked on ${drawbox.zone + 1}: ${drawbox.ptzcamName}`);
 			break;
 		case "ptzset":
