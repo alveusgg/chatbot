@@ -11,9 +11,8 @@ const pauseTwitchMarker = true;
 const pauseCloudSceneChange = false;
 const announceChatSceneChange = false;
 //UTC TIME
-const notifyHours = { start: 14, end: 23 };
+const notifyHours = {start:14,end:23};
 const globalMusicSource = "Music Playlist Global";
-const ptzPrefix = "ptz";
 
 const userRanks = {
     mods: Symbol("mods"),
@@ -25,19 +24,19 @@ const userRanks = {
 let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
-    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick",
-        "lindsay_alveus", "strickknine", "tarantulizer", "spiderdaynightlive", "srutiloops", "evantomology", "amanda2815"],
+    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick", 
+                        "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology","amanda2815"],
     commandMods: [userRanks.mods],
-    commandOperator: ["stolenarmy_", "berlac", "dansza", "merger3", "nitelitedf", "fixterjake14",
-        "purplemartinconservation", "wazix11", "lazygoosepxls", "alxiszzz", "shutupleonard", "taizun", "lumberaxe1", "glennvde",
-        "wolfone_", "dohregard", "lakel1", "darkrow_", "minipurrl", "gnomechildboi", "danman149", "hunnybeehelen", "strangecyan",
-        "viphippo", "bagel_deficient", "rhinofriend"],
+    commandOperator: ["stolenarmy_", "berlac", "dansza", "merger3", "nitelitedf","fixterjake14",
+                    "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
+                    "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl","gnomechildboi","danman149","hunnybeehelen","strangecyan",
+                    "viphippo","bagel_deficient","rhinofriend"],
     commandVips: [userRanks.vips, "tfries_", "sivvii_", "ghandii_", "axialmars",
-        "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo", "nixxform", "madcharliekelly",
-        "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeexd", "kurtyykins",
-        "breacherman", "bryceisrightjr", "sumaxu", "mariemellie", "ewok_626", "quokka64", "nov1cegg",
-        "casualruffian", "likethecheesebri", "otsargh", "just_some_donkus", "fiveacross",
-        "itszalndrin", "nicoleeverleigh", "fishymeep", "ponchobee"],
+        "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","madcharliekelly",
+        "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeexd","kurtyykins",
+        "breacherman", "bryceisrightjr","sumaxu","mariemellie","ewok_626","quokka64","nov1cegg",
+        "casualruffian","likethecheesebri","otsargh","just_some_donkus","fiveacross",
+        "itszalndrin","nicoleeverleigh","fishymeep","ponchobee"],
     commandUsers: [userRanks.subs]
 }
 
@@ -47,8 +46,8 @@ let userBlacklist = ["RestreamBot"];
 const commandPermissionsScenes = {
     commandAdmins: ["testadminscene"],
     commandSuperUsers: ["testsuperscene", "backpackcam", "localbackpackcam", "serverpccam", "localpccam", "servernuthousecam", "phonecam"],
-    commandMods: ["testmodscene", "alveusserver", "brbscreen", "ellaintro", "kaylaintro", "connorintro", "intro", "poboxintro", "aqintro",
-        "accintro", "accbrb", "accending", "ccintro", "ccbrb", "ccending", "sntintro", "sntbrb", "sntending", "nickintro", "nickbrb", "nickending"],
+    commandMods: ["testmodscene", "alveusserver", "brbscreen", "ellaintro", "kaylaintro", "connorintro","intro","poboxintro","aqintro",
+        "accintro","accbrb","accending","ccintro","ccbrb","ccending","sntintro","sntbrb","sntending","nickintro","nickbrb","nickending"],
     commandOperator: [],
     commandVips: [],
     commandUsers: []
@@ -58,51 +57,53 @@ const commandPermissionsScenes = {
 const commandPermissionsCustomCam = {
     commandAdmins: [],
     commandSuperUsers: ["nuthousecam", "localpccam", "backpackcam", "phonecam"],
-    commandMods: ["wolfcam", "wolfcam2", "wolfcam3", "wolfcam4", "wolfcam5", "wolfcam6", "wolfcam7", "wolfcam8", "wolfcam9", "wolfcam10", "parrotcam", "pasturecam",
-        "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
-        "nightcams", "nightcamsbig", "chickencam"],
+    commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","parrotcam", "pasturecam",
+         "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
+        "nightcams", "nightcamsbig","chickencam"],
     commandOperator: ["constructioncam"],
-    commandVips: ["georgiecam", "noodlecam", "patchycam", "toastcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "roachcam", "isopodcam",
-        "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "ratcam", "ratcam2", "ratcam3", "ratcam4", "orangeisopodcam"],
+    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
+        "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "ratcam","ratcam2","ratcam3","ratcam4","orangeisopodcam"],
     commandUsers: []
 }
-//PTZ Commands
-const commandPermissionsCamera = {
-    commandAdmins: ["testadmincamera"],
-    commandSuperUsers: ["testsupercamera", "ptzcontrol", "ptzoverride", "ptzclear"],
-    commandMods: ["testmodcamera", "ptztracking", "ptzirlight", "ptzwake"],
-    commandOperator: ["ptzhomeold", "ptzseta", "ptzgetinfo", "ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
-        "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick", "ptzdraw",
-        "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus"],
-    commandVips: ["ptzhome", "ptzpreset", "ptzzoom", "ptzzoomr", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "ptzgetcam"],
-    commandUsers: []
-}
+    
 
-//Extra Commands
-const commandPermissionsExtra = {
-    commandAdmins: ["testadminextra"],
-    commandSuperUsers: ["testsuperextra", "resetcloudsource", "resetcloudsourcef", "setalveusscene", "setcloudscene", "changeserver", "setmute", "camclear"],
-    commandMods: ["testmodextra", "resetsource", "resetsourcef", "camload", "camlist", "camsave", "camrename", "campresetremove", "customcams", "customcamsbig", "customcamstl", "customcamstr", "customcamsbl", "customcamsbr",
-        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam"],
-    commandOperator: [],
-    commandVips: ["getvolume", "setvolume", "resetvolume", "removecam", "swapcam", "scenecams", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetpc", "resetlivecam", "resetbackpackf", "resetpcf", "resetlivecamf", "resetcam", "resetextra", "resetphone", "resetphonef"],
-    commandUsers: []
-}
-
-//Unifi Commands
-const commandPermissionsUnifi = {
-    commandAdmins: [],
-    commandSuperUsers: ["apclientinfo", "apclientreconnect"],
-    commandMods: ["apsignal", "apreconnect"],
-    commandOperator: [],
-    commandVips: [],
-    commandUsers: []
+//customcam lowercase, no spaces, no s/es
+const multiCustomCamScenes = {
+    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3","wolfmulti4","wolfmulti5"],
+    fox: ["fox", "foxcorner", "foxmulti", "foxden", "foxmulti2", "foxmulti3"],
+    crow: ["crow", "crowmulti", "crowoutdoor","crowmulti2"],
+    marmoset: ["marmoset", "marmosetindoor", "marmosetmulti", "marmosetmulti"],
+    // rat: ["rat","rat2","rat3","ratmulti"]
 }
 
 //One Direction, If on OBS Scene, allow subscenes commands
 //scene names are lowercase, no spaces, no s/es
 let onewayCommands = {
     "4camoutdoor": ["foxcam", "foxcam2", "foxcam3", "foxcam4", "pasturecam"]
+}
+
+//Chat Command Swapping
+//key names are same as multiscenes
+//links command to obs scene names
+let multiCommands = {
+    crow: ["crowcam", "crowcam2", "crowcam3","crowcam4"],
+    fox: ["foxcam", "foxcam2", "foxcam3", "foxcam4"],
+    wolf: ["wolfcam", "wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10"],
+    marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
+    // rat: ["ratcam","ratcam2","ratcam3","ratcam4","ratcamall"]
+}
+
+//Notification Swapping
+//Scene Names in OBS
+//lowercase, no spaces, no s/es
+const multiScenes = {
+    crow: ["crow", "crowoutdoor", "crowmulti2cam"],
+    crowoutdoor: ["crowmulticam"],
+    wolf: ["wolf", "wolfcorner","wolfindoor","wolfden","wolfden2","wolfmulti","wolfmulti2","wolfmulti3"],
+    wolfcorner: ["wolfmulti4", "wolfmulti5"],
+    fox: ["fox", "foxden", "foxmulticam", "foxcorner"],
+    marmoset: ["marmoset", "marmosetindoor", "marmosetmulti"],
+    // rat: ["ratcam","ratcam2","ratcam3","ratcam4"]
 }
 
 const onewayNotifications = {
@@ -115,235 +116,258 @@ const notifyScenes = ["Parrots", "Parrots Muted Mic", "Crows", "Crows Outdoor", 
     "Marmoset", "Marmoset Indoor", "Marmoset Multi",
     "Fox Den", "Fox Corner", "Fox Multicam", "Fox Muted Mic", "4 Cam Outdoor"];
 
-//Chat Command Swapping
-//key names are same as multiscenes
-//links command to obs scene names
-let multiCommands = {
-    crow: ["crowcam", "crowcam2", "crowcam3", "crowcam4"],
-    fox: ["foxcam", "foxcam2", "foxcam3", "foxcam4"],
-    wolf: ["wolfcam", "wolfcam2", "wolfcam3", "wolfcam4", "wolfcam5", "wolfcam6", "wolfcam7", "wolfcam8", "wolfcam9", "wolfcam10"],
-    marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
-}
-
-//ADD IP INFO IN ENV
-const axisCameras = {
-    "bb": ["orangeisopodcam"],
-    "chicken": ["chickencam"],
-    "chin": ["chincam"],
-    "construction": ["constructioncam"],
-    "crow": ["crowcam", "crowcam4"],
-    "crowoutdoor": ["cowcam2", "crowcam3"],
-    "fox": ["foxcam", "foxcam2"],
-    "foxcorner": ["foxcam3"],
-    "foxden": ["foxcam4"],
-    "georgie": ["georgiecam", "georgiemulticam"],
-    "georgiewater": ["georgiewatercam"],
-    "hank": ["hankcam", "hankcam3"],
-    "hankcorner": ["hankcam2"],
-    "marmoset": ["marmosetcam", "marmosetcam3"],
-    "marmosetindoor": ["marmosetcam2"],
-    "marty": ["isopodcam"],
-    "noodle": ["noodlecam"],
-    "parrot": ["parrotcam"],
-    "pasture": ["pasturecam"],
-    "patchy": ["patchycam"],
-    "puppy": ["puppycam"],
-    "rat": ["ratcam", "ratcam2", "ratcam3", "ratcam4"],
-    "roach": ["roachcam"],
-    "toast": ["toastcam"],
-    "wolf": ["wolfcam", "wolfcam6", "wolfcam7", "wolfcam8"],
-    "wolfcorner": ["wolfcam2", "wolfcam9", "wolfcam10"],
-    "wolfden2": ["wolfcam4"],
-    "wolfden": ["wolfcam3"],
-    "wolfindoor": ["wolfcam5"],
-};
 
 //Audio source in OBS
 //lowercase, no spaces, no s/es, cleanName()
 const sceneAudioSource = {
-    "backpack": "maya rtmp 1",
-    "chatchat": "chat chats audio",
-    "chickencam": "Chicken Camera",
-    "crowcam2": "crow mic",
-    "crowcam3": "crow mic",
-    "crowcam4": "crow mic",
-    "crowcam": "crow mic",
-    "foxcam2": "fox mic",
-    "foxcam3": "fox mic",
-    "foxcam4": "fox mic",
-    "foxcam": "fox mic",
-    "localpccam": "local rtmp desktop",
-    "marmosetcam2": "marmoset mic",
-    "marmosetcam3": "marmoset mic",
-    "marmosetcam": "marmoset mic",
     "music": globalMusicSource,
-    "nuthousecam": "nuthouse local",
-    "parrotcam": "Parrot Camera",
-    "pasturecam": "Pasture Camera",
-    "pccam": "local rtmp desktop",
-    "phonecam": "alveus rtmp mobile",
+    "pasture": "Pasture Camera",
+    "fox": "fox mic",
+    "foxden": "fox mic",
+    "foxcorner": "fox mic",
+    "foxmulticam": "fox mic",
+    "parrot": "Parrot Camera",
+    "crow": "crow mic",
+    "crowoutdoor": "crow mic",
+    "crowindoor": "crow mic",
+    "crowmulticam": "crow mic",
+    "crowmulti2cam": "crow mic",
+    "marm": "marmoset mic",
+    "marmoset": "marmoset mic",
+    "marmosetindoor": "marmoset mic",
+    "marmosetoutdoor": "marmoset mic",
+    "marmosetmulti": "marmoset mic",
+    "nuthouse": "nuthouse local",
+    "nut": "nuthouse local",
+    "phone": "alveus rtmp mobile",
+    "backpack": "maya rtmp 1",
+    "pc": "local rtmp desktop",
+    "wolf": "wolf mic",
+    "wolfcorner": "wolf mic",
+    "wolfindoor": "wolf camera indoor",
+    "wolfden": "wolf den2 camera",
+    "wolfden2": "wolf den2 camera",
+    "wolfmulti": "wolf mic",
+    "wolfmulti2": "wolf mic",
+    "wolfmulti3": "wolf mic",
+    "wolfmulti4": "wolf mic",
+    "wolfmulti5": "wolf mic",
+    "chatchat": "chat chats audio",
     "phonemic": "alveus rtmp mobile mic",
-    "wolfcam2": "wolf mic",
-    "wolfcam3": "wolf mic",
-    "wolfcam4": "wolf den2 camera",
-    "wolfcam5": "wolf camera indoor",
-    "wolfcam6": "wolf mic",
-    "wolfcam7": "wolf mic",
-    "wolfcam8": "wolf mic",
-    "wolfcam9": "wolf den2 camera",
-    "wolfcam10": "wolf mic",
-    "wolfcam": "wolf mic",
+    "chicken": "Chicken Camera"
 }
-
 //used for unmute/mute all. match above phrasing
 const micGroups = {
     livecams: {
-        crowcam: { name: sceneAudioSource.crowcam, volume: -7.6 },
-        marmosetcam: { name: sceneAudioSource.marmosetcam, volume: -7.6 },
-        pasturecam: { name: sceneAudioSource.pasturecam, volume: -2.4 }, 
-        parrotcam: { name: sceneAudioSource.parrotcam, volume: -7.9 },
-        wolfcam: { name: sceneAudioSource.wolfcam, volume: -7.9 }, 
-        wolfcam4: { name: sceneAudioSource.wolfcam4, volume: -7.9 },
-        wolfcam5: { name: sceneAudioSource.wolfcam5, volume: -7.9 }
+        pasture: { name: sceneAudioSource.pasture, volume: -2.4 }, parrot: { name: sceneAudioSource.parrot, volume: -7.9 },
+        crow: { name: sceneAudioSource.crow, volume: -7.6 }, marmoset: { name: sceneAudioSource.marm, volume: -7.6 },
+        wolf: { name: sceneAudioSource.wolf, volume: -7.9 }, wolfden: { name: sceneAudioSource.wolfden2, volume: -7.9 },
+        wolfindoor: { name: sceneAudioSource.wolfindoor, volume: -7.9 }
     },
     restrictedcams: {
-        foxcam: { name: sceneAudioSource.foxcam, volume: -2.4 }
+        fox: { name: sceneAudioSource.fox, volume: -2.4 }
     },
     admincams: {
-        backpack: { name: sceneAudioSource.backpack, volume: 0 },
+        phone: { name: sceneAudioSource.phone, volume: 0 },
+        backpack: { name: sceneAudioSource.backpack, volume: 0 }, pc: { name: sceneAudioSource.pc, volume: 0 },
+        nuthouse: { name: sceneAudioSource.nut, volume: 0 },
         chatchat: { name: sceneAudioSource.chatchat, volume: 0 },
-        nuthousecam: { name: sceneAudioSource.nuthousecam, volume: 0 },
-        pccam: { name: sceneAudioSource.pccam, volume: 0 },
-        phonecam: { name: sceneAudioSource.phonecam, volume: 0 },
         phonemic: { name: sceneAudioSource.phonemic, volume: 0 }
     }
 }
 
+
+
+
+//ADD IP INFO IN ENV
+//Scene Names in OBS
+//lowercase, no spaces, no s/es
+const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "toast","roach", "crow", "crowoutdoor", "fox", "foxden",
+    "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "puppy", "marty", "bb","construction","chicken"];
+
+//Axis Camera Mapping to Command. Converting base to source name
+const axisCameraCommandMapping = {
+    "pasture":"pasture",
+    "parrot":"parrot", 
+    "wolf":"wolf", 
+    "wolfcam2":"wolfcorner", 
+    "wolfcam3":"wolfden2", 
+    "wolfcam4":"wolfden", 
+    "wolfcam5":"wolfindoor", 
+    "wolfcam6":"wolf",
+    "wolfcam7":"wolf",
+    "wolfcam8":"wolfcorner",
+    "wolfcam9":"wolf",
+    "wolfcam10":"wolfcorner",
+    "georgie":"georgie", 
+    "georgiewater":"georgiewater", 
+    "noodle":"noodle", 
+    "patchy":"patchy", 
+    "toast":"toast", 
+    "roach":"roach", 
+    "crow":"crow", 
+    "crowcam2":"crowoutdoor", 
+    "crowcam3":"crowmulti", 
+    "crowcam4":"crowmulti2", 
+    "fox":"fox", 
+    "foxcam4":"foxden",
+    "foxcam3":"foxcorner", 
+    "hank":"hank", 
+    "hankcam2":"hankcorner", 
+    "marmoset":"marmoset", 
+    "marmosetcam2":"marmosetindoor", 
+    "chin":"chin", 
+    "puppy":"puppy", 
+    "isopod":"marty", 
+    "orangeisopod":"bb",
+    "construction":"construction",
+    "chickencam":"chicken"
+    // "ratcam":"rat"
+}
+
+//Camera Commands
+const ptzPrefix = "ptz";
+const commandPermissionsCamera = {
+    commandAdmins: ["testadmincamera"],
+    commandSuperUsers: ["testsupercamera", "ptzcontrol", "ptzoverride", "ptzclear"],
+    commandMods: ["testmodcamera", "ptztracking", "ptzirlight", "ptzwake"],
+    commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
+                     "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick", "ptzdraw",
+                     "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus"],
+    commandVips: ["ptzhome", "ptzpreset", "ptzzoom","ptzzoomr", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "ptzgetcam"],
+    commandUsers: []
+}
+
+//Extra Commands
+const commandPermissionsExtra = {
+    commandAdmins: ["testadminextra"],
+    commandSuperUsers: ["testsuperextra", "resetcloudsource", "resetcloudsourcef", "setalveusscene", "setcloudscene", "changeserver", "setmute", "camclear"],
+    commandMods: ["testmodextra", "resetsource","resetsourcef","camload", "camlist", "camsave", "camrename", "campresetremove", "customcams", "customcamsbig", "customcamstl", "customcamstr", "customcamsbl", "customcamsbr",
+        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam"],
+    commandOperator: [],
+    commandVips: ["getvolume", "setvolume", "resetvolume", "removecam", "swapcam", "scenecams", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetpc", "resetlivecam", "resetbackpackf", "resetpcf", "resetlivecamf", "resetcam", "resetextra","resetphone", "resetphonef"],
+    commandUsers: []
+}
+
+//Unifi
+const commandPermissionsUnifi = {
+    commandAdmins: [],
+    commandSuperUsers: ["apclientinfo", "apclientreconnect"],
+    commandMods: ["apsignal", "apreconnect"],
+    commandOperator: [],
+    commandVips: [],
+    commandUsers: []
+}
+
 //CCam Argument for Command Mapping. Converting base to source name
 const customCamCommandMapping = {
-    "3cam": "georgie noodle isopod",
-    "4cam": "georgie noodle isopod roach",
-    "4camoutdoor": "pasture parrot marmoset fox",
-    "backpack": "backpack",
-    "chickencam": "chicken",
-    "chincam": "chin",
-    "constructioncam": "construction",
-    "connorpc": "connorpc",
+    "hankcam2": "hankcorner",
+    "hankcam3": "hankmulti",
+    "noodlehidecam": "noodlehide",
+    "georgiewatercam": "georgiewater",
+    "georgiemulticam": "georgiemulti",
+    "crowcam": "crow",
     "crowcam2": "crowoutdoor",
     "crowcam3": "crowmulti",
     "crowcam4": "crowmulti2",
-    "crowcam": "crow",
+    "foxcam": "fox",
     "foxcam2": "foxmulti",
     "foxcam3": "foxcorner",
     "foxcam4": "foxden",
-    "foxcam": "fox",
-    "georgiecam": "georgie",
-    "georgiemulticam": "georgiemulti",
-    "georgiewatercam": "georgiewater",
-    "hankcam2": "hankcorner",
-    "hankcam3": "hankmulti",
-    "hankcam": "hank",
-    "indoorcams": "georgie hank puppy chin isopod roach",
-    "indoorcamsbig": "georgie hank puppy chin isopod roach",
-    "isopodcam": "isopod",
-    "localpccam": "pc",
+    "marmosetcam": "marmoset",
     "marmosetcam2": "marmosetindoor",
     "marmosetcam3": "marmosetmulti",
-    "marmosetcam": "marmoset",
+    "3cam": "georgie noodle isopod",
+    "4cam": "georgie noodle isopod roach",
+    "4camoutdoor": "pasture parrot marmoset fox",
     "nightcams": "wolf pasture parrot fox crow marmoset",
     "nightcamsbig": "wolf pasture parrot fox crow marmoset",
-    "noodlecam": "noodle",
-    "noodlehidecam": "noodlehide",
-    "nuthousecam": "nuthouse",
-    "orangeisopodcam": "orangeisopod",
-    "parrotcam": "parrot",
-    "pasturecam": "pasture",
-    "patchycam": "patchy",
-    "pccam": "pc",
-    "phonecam": "phone",
-    "puppycam": "puppy",
+    "indoorcams": "georgie hank puppy chin isopod roach",
+    "indoorcamsbig": "georgie hank puppy chin isopod roach",
+    "chincam": "chin",
+    "ratcam": "rat",
     "ratcam2": "rat2",
     "ratcam3": "rat3",
     "ratcam4": "ratmulti",
-    "ratcam": "rat",
     "ratcamall": "rat rat2 rat3",
-    "roachcam": "roaches",
+    "localpccam": "pc",
     "serverpccam": "pc",
-    "toastcam": "toast",
-    "wolfcam2": "wolfcorner",
-    "wolfcam3": "wolfden",
-    "wolfcam4": "wolfden2",
-    "wolfcam5": "wolfindoor",
-    "wolfcam6": "wolfmulti",
-    "wolfcam7": "wolfmulti2",
-    "wolfcam8": "wolfmulti3",
-    "wolfcam9": "wolfmulti4",
-    "wolfcam10": "wolfmulti5",
-    "wolfcam": "wolf",
+    "orangeisopodcam": "orangeisopod",
+    "roachcam":"roaches",
+    "constructioncam":"construction",
+    "wolfcam2":"wolfcorner", 
+    "wolfcam3":"wolfden", 
+    "wolfcam4":"wolfden2", 
+    "wolfcam5":"wolfindoor", 
+    "wolfcam6":"wolfmulti", 
+    "wolfcam7":"wolfmulti2", 
+    "wolfcam8":"wolfmulti3", 
+    "wolfcam9":"wolfmulti4", 
+    "wolfcam10":"wolfmulti5", 
 }
 
 const commandSceneAlias = {
-    "4camoutdoor": ["4camoutdoors", "multioutdoor"],
-    accbrb: ["acbrb"],
-    accending: ["acending", "accend", "acend"],
-    accintro: ["acintro"],
-    ccbrb: ["cbrb"],
-    ccending: ["cending", "ccend", "cend"],
-    ccintro: ["cintro"],
-    chatchat: ["bugmic", "chatchatmic"],
-    chincam: ["chinchillacam", "chinscam", "chincam", "snorkcam", "moomincam", "fluffycam"],
-    connorintro: ["penis"],
-    connorpc: ["connordesktop"],
-    constructioncam: ["timelapsecam"],
-    crowcam2: ["crowcamoutdoor", "crowcamoutdoors", "crowoutdoorcam", "crowoutcam"],
-    crowcam3: ["crowcammulti", "crowmulticam", "crowoutcrowinmulticam", "crowoutcrowincam", "crowoutcrowcam", "crowcrowincam"],
-    crowcam4: ["crowcammulti2", "crowmulti2cam", "crowincrowoutmulticam", "crowincrowoutcam", "crowcrowoutcam", "crowincrowcam"],
-    crowcam: ["crowcamindoor", "crowindoorcam", "crowincam", "crowinsidecam"],
-    foxcam2: ["foxmulticam", "foxcammulti", "foxfoxcornercam", "foxfoxcornermulticam"],
-    foxcam3: ["foxwideangle", "foxcornercam"],
-    foxcam4: ["foxdencam", "foxcamden"],
-    foxcam: ["foxcam", "foxescam"],
-    georgiecam: ["georgcam"],
-    georgiewatercam: ["georgieunderwatercam"],
+    localpccam: ["desktopcam","pclocalcam","pccamlocal","alveuspccam"],
+    serverpccam: ["pccam","pcservercam", "remotepccam","serverpccam"],
+    phonecam: ["alveusphonecam", "winniecam", "goatcam"],
+    puppycam: ["scorpioncam"],
+    roachcam: ["roachescam","barbaracam"],
+    hankcam: ["mrmctraincam ", "choochoocam", "hankthetankchoochoomrmctraincam"],
     hankcam2: ["mrmctraincam2 ", "choochoocam2", "hankthetankchoochoomrmctraincam3", "hanknightcam", "hankcornercam"],
     hankcam3: ["mrmctraincam3 ", "choochoocam3", "hankthetankchoochoomrmctraincam3", "hankmulticam"],
-    hankcam: ["mrmctraincam ", "choochoocam", "hankthetankchoochoomrmctraincam"],
-    indoorcams: ["4cams", "indoorcam", "insidecams", "insidecam"],
-    indoorcamsbig: ["indoorcambig", "insidecamsbig", "insidecambig"],
     isopodcam: ["isopodscam", "martycam", "martyisopodcam"],
-    localpccam: ["desktopcam", "pclocalcam", "pccamlocal", "alveuspccam"],
-    marmosetcam2: ["marmosetindoorcam", "marmosetsindoorcam", "marmsindoorcam", "marminsidecam", "marmsincam", "marmindoorcam", "marmincam"],
-    marmosetcam3: ["marmosetmulticam", "marmosetsmulticam", "marmsmulticam", "marmmulticam", "marmoutmarmincam", "marmmarmincam", "marmoutmarmcam", "marmoutmarminmulticam", "marmosetoutmarmosetinmulticam"],
+    orangeisopodcam: ["bbcam", "bbisopodcam", "sisopodcam", "isopodorangecam", "oisopodcam", "spanishisopodcam", "isopod2cam", "isopodcam2"],
+    georgiecam: ["georgcam"],
+    georgiewatercam: ["georgieunderwatercam"],
+    servernuthousecam: ["servernutcam", "remotenutcam", "remotenuthousecam"],
+    crowcam: ["crowcamindoor", "crowindoorcam","crowincam","crowinsidecam"],
+    crowcam2: ["crowcamoutdoor", "crowcamoutdoors", "crowoutdoorcam","crowoutcam"],
+    crowcam3: ["crowcammulti", "crowmulticam","crowoutcrowinmulticam","crowoutcrowincam","crowoutcrowcam","crowcrowincam"],
+    crowcam4: ["crowcammulti2", "crowmulti2cam","crowincrowoutmulticam","crowincrowoutcam","crowcrowoutcam","crowincrowcam"],
+    foxcam: ["foxcam", "foxescam"],
+    foxcam2: ["foxmulticam", "foxcammulti","foxfoxcornercam","foxfoxcornermulticam"],
+    foxcam3: ["foxwideangle", "foxcornercam"],
+    foxcam4: ["foxdencam", "foxcamden"],
     marmosetcam: ["marmosetoutdoorcam", "marmosetscam", "marmcam", "marmscam", "marmsoutdoorcam", "marmsoutcam", "marmoutdoorcam", "marmoutcam"],
-    nickending: ["nickend"],
+    marmosetcam2: ["marmosetindoorcam", "marmosetsindoorcam", "marmsindoorcam", "marminsidecam","marmsincam", "marmindoorcam", "marmincam"],
+    marmosetcam3: ["marmosetmulticam", "marmosetsmulticam", "marmsmulticam", "marmmulticam","marmoutmarmincam","marmmarmincam",
+                    "marmoutmarmcam","marmoutmarminmulticam","marmosetoutmarmosetinmulticam"],
+    "4camoutdoor": ["4camoutdoors", "multioutdoor"],
     nightcams: ["nightcam", "outdoorcams", "outdoorcam", "outsidecam", "outsidecams", "livecams", "livecam"],
     nightcamsbig: ["nightcambig", "outdoorcamsbig", "outdoorcambig", "outsidecambig", "outsidecamsbig", "nightcamb", "nightcams2", "ncb"],
-    nuthousecam: ["nutcam"],
-    orangeisopodcam: ["bbcam", "bbisopodcam", "sisopodcam", "isopodorangecam", "oisopodcam", "spanishisopodcam", "isopod2cam", "isopodcam2"],
-    phonecam: ["alveusphonecam", "winniecam", "goatcam"],
-    phonemic: ["phoneaudio", "phonemic", "mobilemic"],
-    puppycam: ["scorpioncam"],
-    ratcam2: ["ratmiddlecam", "rat2cam", "ratmcam"],
-    ratcam3: ["ratbottomcam", "rat3cam", "ratbcam"],
+    indoorcams: ["4cams", "indoorcam", "insidecams", "insidecam"],
+    indoorcamsbig: ["indoorcambig", "insidecamsbig", "insidecambig"],
+    chincam: ["chinchillacam", "chinscam", "chincam", "snorkcam", "moomincam", "fluffycam"],
+    ratcam: ["ratcam1","rattopcam", "rat1cam","nillacam","chipscam","chipcam","rattcam"],
+    ratcam2: ["ratmiddlecam", "rat2cam","ratmcam"],
+    ratcam3: ["ratbottomcam", "rat3cam","ratbcam"],
     ratcam4: ["ratmulticam", "rat4cam"],
-    ratcam: ["ratcam1", "rattopcam", "rat1cam", "nillacam", "chipscam", "chipcam", "rattcam"],
     ratcamall: ["ratallcam", "ratstackcam"],
-    roachcam: ["roachescam", "barbaracam"],
-    servernuthousecam: ["servernutcam", "remotenutcam", "remotenuthousecam"],
-    serverpccam: ["pccam", "pcservercam", "remotepccam", "serverpccam"],
-    sntbrb: ["showbrb", "tellbrb", "showntellbrb", "showandtellbrb"],
-    sntending: ["showending", "tellending", "showntellending", "showandtellending", "sntend"],
-    sntintro: ["showintro", "tellintro", "showntellintro", "showandtellintro"],
-    wolfcam2: ["wolvescornercam", "wolfcornercam", "wolfsidecam", "wolfdeckcam", "wolf2cam"],
-    wolfcam3: ["wolvesdencam", "wolfdencam", "wolfponddencam"],
-    wolfcam4: ["wolvesden2cam", "wolfden2cam", "wolfdeckdencam"],
-    wolfcam5: ["wolvesindoorcam", "wolfindoorcam", "wolfinsidecam", "wolfincam", "wolficam", "wolfcamindoor", "wolfcamin", "wolfcaminside"],
-    wolfcam6: ["wolvesmulticam", "wolfmulticam", "wolfoutmulticam", "wolfwolfcornermulticam"],
-    wolfcam7: ["wolfindoormulticam", "wolfinmulticam", "wolfinsidemulticam", "wolfwolfinmulticam", "wolfwolfincam"],
-    wolfcam8: ["wolfdenmulticam", "wolfwolfdenmulticam", "wolfwolfdencam"],
-    wolfcam9: ["wolfden2multicam", "wolfwolfden2multicam", "wolfwolfden2cam"],
-    wolfcam10: ["wolfcornermulticam", "wolfcornerwolfincam", "wolfcornerwolfinmulticam", "wolfcwolfincam", "wolfcwolficam"],
-    wolfcam: ["wolvescam", "timbercam", "awacam", "wolfocam", "wolfoutcam", "wolfoutdoorcam", "wolfoutsidecam", "wolfcamout", "wolfcamoutdoor"],
+    connorpc: ["connordesktop"],
+    constructioncam: ["timelapsecam"],
+    connorintro: ["penis"],
+    accintro: ["acintro"],
+    accbrb: ["acbrb"],
+    accending: ["acending","accend","acend"],
+    ccintro: ["cintro"],
+    ccbrb: ["cbrb"],
+    ccending: ["cending","ccend","cend"],
+    sntintro: ["showintro","tellintro","showntellintro","showandtellintro"],
+    sntbrb: ["showbrb","tellbrb","showntellbrb","showandtellbrb"],
+    sntending: ["showending","tellending","showntellending","showandtellending","sntend"],
+    nickending: ["nickend"],
+    chatchat: ["bugmic","chatchatmic"],
+    phonemic: ["phoneaudio","phonemic","mobilemic"],
+    wolfcam: ["wolvescam","timbercam","awacam","wolfocam","wolfoutcam","wolfoutdoorcam","wolfoutsidecam","wolfcamout","wolfcamoutdoor"],
+    wolfcam2: ["wolvescornercam","wolfcornercam","wolfsidecam","wolfdeckcam","wolf2cam"],
+    wolfcam3: ["wolvesdencam","wolfdencam","wolfponddencam"],
+    wolfcam4: ["wolvesden2cam","wolfden2cam","wolfdeckdencam"],
+    wolfcam5: ["wolvesindoorcam","wolfindoorcam","wolfinsidecam","wolfincam","wolficam","wolfcamindoor","wolfcamin","wolfcaminside"],
+    wolfcam6: ["wolvesmulticam","wolfmulticam","wolfoutmulticam","wolfwolfcornermulticam"],
+    wolfcam7: ["wolfindoormulticam","wolfinmulticam","wolfinsidemulticam","wolfwolfinmulticam","wolfwolfincam"],
+    wolfcam8: ["wolfdenmulticam","wolfwolfdenmulticam","wolfwolfdencam"],
+    wolfcam9: ["wolfden2multicam","wolfwolfden2multicam","wolfwolfden2cam"],
+    wolfcam10: ["wolfcornermulticam","wolfcornerwolfincam","wolfcornerwolfinmulticam","wolfcwolfincam","wolfcwolficam"],
 }
 
 const commandControlAlias = {
@@ -369,7 +393,7 @@ const commandControlAlias = {
     camrename: ["camsrename", "renamecam", "renamecams"],
     camlist: ["camslist", "listcam", "listcams", "listlayout", "listlayouts", "layouts"],
     setvolume: ["volumeset", "camvolume", "micvolume"],
-    getvolume: ["volumeinfo", "volumeget", "getvolumes", "volume"],
+    getvolume: ["volumeinfo", "volumeget","getvolumes","volume"],
     resetvolume: ["volumereset", "camvolumereset", "micvolumereset", "resetvolumes", "resetmic", "resetmics"],
     unmutecam: ["unmute", "unmutemic"],
     unmuteallcams: ["unmuteall", "unmutecamsall", "unmutecamall", "unmuteallmic"],
@@ -393,80 +417,76 @@ const commandControlAlias = {
 }
 
 let commandScenes = {
+    backpackcam: "Backpack Server", //Cloud server
+    serverpccam: "Alveus PC Server",//"Alveus PC Server", //Cloud server
+    phonecam: "Phone Server", //Cloud server
+    servernuthousecam: "fullcam nuthouse",
+    brbscreen: "BRB", //Cloud server
+    ellaintro: "EllaIntro",
+    kaylaintro: "KaylaIntro",
+    connorintro: "ConnorIntro",
+    poboxintro: "POBoxIntro",
+    aqintro: "AQIntro",
+    accintro: "ACCIntro",
     accbrb: "ACCBRB",
     accending: "ACCEnding",
-    accintro: "ACCIntro",
-    aqintro: "AQIntro",
-    backpackcam: "Backpack Server", //Cloud server
-    brbscreen: "BRB", //Cloud server
+    ccintro: "CCIntro",
     ccbrb: "CCBRB",
     ccending: "CCEnding",
-    ccintro: "CCIntro",
-    connorintro: "ConnorIntro",
-    ellaintro: "EllaIntro",
-    intro: "INTRO",
-    kaylaintro: "KaylaIntro",
-    localbackpackcam: "Backpack",
-    localpccam: "Alveus PC",
-    nickbrb: "NickBRB",
-    nickending: "NickEnding",
-    nickintro: "NickIntro",
-    phonecam: "Phone Server", //Cloud server
-    poboxintro: "POBoxIntro",
-    servernuthousecam: "fullcam nuthouse",
-    serverpccam: "Alveus PC Server",//"Alveus PC Server", //Cloud server
+    sntintro: "SNTIntro",
     sntbrb: "SNTBRB",
     sntending: "SNTEnding",
-    sntintro: "SNTIntro",
+    nickintro: "NickIntro",
+    nickbrb: "NickBRB",
+    nickending: "NickEnding",
+    intro: "INTRO",
+    localbackpackcam: "Backpack",
+    localpccam: "Alveus PC",
 }
 
 let commandScenesCloud = {
+    backpackcam: "Maya LiveU",
+    serverpccam: "Alveus PC",
+    phonecam: "Phone",
+    brbscreen: "BRB",
+    servernuthousecam: "Alveus Nuthouse",
+    ellaintro: "EllaIntro",
+    kaylaintro: "KaylaIntro",
+    connorintro: "ConnorIntro",
+    poboxintro: "POBoxIntro",
+    aqintro: "AQIntro",
+    accintro: "ACCIntro",
     accbrb: "ACCBRB",
     accending: "ACCEnding",
-    accintro: "ACCIntro",
-    aqintro: "AQIntro",
-    backpackcam: "Maya LiveU",
-    brbscreen: "BRB",
+    ccintro: "CCIntro",
     ccbrb: "CCBRB",
     ccending: "CCEnding",
-    ccintro: "CCIntro",
-    connorintro: "ConnorIntro",
-    ellaintro: "EllaIntro",
-    intro: "Intro",
-    kaylaintro: "KaylaIntro",
-    localbackpackcam: "Alveus Server",
-    localpccam: "Alveus Server",
-    nickbrb: "NickBRB",
-    nickending: "NickEnding",
-    nickintro: "NickIntro",
-    phonecam: "Phone",
-    poboxintro: "POBoxIntro",
-    servernuthousecam: "Alveus Nuthouse",
-    serverpccam: "Alveus PC",
+    sntintro: "SNTIntro",
     sntbrb: "SNTBRB",
     sntending: "SNTEnding",
-    sntintro: "SNTIntro",
+    nickintro: "NickIntro",
+    nickbrb: "NickBRB",
+    nickending: "NickEnding",
+    intro: "Intro",
+    localbackpackcam: "Alveus Server",
+    localpccam: "Alveus Server"
 }
+
 
 
 //-----------------------------------------------------------
 
 const commandAlias = { ...commandControlAlias, ...commandSceneAlias };
 
-//create Permission List with aliases
+//create Permission List
 const commandPermissions = getCommandPermissions();
-//create Full Command List
+//create Command List
 const commandList = getCommandList(commandPermissions, commandAlias);
-//add aliases
 commandScenes = setupCommandScenes(commandScenes);
-//add aliases
 commandScenesCloud = setupCommandScenes(commandScenesCloud);
-//add aliases
 multiCommands = setupCommandAliasMap(multiCommands);
-//add aliases
 onewayCommands = setupCommandAliasMap(onewayCommands);
 
-//create list of all aliases:basecommand
 const commandAliasConverted = setupCommandAliasConversion(commandAlias);
 const multiCustomCamScenesConverted = setupCommandAliasConversion(multiCustomCamScenes);
 const customCommandAlias = setupCustomCamAlias(commandSceneAlias);
