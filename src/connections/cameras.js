@@ -56,6 +56,40 @@ class Axis {
   }
 
   /**
+   * Make a binary GET request to the camera
+   *
+   * @param {string} endpoint Endpoint to make the request to
+   * @returns {Promise<string | null>} Response body, or null if the request failed
+   * @private
+   */
+  async #getBinary(endpoint) {
+    try {
+        const url = `http://${this.#host}${endpoint}`;
+        console.log(`Fetching binary data from: ${url}`); // Log the request URL
+
+        const response = await this.#client.fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'image/jpeg' // Specify the expected content type
+            }
+        });
+
+        if (!response.ok) {
+            this.#logger.error(`Failed to GET ${endpoint}: ${response.status} ${response.statusText}`);
+            return null; // Return null if the response is not OK
+        }
+
+        // Return the response as an ArrayBuffer
+        const data = await response.arrayBuffer();
+        console.log('Received ArrayBuffer of size:', data.byteLength); // Log the size of the ArrayBuffer
+        return data;
+    } catch (e) {
+        this.#logger.error(`Failed to GET ${endpoint}: ${e.message}`);
+        return null;
+    }
+  }
+  
+  /**
    * Make a POST request to the camera
    *
    * Parses the response as JSON
@@ -131,6 +165,30 @@ class Axis {
     );
     return resp !== null;
   }
+
+   /**
+     * Fetch an image from the Axis camera
+     * @returns {Promise<string|null>} The image as a Base64 string
+     */
+   async fetchImage() {
+    try {
+        // Use #getBinary to fetch the image as an ArrayBuffer
+        const resp = await this.#getBinary('/axis-cgi/jpg/image.cgi');
+      
+        // Check if resp is defined and has data
+        if (resp && resp.byteLength > 0) {
+            const base64Image = Buffer.from(resp).toString('base64'); // Convert to Base64
+            return base64Image;
+        } else {
+            this.#logger.error('Image response is undefined or has no data');
+            return null; // Return null if the image fetch was unsuccessful
+        }
+    } catch (error) {
+        this.#logger.error(`Failed to fetch image: ${error.message}`); // Improved error logging
+        console.error('Error fetching image:', error);
+        return null; // Return null on error
+    }           
+ } 
 
   /**
    * Run a PTZ commands on the camera
