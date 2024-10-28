@@ -1,4 +1,3 @@
-require('dotenv').config(); // Load environment variables from .env
 const { onTwitchMessage } = require('../modules/legacy');
 const Logger = require('../utils/logger');
 const WebSocket = require('ws');
@@ -12,7 +11,7 @@ class API {
   #pingInterval;
   #tokenCache; // Token cache
 
-  constructor(wsUrl, wsKey, secretKey, controller) { 
+  constructor(wsUrl, wsKey, secretKey, controller) {
     this.wsUrl = `${wsUrl}?token=${wsKey}`; // Append wsKey to the WebSocket URL
     this.secretKey = secretKey || 'your-secret-key';
     this.controller = controller;
@@ -21,11 +20,6 @@ class API {
     // Initialize token cache with a time-to-live of 30 days
     this.#tokenCache = new NodeCache({ stdTTL: 30 * 24 * 60 * 60 }); // 30 days in seconds
 
-    if (!this.wsUrl) {
-      this.#logger.error('PUBLIC_WS_URL is not defined in environment variables.');
-      process.exit(1);
-    }
-    
     this.#createWebSocketConnection();
   }
 
@@ -41,10 +35,6 @@ class API {
 
       this.#ws.addEventListener('open', () => {
         this.#logger.log('Connected to the public API server via WebSocket');
-        if (this.controller) {
-          this.controller.ws = this.#ws; // Ensure controller.ws is set
-          this.#logger.log('controller.ws assigned');
-        }
 
         // Start the ping heartbeat
         this.#startHeartbeat();
@@ -93,7 +83,6 @@ class API {
           };
 
           this.controller.currentResponse = this.#ws;
-          this.controller.ws = this.#ws;
 
           try {
             await onTwitchMessage(this.controller, 'ptzapi', userName, cmdMessage, tags);
@@ -132,15 +121,13 @@ class API {
   // Send API command
   async sendAPI(output) {
     try {
-      const ws = this.controller ? this.controller.currentResponse : null;
-
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
+      if (!this.#ws || this.#ws.readyState !== WebSocket.OPEN) {
         this.#logger.error('WebSocket connection not found or closed');
         return;
       }
 
       try {
-        ws.send(JSON.stringify({ message: output }));
+        this.#ws.send(JSON.stringify({ message: output }));
         this.controller.currentResponse = null;
       } catch (error) {
         this.#logger.error(`Failed to send response: ${error.message}`);
@@ -153,15 +140,13 @@ class API {
   // Send broadcast message
   async sendBroadcastMessage(message, type = 'frontend') {
     try {
-      const ws = this.controller ? this.controller.ws : null;
-
-      if (!ws || ws.readyState !== WebSocket.OPEN) {
+      if (!this.#ws || this.#ws.readyState !== WebSocket.OPEN) {
         this.#logger.error('WebSocket connection not found or closed');
         return;
       }
 
       try {
-        ws.send(JSON.stringify({ type: type, data: message }));
+        this.#ws.send(JSON.stringify({ type: type, data: message }));
       } catch (error) {
         this.#logger.error(`Failed to send broadcast message: ${error.message}`);
       }
@@ -171,23 +156,21 @@ class API {
   }
 }
 
-// Global error handling
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-});
-
-// Export a function that instantiates the API class with controller
 module.exports = (controller) => {
+  const wsUrl = process.env.PUBLIC_WS_URL; // Get the Public WS server URL
+  const secretKey = process.env.JWT_SECRET; // Get the JWT decrypt token
+  const wsKey = process.env.WS_SECRET_TOKEN; // Get the WebSocket key token 
+
+  // Check if wsUrl is defined before instantiation
+  if (!wsUrl) {
+    console.error('PUBLIC_WS_URL is not defined in environment variables.');
+    process.exit(1);
+  }
+
   try {
-    const wsUrl = process.env.PUBLIC_WS_URL; // Get the Public WS server url
-    const secretKey = process.env.JWT_SECRET; // Get the JWT decrypt token
-    const wsKey = process.env.WS_SECRET_TOKEN; // Get the Websocket key token 
     controller.connections.api = new API(wsUrl, wsKey, secretKey, controller); 
   } catch (error) {
     console.error('Failed to instantiate API:', error.message);
+    controller.connections.api = null; // Set to null as a fallback indicator
   }
 };

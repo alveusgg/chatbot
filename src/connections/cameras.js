@@ -65,7 +65,7 @@ class Axis {
   async #getBinary(endpoint) {
     try {
         const url = `http://${this.#host}${endpoint}`;
-        console.log(`Fetching binary data from: ${url}`); // Log the request URL
+        this.#logger.log(`Fetching binary data from: ${url}`); // Log the request URL
 
         const response = await this.#client.fetch(url, {
             method: 'GET',
@@ -81,7 +81,7 @@ class Axis {
 
         // Return the response as an ArrayBuffer
         const data = await response.arrayBuffer();
-        console.log('Received ArrayBuffer of size:', data.byteLength); // Log the size of the ArrayBuffer
+        this.#logger.log('Received ArrayBuffer of size:', data.byteLength); // Log the size of the ArrayBuffer
         return data;
     } catch (e) {
         this.#logger.error(`Failed to GET ${endpoint}: ${e.message}`);
@@ -184,8 +184,7 @@ class Axis {
             return null; // Return null if the image fetch was unsuccessful
         }
     } catch (error) {
-        this.#logger.error(`Failed to fetch image: ${error.message}`); // Improved error logging
-        console.error('Error fetching image:', error);
+        this.#logger.error(`Failed to fetch image: ${error.message}`); 
         return null; // Return null on error
     }           
  } 
