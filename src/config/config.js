@@ -250,8 +250,8 @@ const commandPermissionsCamera = {
     commandMods: ["testmodcamera", "ptztracking", "ptzirlight", "ptzwake"],
     commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
                      "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick", "ptzdraw",
-                     "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus"],
-    commandVips: ["ptzhome", "ptzpreset", "ptzzoom","ptzzoomr", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "ptzgetcam"],
+                     "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus", "ptzfetchimg"],
+    commandVips: ["ptzhome", "ptzpreset", "ptzzoom","ptzzoomr", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "ptzgetcam", "apigetperms"],
     commandUsers: []
 }
 //timeRestrictedCommands = timeRestrictedCommands.concat(["ptzclear"]);
