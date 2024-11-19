@@ -408,7 +408,31 @@ class Axis {
     const [key, value] = resp.trim().split("=");
     return isNaN(value) ? null : parseFloat(value);
   }
+
+  /**
+   * Run a Play command on the speaker
+   * https://www.axis.com/vapix-library/subjects/t10100065/section/t10036045/display
+   * @param {number} clipNumber to play
+   * @returns {Promise<string | null>} Response body, or null if the request failed
+   */
+  async playAudioClip(clipNumber) {
+    const resp = await this.#get(`/axis-cgi/mediaclip.cgi?action=play&clip=${clipNumber}`);
+    this.#logger.info(`playAudioClip ${`/axis-cgi/mediaclip.cgi?action=play&clip=${clipNumber}`}: ${resp}`);
+    return resp !== null;
+  }
+
+  /**
+   * Run a Stop command on the speaker
+   *
+   * @returns {Promise<string | null>} Response body, or null if the request failed
+   */
+  async stopAudioClip() {
+    const resp = await this.#get(`/axis-cgi/mediaclip.cgi?action=stop`);
+    this.#logger.info(`stopAudioClip ${resp}`);
+    return resp !== null;
+  }
 }
+
 
 /**
  * Establishes connections to the Axis cameras
