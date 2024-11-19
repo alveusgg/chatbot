@@ -2,7 +2,7 @@
 const devPrefix = process.env.NODE_ENV == 'development' ? `$` : '!';
 const commandPrefix = devPrefix;
 
-const twitchChannelList = ["spacevoyage", "alveussanctuary", "alveusgg"];
+const twitchChannelList = process.env.NODE_ENV == 'development' ? ["spacevoyage"] : ["spacevoyage", "alveussanctuary", "alveusgg"];
 
 const alveusTwitchID = 636587384;
 const pauseNotify = true;
@@ -66,6 +66,17 @@ const commandPermissionsCustomCam = {
         "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "ratcam", "ratcam2", "ratcam3", "ratcam4", "orangeisopodcam"],
     commandUsers: []
 }
+
+//Mic permissions
+const commandPermissionsMic = {
+    commandAdmins: [],
+    commandSuperUsers: ["backpackmic","chatchatmic","localpcmic","chickenmic","foxmic","nuthousemic","pcmic","phonemic","phonedirectmic"],
+    commandMods: ["crowmic","marmosetmic","parrotmic","pasturemic","wolfmic","wolfden2mic","wolfindoormic"],
+    commandOperator: [],
+    commandVips: ["music"],
+    commandUsers: []
+}
+
 //PTZ Commands
 const commandPermissionsCamera = {
     commandAdmins: ["testadmincamera"],
@@ -99,31 +110,21 @@ const commandPermissionsUnifi = {
     commandUsers: []
 }
 
-//One Direction, If on OBS Scene, allow subscenes commands
-//scene names are lowercase, no spaces, no s/es
-let onewayCommands = {
-    "4camoutdoor": ["foxcam", "foxcam2", "foxcam3", "foxcam4", "pasturecam"]
-}
+// //One Direction, If on OBS Scene, allow subscenes commands
+// //scene names are lowercase, no spaces, no s/es
+// let onewayCommands = {
+//     "4camoutdoor": ["foxcam", "foxcam2", "foxcam3", "foxcam4", "pasturecam"]
+// }
 
-const onewayNotifications = {
-    "4camoutdoor": ["foxes", "fox den", "fox multicam", "fox corner", "pasture"]
-}
+// const onewayNotifications = {
+//     "4camoutdoor": ["foxes", "fox den", "fox multicam", "fox corner", "pasture"]
+// }
 
-//Scene Names in OBS
-const notifyScenes = ["Parrots", "Parrots Muted Mic", "Crows", "Crows Outdoor", "Crows Muted Mic",
-    "Crows Multicam", "Nuthouse", "4 Cam Crows", "3 Cam Crows", "Pasture", "Foxes",
-    "Marmoset", "Marmoset Indoor", "Marmoset Multi",
-    "Fox Den", "Fox Corner", "Fox Multicam", "Fox Muted Mic", "4 Cam Outdoor"];
-
-//Chat Command Swapping
-//key names are same as multiscenes
-//links command to obs scene names
-let multiCommands = {
-    crow: ["crowcam", "crowcam2", "crowcam3", "crowcam4"],
-    fox: ["foxcam", "foxcam2", "foxcam3", "foxcam4"],
-    wolf: ["wolfcam", "wolfcam2", "wolfcam3", "wolfcam4", "wolfcam5", "wolfcam6", "wolfcam7", "wolfcam8", "wolfcam9", "wolfcam10"],
-    marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
-}
+// //Scene Names in OBS
+// const notifyScenes = ["Parrots", "Parrots Muted Mic", "Crows", "Crows Outdoor", "Crows Muted Mic",
+//     "Crows Multicam", "Nuthouse", "4 Cam Crows", "3 Cam Crows", "Pasture", "Foxes",
+//     "Marmoset", "Marmoset Indoor", "Marmoset Multi",
+//     "Fox Den", "Fox Corner", "Fox Multicam", "Fox Muted Mic", "4 Cam Outdoor"];
 
 //ADD IP INFO IN ENV
 const axisCameras = {
@@ -160,67 +161,28 @@ const axisCameras = {
 
 //Audio source in OBS
 //lowercase, no spaces, no s/es, cleanName()
-const sceneAudioSource = {
-    "backpack": "maya rtmp 1",
-    "chatchat": "chat chats audio",
-    "chickencam": "Chicken Camera",
-    "crowcam2": "crow mic",
-    "crowcam3": "crow mic",
-    "crowcam4": "crow mic",
-    "crowcam": "crow mic",
-    "foxcam2": "fox mic",
-    "foxcam3": "fox mic",
-    "foxcam4": "fox mic",
-    "foxcam": "fox mic",
-    "localpccam": "local rtmp desktop",
-    "marmosetcam2": "marmoset mic",
-    "marmosetcam3": "marmoset mic",
-    "marmosetcam": "marmoset mic",
-    "music": globalMusicSource,
-    "nuthousecam": "nuthouse local",
-    "parrotcam": "Parrot Camera",
-    "pasturecam": "Pasture Camera",
-    "pccam": "local rtmp desktop",
-    "phonecam": "alveus rtmp mobile",
-    "phonemic": "alveus rtmp mobile mic",
-    "wolfcam2": "wolf mic",
-    "wolfcam3": "wolf mic",
-    "wolfcam4": "wolf den2 camera",
-    "wolfcam5": "wolf camera indoor",
-    "wolfcam6": "wolf mic",
-    "wolfcam7": "wolf mic",
-    "wolfcam8": "wolf mic",
-    "wolfcam9": "wolf den2 camera",
-    "wolfcam10": "wolf mic",
-    "wolfcam": "wolf mic",
-}
-
-//used for unmute/mute all. match above phrasing
-const micGroups = {
-    livecams: {
-        crowcam: { name: sceneAudioSource.crowcam, volume: -7.6 },
-        marmosetcam: { name: sceneAudioSource.marmosetcam, volume: -7.6 },
-        pasturecam: { name: sceneAudioSource.pasturecam, volume: -2.4 }, 
-        parrotcam: { name: sceneAudioSource.parrotcam, volume: -7.9 },
-        wolfcam: { name: sceneAudioSource.wolfcam, volume: -7.9 }, 
-        wolfcam4: { name: sceneAudioSource.wolfcam4, volume: -7.9 },
-        wolfcam5: { name: sceneAudioSource.wolfcam5, volume: -7.9 }
-    },
-    restrictedcams: {
-        foxcam: { name: sceneAudioSource.foxcam, volume: -2.4 }
-    },
-    admincams: {
-        backpack: { name: sceneAudioSource.backpack, volume: 0 },
-        chatchat: { name: sceneAudioSource.chatchat, volume: 0 },
-        nuthousecam: { name: sceneAudioSource.nuthousecam, volume: 0 },
-        pccam: { name: sceneAudioSource.pccam, volume: 0 },
-        phonecam: { name: sceneAudioSource.phonecam, volume: 0 },
-        phonemic: { name: sceneAudioSource.phonemic, volume: 0 }
-    }
+const audioSources = {
+    "backpackmic": { source: "maya rtmp 1", defaultVolume: -7.6, scenes: ["backpack"] },
+    "chatchatmic": { source: "chat chats audio", defaultVolume: -7.6, scenes: ["chatchat"] },
+    "chickenmic": { source: "Chicken Camera", defaultVolume: -7.6, scenes: ["chickencam"] },
+    "crowmic": { source: "crow mic", defaultVolume: -7.6, scenes: ["crowcam","crowcam2","crowcam3","crowcam4"] },
+    "foxmic": { source: "fox mic", defaultVolume: -2.6, scenes: ["foxcam","foxcam2","foxcam3","foxcam4"] },
+    "localpcmic": { source: "local rtmp desktop", defaultVolume: -7.6, scenes: ["localpccam"] },
+    "marmosetmic": { source: "marmoset mic", defaultVolume: -7.6, scenes: ["marmosetcam","marmosetcam2","marmosetcam3"] },
+    "music": { source: globalMusicSource, defaultVolume: -7.6, scenes: ["music"] },
+    "nuthousemic": { source: "nuthouse local", defaultVolume: -7.6, scenes: ["nuthousecam"] },
+    "parrotmic": { source: "Parrot Camera", defaultVolume: -7.6, scenes: ["parrotcam"] },
+    "pasturemic": { source: "Pasture Camera", defaultVolume: -2.6, scenes: ["pasturecam"] },
+    "pcmic": { source: "local rtmp desktop", defaultVolume: -7.6, scenes: ["pccam"] },
+    "phonemic": { source: "alveus rtmp mobile", defaultVolume: -7.6, scenes: ["phonecam"] },
+    "phonedirectmic": { source: "alveus rtmp mobile mic", defaultVolume: -7.6, scenes: ["phonemic"] },
+    "wolfmic": { source: "wolf mic", defaultVolume: -7.6, scenes: ["wolfcam","wolfcam2","wolfcam3","wolfcam6","wolfcam7","wolfcam8","wolfcam10"] },
+    "wolfden2mic": { source: "wolf den2 camera", defaultVolume: -7.6, scenes: ["wolfcam4","wolfcam9"] },
+    "wolfindoormic": { source: "wolf camera indoor", defaultVolume: -7.6, scenes: ["wolfcam5"] },
 }
 
 //CCam Argument for Command Mapping. Converting base to source name
-const customCamCommandMapping = {
+const customCamSources = {
     "3cam": "georgie noodle isopod",
     "4cam": "georgie noodle isopod roach",
     "4camoutdoor": "pasture parrot marmoset fox",
@@ -282,6 +244,79 @@ const customCamCommandMapping = {
     "wolfcam": "wolf",
 }
 
+//OBS Scene Names
+let obsSources = {
+    accbrb: "ACCBRB",
+    accending: "ACCEnding",
+    accintro: "ACCIntro",
+    aqintro: "AQIntro",
+    backpackcam: "Backpack Server", //Cloud server
+    brbscreen: "BRB", //Cloud server
+    ccbrb: "CCBRB",
+    ccending: "CCEnding",
+    ccintro: "CCIntro",
+    connorintro: "ConnorIntro",
+    ellaintro: "EllaIntro",
+    intro: "INTRO",
+    kaylaintro: "KaylaIntro",
+    localbackpackcam: "Backpack",
+    localpccam: "Alveus PC",
+    nickbrb: "NickBRB",
+    nickending: "NickEnding",
+    nickintro: "NickIntro",
+    phonecam: "Phone Server", //Cloud server
+    poboxintro: "POBoxIntro",
+    servernuthousecam: "fullcam nuthouse",
+    serverpccam: "Alveus PC Server",//"Alveus PC Server", //Cloud server
+    sntbrb: "SNTBRB",
+    sntending: "SNTEnding",
+    sntintro: "SNTIntro",
+}
+//OBS Cloud Scene Names
+let obsCloudSources = {
+    accbrb: "ACCBRB",
+    accending: "ACCEnding",
+    accintro: "ACCIntro",
+    aqintro: "AQIntro",
+    backpackcam: "Maya LiveU",
+    brbscreen: "BRB",
+    ccbrb: "CCBRB",
+    ccending: "CCEnding",
+    ccintro: "CCIntro",
+    connorintro: "ConnorIntro",
+    ellaintro: "EllaIntro",
+    intro: "Intro",
+    kaylaintro: "KaylaIntro",
+    localbackpackcam: "Alveus Server",
+    localpccam: "Alveus Server",
+    nickbrb: "NickBRB",
+    nickending: "NickEnding",
+    nickintro: "NickIntro",
+    phonecam: "Phone",
+    poboxintro: "POBoxIntro",
+    servernuthousecam: "Alveus Nuthouse",
+    serverpccam: "Alveus PC",
+    sntbrb: "SNTBRB",
+    sntending: "SNTEnding",
+    sntintro: "SNTIntro",
+}
+
+//Allow Swapping between same group
+const camGrouping = {
+    crowbase: ["crowcam", "crowcam2", "crowcam3", "crowcam4"],
+    foxbase: ["foxcam", "foxcam2", "foxcam3", "foxcam4"],
+    wolfbase: ["wolfcam", "wolfcam2", "wolfcam3", "wolfcam4", "wolfcam5", "wolfcam6", "wolfcam7", "wolfcam8", "wolfcam9", "wolfcam10"],
+    marmosetbase: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
+}
+
+//Cams and Mics to use for commands that change multiple at once
+const accessGrouping = {
+    outdoorcam: ["pasturecam","parrotcam",...camGrouping[crow],...camGrouping[wolf],...camGrouping[marmoset],...camGrouping[fox]],
+    admincam: ["backpack","chatchat","localpccam","nuthousecam","pccam","phonecam","phonemic"],
+    modmic: ["pasturecam","parrotcam",...camGrouping[crow],...camGrouping[wolf],...camGrouping[marmoset]],
+    adminmic: ["backpack","chatchat","localpccam","nuthousecam","pccam","phonecam","phonemic",...camGrouping[fox]],
+}
+
 const commandSceneAlias = {
     "4camoutdoor": ["4camoutdoors", "multioutdoor"],
     accbrb: ["acbrb"],
@@ -321,7 +356,7 @@ const commandSceneAlias = {
     nuthousecam: ["nutcam"],
     orangeisopodcam: ["bbcam", "bbisopodcam", "sisopodcam", "isopodorangecam", "oisopodcam", "spanishisopodcam", "isopod2cam", "isopodcam2"],
     phonecam: ["alveusphonecam", "winniecam", "goatcam"],
-    phonemic: ["phoneaudio", "phonemic", "mobilemic"],
+    phonemic: ["phoneaudio", "mobilemic"],
     puppycam: ["scorpioncam"],
     ratcam2: ["ratmiddlecam", "rat2cam", "ratmcam"],
     ratcam3: ["ratbottomcam", "rat3cam", "ratbcam"],
@@ -392,96 +427,150 @@ const commandControlAlias = {
     ptzgetfocus: ["getfocus"],
 }
 
-let commandScenes = {
-    accbrb: "ACCBRB",
-    accending: "ACCEnding",
-    accintro: "ACCIntro",
-    aqintro: "AQIntro",
-    backpackcam: "Backpack Server", //Cloud server
-    brbscreen: "BRB", //Cloud server
-    ccbrb: "CCBRB",
-    ccending: "CCEnding",
-    ccintro: "CCIntro",
-    connorintro: "ConnorIntro",
-    ellaintro: "EllaIntro",
-    intro: "INTRO",
-    kaylaintro: "KaylaIntro",
-    localbackpackcam: "Backpack",
-    localpccam: "Alveus PC",
-    nickbrb: "NickBRB",
-    nickending: "NickEnding",
-    nickintro: "NickIntro",
-    phonecam: "Phone Server", //Cloud server
-    poboxintro: "POBoxIntro",
-    servernuthousecam: "fullcam nuthouse",
-    serverpccam: "Alveus PC Server",//"Alveus PC Server", //Cloud server
-    sntbrb: "SNTBRB",
-    sntending: "SNTEnding",
-    sntintro: "SNTIntro",
-}
-
-let commandScenesCloud = {
-    accbrb: "ACCBRB",
-    accending: "ACCEnding",
-    accintro: "ACCIntro",
-    aqintro: "AQIntro",
-    backpackcam: "Maya LiveU",
-    brbscreen: "BRB",
-    ccbrb: "CCBRB",
-    ccending: "CCEnding",
-    ccintro: "CCIntro",
-    connorintro: "ConnorIntro",
-    ellaintro: "EllaIntro",
-    intro: "Intro",
-    kaylaintro: "KaylaIntro",
-    localbackpackcam: "Alveus Server",
-    localpccam: "Alveus Server",
-    nickbrb: "NickBRB",
-    nickending: "NickEnding",
-    nickintro: "NickIntro",
-    phonecam: "Phone",
-    poboxintro: "POBoxIntro",
-    servernuthousecam: "Alveus Nuthouse",
-    serverpccam: "Alveus PC",
-    sntbrb: "SNTBRB",
-    sntending: "SNTEnding",
-    sntintro: "SNTIntro",
-}
-
-
 //-----------------------------------------------------------
-
-const commandAlias = { ...commandControlAlias, ...commandSceneAlias };
-
-//create Permission List with aliases
-const commandPermissions = getCommandPermissions();
-//create Full Command List
-const commandList = getCommandList(commandPermissions, commandAlias);
-//add aliases
-commandScenes = setupCommandScenes(commandScenes);
-//add aliases
-commandScenesCloud = setupCommandScenes(commandScenesCloud);
-//add aliases
-multiCommands = setupCommandAliasMap(multiCommands);
-//add aliases
-onewayCommands = setupCommandAliasMap(onewayCommands);
-
-//create list of all aliases:basecommand
-const commandAliasConverted = setupCommandAliasConversion(commandAlias);
-const multiCustomCamScenesConverted = setupCommandAliasConversion(multiCustomCamScenes);
-const customCommandAlias = setupCustomCamAlias(commandSceneAlias);
-const customSceneCommands = getCommandList(commandPermissionsCustomCam, commandSceneAlias);
-
-userBlacklist.forEach(user => {
-    user = user.toLowerCase().trim();
-});
-
+//convert all usernames to lowercase
 for (const permission of userPermissions.commandPriority) {
     userPermissions[permission].forEach(user => {
         if (typeof user === "symbol") return;
         user = user.toLowerCase().trim();
     });
 }
+//convert all usernames to lowercase
+userBlacklist.forEach(user => {
+    user = user.toLowerCase().trim();
+});
+
+//base : [aliases]
+const commandAliases = combineAliasCommands();
+//base : camera
+const commandCameras = getBaseToSource(axisCameras);
+//base : group
+const commandMics = getBaseToMic(audioSources);
+//base : [groups]
+const camGroups = getBaseToSourceList(camGrouping);
+//base : [groups]
+const accessGroups = getBaseToSourceList(accessGrouping);
+
+//create database
+const commandDB = createDB();
+
+
+
+function createDB() {
+    const commandPermissions = {};
+    const baseCommands = {};
+    //combine all permission level commands
+    for (const permission of userPermissions.commandPriority) {
+        let scenes = commandPermissionsScenes[permission] || [];
+        let customCam = commandPermissionsCustomCam[permission] || [];
+        let camera = commandPermissionsCamera[permission] || [];
+        let extra = commandPermissionsExtra[permission] || [];
+        let unifi = commandPermissionsUnifi[permission] || [];
+        let mic = commandPermissionsMic[permission] || [];
+        commandPermissions[permission] = [].concat(scenes, customCam, camera, extra, unifi,mic);
+
+        //create a map of every base command
+        for (const base of commandPermissions[permission]) {
+            baseCommands[base] = {
+                permissionLevel: permission,
+                users: userPermissions[permission],
+                aliases: commandAliases[base],
+                camera: commandCameras[base],
+                audio: {name:commandMics[base], ...audioSources[commandMics[base]]},
+                camGroups: camGroups[base],
+                accessGroups: accessGroups[base],
+                customSource: customCamSources[base],
+                obsScene: obsSources[base],
+                obsCloudScene: obsCloudSources[base]
+            };
+        }
+        
+        // //add aliases
+        // let newAliases = [];
+        // for (const base of commandPermissions[permission]){
+        //     let aliasArray = commandAliases[base];
+        //     newAliases = newAliases.concat[aliasArray];
+        // }
+        // commandPermissions[permission] = commandPermissions[permission].concat(newAliases);
+        // //remove duplicates
+        // commandPermissions[permission].filter( (item, index) =>
+        //     commandPermissions[permission].indexOf(item) == index
+        // )
+    }
+
+    return baseCommands;
+}
+
+function combineAliasCommands() {
+    const commandAlias = { ...commandControlAlias, ...commandSceneAlias };
+
+    for (const parentCommand in commandAlias) {
+        commandAlias[parentCommand].push(parentCommand);
+    }
+    return commandAlias;
+}
+
+function getBaseToSource(map) {
+    let invertedMap = {};
+    for (const source in map) {
+        for (const base of map[source]) {
+            invertedMap[base] = source;
+        }
+    }
+    return invertedMap;
+}
+
+function getBaseToSourceList(map) {
+    let invertedMap = {};
+    for (const source in map) {
+        for (const base of map[source]) {
+            invertedMap[base] = invertedMap[base] || [];
+            invertedMap[base].push(source);
+        }
+    }
+    return invertedMap;
+}
+
+function getBaseToMic(map) {
+    let invertedMap = {};
+    for (const source in map) {
+        let basenames = map[source]?.scenes || [];
+        for (const base of basenames) {
+            invertedMap[base] = source;
+        }
+    }
+    return invertedMap;
+}
+
+
+//aliases : base
+const commandToBase = invertMap(commandAlias);
+
+//combine all permission maps together
+//create Full Command Array
+const commandList = getCommandList(commandPermissions, commandAlias);
+
+//base+aliases : source
+obsSources = addAliasesMap(obsSources);
+//base+aliases : source
+obsCloudSources = addAliasesMap(obsCloudSources);
+//base : [aliases]
+multiCommands = addArrayAliases(multiCommands);
+//base : [aliases]
+onewayCommands = addArrayAliases(onewayCommands);
+
+//create list of all aliases:basecommand
+
+//aliases : base
+const multiCustomCamScenesConverted = invertMap(multiCustomCamScenes);
+
+//aliases : base
+const customCommandAlias = setupCustomCamAlias(commandSceneAlias);
+const customSceneCommands = getCommandList(commandPermissionsCustomCam, commandSceneAlias);
+
+
+
+
 
 function getCommandList(commandObj, aliasObj) {
     //add Alias commands to user permissions
@@ -502,19 +591,7 @@ function getCommandList(commandObj, aliasObj) {
     return list
 }
 
-function getCommandPermissions() {
-    const commandPermissions = {};
-    //get full list of all possible commands
-    for (const permission of userPermissions.commandPriority) {
-        let scenes = commandPermissionsScenes[permission] || [];
-        let customCam = commandPermissionsCustomCam[permission] || [];
-        let camera = commandPermissionsCamera[permission] || [];
-        let extra = commandPermissionsExtra[permission] || [];
-        let unifi = commandPermissionsUnifi[permission] || [];
-        commandPermissions[permission] = [].concat(scenes, customCam, camera, extra, unifi);
-    }
-    return commandPermissions;
-}
+
 
 function getListOfCommands(commandObj) {
     const list = [];
@@ -531,8 +608,8 @@ function getListOfCommands(commandObj) {
     return list;
 }
 
-function setupCommandScenes(sceneMap) {
-    //add alias commands to commandScenes
+function addAliasesMap(sceneMap) {
+    //add alias commands to obsSources
     for (const parentCommand in commandAlias) {
         //get scene for parent command
         const scene = sceneMap[parentCommand];
@@ -547,7 +624,7 @@ function setupCommandScenes(sceneMap) {
     return sceneMap;
 }
 
-function setupCommandAliasMap(commandList) {
+function addArrayAliases(commandList) {
     for (const baseCommand in commandList) {
         for (const mainCommand of commandList[baseCommand]) {
             //get every command from Multicommand
@@ -567,26 +644,7 @@ function setupCommandAliasMap(commandList) {
     return commandList;
 }
 
-function setupCommandAliasArray(commandList) {
-    for (let i = 0; i < commandList.length; i++) {
-        //get every command from Multicommand
-        const mainCommand = commandList[i];
-        const aliasList = commandAlias[mainCommand];
-        if (aliasList != null) {
-            //check if alias commands for the maincommand
-            for (let j = 0; j < aliasList.length; j++) {
-                const alias = aliasList[j];
-                //add all to multicommand list
-                if (!commandList.includes(alias)) {
-                    commandList.push(alias);
-                }
-            }
-        }
-    }
-    return commandList;
-}
-
-function setupCommandAliasConversion(aliasList) {
+function invertMap(aliasList) {
     const convertedList = {};
     for (const baseCommand in aliasList) {
         for (const aliasCommand of aliasList[baseCommand]) {
@@ -605,7 +663,7 @@ function setupCustomCamAlias(aliasList) {
         newBaseCommand = newBaseCommand.replaceAll(/(?:full)?cams?/g, "");
         // newBaseCommand = newBaseCommand.replaceAll(" ", "");
 
-        let convertedBaseCommand = customCamCommandMapping[baseCommand] || baseCommand;
+        let convertedBaseCommand = customCamSources[baseCommand] || baseCommand;
 
         let newConvertedBaseCommand = convertedBaseCommand.toLowerCase();
         newConvertedBaseCommand = newConvertedBaseCommand.replaceAll(/e?s(\s|\W|$|multi(?:cam)?|cam|outdoor|indoor|inside|wideangle|corner|den)/g, "$1");
@@ -1157,8 +1215,8 @@ module.exports = {
     userPermissions,
     commandPermissions,
     commandAlias,
-    commandScenes,
-    commandScenesCloud,
+    obsSources,
+    obsCloudSources,
     commandList,
     customSceneCommands,
     notifyScenes,
@@ -1167,7 +1225,7 @@ module.exports = {
     axisCameras,
     onewayCommands,
     onewayNotifications,
-    sceneAudioSource,
+    audioSources,
     scenePositions,
     globalMusicSource,
     commandAliasConverted,
@@ -1179,7 +1237,7 @@ module.exports = {
     pauseTwitchMarker,
     announceChatSceneChange,
     alveusTwitchID,
-    customCamCommandMapping,
+    customCamSources,
     customCommandAlias,
     micGroups,
     userBlacklist,

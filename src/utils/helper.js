@@ -12,7 +12,7 @@ function commandCheck(message){
     }
     message = message.replace(config.commandPrefix,"");
     message = message.toLowerCase();
-    let convertedAlias = config.commandAliasConverted[message];
+    let convertedAlias = config.commandToBase[message];
     if (convertedAlias != null){
         message = convertedAlias;
     }

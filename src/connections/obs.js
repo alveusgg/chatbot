@@ -1279,8 +1279,8 @@ const create = async (connection) => {
  * @returns {Promise<void>}
  */
 module.exports = async (controller) => {
-  const local = await create("localAlveus");
-  const cloud = await create("cloudSpace");
+  const local = process.env.NODE_ENV == 'development' ? await create("localTest") : await create("localAlveus");
+  const cloud = process.env.NODE_ENV == 'development' ? await create("localTest") : await create("cloudSpace");
 
   controller.connections.obs = { local, cloud, create };
 };
