@@ -2,9 +2,14 @@
 const devPrefix = process.env.NODE_ENV == 'development' ? `$` : '!';
 const commandPrefix = devPrefix;
 
-const twitchChannelList = ["spacevoyage", "alveussanctuary", "alveusgg"];
+const twitchChannelList = process.env.TWITCH_CHANNELS ?
+    process.env.TWITCH_CHANNELS.split(",").map((channel) => channel.trim()) :
+    ["spacevoyage", "alveussanctuary", "alveusgg"];
 
-const alveusTwitchID = 636587384;
+const alveusTwitchID = process.env.ALVEUS_TWITCH_ID ?
+    Number.parseInt(process.env.ALVEUS_TWITCH_ID) :
+    636587384;
+
 const pauseNotify = true;
 const pauseGameChange = true;
 const pauseTwitchMarker = true;
