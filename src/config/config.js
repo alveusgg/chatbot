@@ -31,7 +31,7 @@ let userPermissions = {
     commandOperator: ["stolenarmy_", "berlac", "dansza", "merger3", "nitelitedf","fixterjake14",
                     "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
                     "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl","gnomechildboi","danman149","hunnybeehelen","strangecyan",
-                    "viphippo","bagel_deficient","rhinofriend"],
+                    "viphippo","bagel_deficient","rhinofriend", "orophia"],
     commandVips: [userRanks.vips, "tfries_", "sivvii_", "ghandii_", "axialmars",
         "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","madcharliekelly",
         "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeexd","kurtyykins",
