@@ -444,7 +444,7 @@ userBlacklist.forEach(user => {
 const commandAliases = combineAliasCommands();
 //base : camera
 const commandCameras = getBaseToSource(axisCameras);
-//base : group
+//base : mic
 const commandMics = getBaseToMic(audioSources);
 //base : [groups]
 const camGroups = getBaseToSourceList(camGrouping);
