@@ -43,6 +43,10 @@ const main = async controller => {
 
 	runAtSpecificTimeOfDay(config.restrictedHours.start - 1, 55, () => {
 		try {
+			let now = new Date();
+			let minutes = now.getUTCMinutes();
+			let hour = now.getUTCHours();
+			logger.log("check time",now,hour,minutes,config.restrictedHours);
 			logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
 			controller.connections.twitch.send("alveusgg", `!nightcams`);
 			controller.connections.obs.local.setMute(config.sceneAudioSource["fox"], true);
@@ -564,7 +568,40 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
 
 	//console.log("ptzcommand",userCommand,currentScene,"base",baseName,"cam",ptzcamName);
-
+	if (userCommand == "ptzplayaudio"){
+		let speaker = controller.connections.cameras["speaker"];
+		//http://0.0.0.0/axis-cgi/param.cgi?action=list
+		let clip = 37 //alarm
+		if (arg1 == "alarm"){
+			clip = 37;
+		} else if (arg1 == "siren"){
+			clip = 49;
+		} else if (arg1 == "emergency"){
+			clip = 40;
+		} else if (arg1 == "trespassing"){
+			clip = 43;
+		} else if (arg1 == "camera"){
+			clip = 33;
+		} else if (arg1 == "hello"){
+			clip = 1;
+		} else if (arg1 == "despacito "){
+			clip = 0;
+		} else if (arg1 == "ringtone"){
+			//35-36
+			clip = 35;
+		} else if (arg1 == "dog"){
+			//44-48
+			clip = 44;
+		} else if (arg1 != null && arg1 !== "") {
+			clip = arg1
+		}
+		speaker.playAudioClip(clip);
+		return;
+	} else if (userCommand == "ptzstopaudio"){
+		let speaker = controller.connections.cameras["speaker"];
+		speaker.stopAudioClip();
+		return;
+	}
 
 	if (controller.connections.cameras[ptzcamName] != null) {
 		specificCamera = ptzcamName;
@@ -2669,6 +2706,10 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
 	if (eta_ms < 0) {
 		eta_ms += twentyFourHours;
 	}
+	let nowMin = now.getUTCMinutes();
+	let nowHour = now.getUTCHours();
+	logger.log("check time: ",now,nowHour,nowMin,config);
+	logger.log("setup !livecam Timer for: ",eta_ms);
 	setTimeout(function () {
 		//run once
 		func();

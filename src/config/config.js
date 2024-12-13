@@ -2,9 +2,14 @@
 const devPrefix = process.env.NODE_ENV == 'development' ? `$` : '!';
 const commandPrefix = devPrefix;
 
-const twitchChannelList = ["spacevoyage", "alveussanctuary", "alveusgg"];
+const twitchChannelList = process.env.TWITCH_CHANNELS ?
+    process.env.TWITCH_CHANNELS.split(",").map((channel) => channel.trim()) :
+    ["spacevoyage", "alveussanctuary", "alveusgg"];
 
-const alveusTwitchID = 636587384;
+const alveusTwitchID = process.env.ALVEUS_TWITCH_ID ?
+    Number.parseInt(process.env.ALVEUS_TWITCH_ID) :
+    636587384;
+
 const pauseNotify = true;
 const pauseGameChange = true;
 const pauseTwitchMarker = true;
@@ -31,13 +36,13 @@ let userPermissions = {
     commandOperator: ["stolenarmy_", "berlac", "dansza", "merger3", "nitelitedf","fixterjake14",
                     "purplemartinconservation","wazix11","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
                     "wolfone_", "dohregard", "lakel1","darkrow_","minipurrl","gnomechildboi","danman149","hunnybeehelen","strangecyan",
-                    "viphippo","bagel_deficient","rhinofriend"],
+                    "viphippo","bagel_deficient","rhinofriend","ponchobee","orophia"],
     commandVips: [userRanks.vips, "tfries_", "sivvii_", "ghandii_", "axialmars",
         "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","madcharliekelly",
         "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeexd","kurtyykins",
         "breacherman", "bryceisrightjr","sumaxu","mariemellie","ewok_626","quokka64","nov1cegg",
         "casualruffian","likethecheesebri","otsargh","just_some_donkus","fiveacross",
-        "itszalndrin","nicoleeverleigh","fishymeep","ponchobee"],
+        "itszalndrin","ohnonicoleio","fishymeep"],
     commandUsers: [userRanks.subs]
 }
 
@@ -76,10 +81,10 @@ const commandPermissionsCustomCam = {
     commandSuperUsers: ["nuthousecam", "localpccam", "backpackcam", "phonecam"],
     commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","parrotcam", "pasturecam",
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
-        "nightcams", "nightcamsbig","chickencam"],
+        "nightcams", "nightcamsbig","chickencam","gardencam"],
     commandOperator: ["constructioncam"],
-    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
-        "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "ratcam","ratcam2","ratcam3","ratcam4","orangeisopodcam"],
+    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam","pushpopcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
+        "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "chincam2", "chincam3", "chincam4", "ratcam","ratcam2","ratcam3","ratcam4","orangeisopodcam"],
     commandUsers: []
 }
     
@@ -156,7 +161,7 @@ const sceneAudioSource = {
     "marmosetmulti": "marmoset mic",
     "nuthouse": "nuthouse local",
     "nut": "nuthouse local",
-    "phone": "alveus rtmp mobile",
+    "phone": "Space RTMP Phone",
     "backpack": "maya rtmp 1",
     "pc": "local rtmp desktop",
     "wolf": "wolf mic",
@@ -171,7 +176,8 @@ const sceneAudioSource = {
     "wolfmulti5": "wolf mic",
     "chatchat": "chat chats audio",
     "phonemic": "alveus rtmp mobile mic",
-    "chicken": "Chicken Camera"
+    "chicken": "Chicken Camera",
+    "garden": "Garden Mic"
 }
 //used for unmute/mute all. match above phrasing
 const micGroups = {
@@ -182,7 +188,8 @@ const micGroups = {
         wolfindoor: { name: sceneAudioSource.wolfindoor, volume: -7.9 }
     },
     restrictedcams: {
-        fox: { name: sceneAudioSource.fox, volume: -2.4 }
+        fox: { name: sceneAudioSource.fox, volume: -2.4 }, 
+        garden: { name: sceneAudioSource.garden, volume: -2.4 }, 
     },
     admincams: {
         phone: { name: sceneAudioSource.phone, volume: 0 },
@@ -200,7 +207,7 @@ const micGroups = {
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
 const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "toast","roach", "crow", "crowoutdoor", "fox", "foxden",
-    "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "puppy", "marty", "bb","construction","chicken"];
+    "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "pushpop", "marty", "bb","construction","chicken", "garden","speaker"];
 
 //Axis Camera Mapping to Command. Converting base to source name
 const axisCameraCommandMapping = {
@@ -235,10 +242,13 @@ const axisCameraCommandMapping = {
     "marmosetcam2":"marmosetindoor", 
     "chin":"chin", 
     "puppy":"puppy", 
+    "pushpop":"pushpop", 
     "isopod":"marty", 
     "orangeisopod":"bb",
     "construction":"construction",
-    "chickencam":"chicken"
+    "chickencam":"chicken",
+    "gardencam":"garden",
+    "speaker":"speaker",
     // "ratcam":"rat"
 }
 
@@ -250,8 +260,8 @@ const commandPermissionsCamera = {
     commandMods: ["testmodcamera", "ptztracking", "ptzirlight", "ptzwake"],
     commandOperator: ["ptzhomeold","ptzseta","ptzgetinfo","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
                      "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzareazoom", "ptzclick", "ptzdraw",
-                     "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus", "ptzfetchimg"],
-    commandVips: ["ptzhome", "ptzpreset", "ptzzoom","ptzzoomr", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "ptzgetcam", "apigetperms"],
+                     "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus","ptzplayaudio","ptzstopaudio","ptzfetchimg"],
+    commandVips: ["ptzhome", "ptzpreset", "ptzzoom","ptzzoomr", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocus", "ptzgetfocus", "ptzfocusr", "ptzautofocus", "ptzgetcam","apigetperms"],
     commandUsers: []
 }
 //timeRestrictedCommands = timeRestrictedCommands.concat(["ptzclear"]);
@@ -298,14 +308,18 @@ const customCamCommandMapping = {
     "marmosetcam": "marmoset",
     "marmosetcam2": "marmosetindoor",
     "marmosetcam3": "marmosetmulti",
-    "3cam": "georgie noodle isopod",
-    "4cam": "georgie noodle isopod roach",
+    "3cam": "georgie noodle toast",
+    "4cam": "georgie noodle patchy toast",
     "4camoutdoor": "pasture parrot marmoset fox",
     "nightcams": "wolf pasture parrot fox crow marmoset",
     "nightcamsbig": "wolf pasture parrot fox crow marmoset",
-    "indoorcams": "georgie hank puppy chin isopod roach",
-    "indoorcamsbig": "georgie hank puppy chin isopod roach",
+    "indoorcams": "georgie noodle toast chin isopod roach",
+    "indoorcamsbig": "georgie noodle toast chin isopod roach",
     "chincam": "chin",
+    "chincam2": "chin2",
+    "chincam3": "chin3",
+    "chincam4": "chinmulti",
+    "chincamall": "chin chin2 chin3",
     "ratcam": "rat",
     "ratcam2": "rat2",
     "ratcam3": "rat3",
@@ -325,6 +339,7 @@ const customCamCommandMapping = {
     "wolfcam8":"wolfmulti3", 
     "wolfcam9":"wolfmulti4", 
     "wolfcam10":"wolfmulti5", 
+    "gardencam":"garden"
 }
 
 const commandSceneAlias = {
@@ -359,7 +374,11 @@ const commandSceneAlias = {
     nightcamsbig: ["nightcambig", "outdoorcamsbig", "outdoorcambig", "outsidecambig", "outsidecamsbig", "nightcamb", "nightcams2", "ncb"],
     indoorcams: ["4cams", "indoorcam", "insidecams", "insidecam"],
     indoorcamsbig: ["indoorcambig", "insidecamsbig", "insidecambig"],
-    chincam: ["chinchillacam", "chinscam", "chincam", "snorkcam", "moomincam", "fluffycam"],
+    chincam: ["chinchillacam", "chinscam","chincam1", "snorkcam", "moomincam", "fluffycam"],
+    chincam2: ["chinmiddlecam", "chin2cam","chinmcam"],
+    chincam3: ["chinbottomcam", "chin3cam","chinbcam"],
+    chincam4: ["chinmulticam", "chin4cam"],
+    chincamall: ["chinallcam", "chinstackcam"],
     ratcam: ["ratcam1","rattopcam", "rat1cam","nillacam","chipscam","chipcam","rattcam"],
     ratcam2: ["ratmiddlecam", "rat2cam","ratmcam"],
     ratcam3: ["ratbottomcam", "rat3cam","ratbcam"],
@@ -371,7 +390,7 @@ const commandSceneAlias = {
     accintro: ["acintro"],
     accbrb: ["acbrb"],
     accending: ["acending","accend","acend"],
-    ccintro: ["cintro"],
+    ccintro: ["cintro","ccintro2","cintro2","evanintro","allisonintro"],
     ccbrb: ["cbrb"],
     ccending: ["cending","ccend","cend"],
     sntintro: ["showintro","tellintro","showntellintro","showandtellintro"],
@@ -390,6 +409,7 @@ const commandSceneAlias = {
     wolfcam8: ["wolfdenmulticam","wolfwolfdenmulticam","wolfwolfdencam"],
     wolfcam9: ["wolfden2multicam","wolfwolfden2multicam","wolfwolfden2cam"],
     wolfcam10: ["wolfcornermulticam","wolfcornerwolfincam","wolfcornerwolfinmulticam","wolfcwolfincam","wolfcwolficam"],
+    gardencam: ["pollinatorcam","plantcam"],
 }
 
 const commandControlAlias = {
@@ -436,6 +456,8 @@ const commandControlAlias = {
     apsignal: ["apinfo", "liveu", "liveusignal", "liveuinfo", "liveustatus", "signal", "wifi"],
     apreconnect: ["apreset", "liveureset", "liveureconnect", "resetliveu", "reconnectliveu"],
     ptzgetfocus: ["getfocus"],
+    ptzplayaudio: ["playclip","playaudio"],
+    ptzstopaudio: ["stopclip","stopaudio"],
 }
 
 let commandScenes = {
