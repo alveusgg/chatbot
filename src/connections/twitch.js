@@ -157,8 +157,12 @@ class Twitch {
    * @param {string} message Message to send
    * @returns {Promise<boolean>} Whether the message was sent successfully
    */
-  async send(channel, message) {
+  async send(channel, message, api) {
     try {
+      // send twitch message to alveusgg channel if api is true 
+      if (api === true) {
+        channel = 'alveusgg';
+      }     
       let messageList = [];
       if (message.length > 500){
         let splitString = message.match(/.{1,480}([\.\s,]|$)/g).map(item => item.trim());

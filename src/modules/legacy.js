@@ -70,8 +70,6 @@ const main = async controller => {
 	// }
 }
 
-module.exports = main;
-
 /**
  * Handle local OBS scene changes
  *
@@ -356,7 +354,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 	let currentScene = controller.connections.obs.local.currentScene || "";
 	currentScene = helper.cleanName(currentScene);
 
-	let parameters = { controller, userCommand, accessProfile, channel, message, currentScene }
+	let parameters = { controller, userCommand, accessProfile, channel, message, currentScene, user }
 	//check if scene command
 	try {
 		let cloudSceneCommand = await checkLocalSceneCommand(...Object.values(parameters));
@@ -530,7 +528,7 @@ async function checkServerSceneCommand(controller, userCommand, accessProfile, c
 	return sceneCommand;
 }
 
-async function checkCustomSceneCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
+async function checkCustomSceneCommand(controller, userCommand, accessProfile, channel, message, currentScene, user) {
 
 	userCommand = userCommand || "";
 	userCommand = userCommand.toLowerCase();
@@ -548,7 +546,7 @@ async function checkCustomSceneCommand(controller, userCommand, accessProfile, c
 	return true;
 }
 
-async function checkPTZCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
+async function checkPTZCommand(controller, userCommand, accessProfile, channel, message, currentScene, user) {
 	//check if PTZ command
 	if (!userCommand.startsWith(config.ptzPrefix)) {
 		return false;
@@ -693,10 +691,16 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			// logger.log('ptzpan',arg1);
 			camera.panCamera(arg1);
 			camera.enableAutoFocus();
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: ptzpan ${ptzcamName} ${arg1}`, true);
+			}
 			break;
 		case "ptztilt":
 			camera.tiltCamera(arg1);
 			camera.enableAutoFocus();
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: ptztilt ${ptzcamName} ${arg1}`, true);
+			}
 			break;
 		case "ptzzoom":
 			let zscaledAmount = arg1 * 100 || 0;
@@ -765,6 +769,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		case "ptzmove":
 			camera.moveCamera(arg1);
 			camera.enableAutoFocus();
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: ptzmove ${ptzcamName} ${arg1}`, true);
+			}
 			break;
 		case "ptzspeed":
 			if (arg1 != "") {
@@ -783,11 +790,17 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			//x-cord y-cord rzoom 
 			camera.ptz({ center: `${arg1},${arg2}`, rzoom: arg3 });
 			camera.enableAutoFocus();
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: Clicked on ${ptzcamName}`, true);
+			}
 			break;
 		case "ptzareazoom":
 			//x-cord y-cord zoom 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
 			camera.enableAutoFocus();
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: Clicked on ${ptzcamName}`, true);
+			}
 			break;
 		case "ptzgetcam":
 			let xCord = parseInt(arg1, 10);
@@ -825,7 +838,11 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (arg4 != 'off') {
 				await camera.enableAutoFocus();
 			}
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user} clicked on ${clickbox.zone + 1}: ${clickbox.ptzcamName}`, true);
+			} else {
 			controller.connections.twitch.send(channel, `Clicked on ${clickbox.zone + 1}: ${clickbox.ptzcamName}`);
+			}
 			break;
 		case "ptzdraw":
 			// assign user inputs as integers.
@@ -848,7 +865,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			let zoomWidth = drawbox.sourceWidth / scaledRectWidth;
 			let zoomHeight = drawbox.sourceHeight / scaledRectHeight;
 
-			zoom = Math.min(zoomWidth, zoomHeight) * 100;
+			zoom = Math.floor(Math.min(zoomWidth, zoomHeight) * 100);
 
 			// Set the camera
 			camera = controller.connections.cameras[drawbox.ptzcamName];
@@ -856,11 +873,18 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (arg5 != 'off') {
 				await camera.enableAutoFocus();
 			}
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user} clicked on ${drawbox.zone + 1}: ${drawbox.ptzcamName}`, true);
+			} else {
 			controller.connections.twitch.send(channel, `Clicked on ${drawbox.zone + 1}: ${drawbox.ptzcamName}`);
+			}
 			break;
 		case "ptzset":
 			//pan tilt zoom relative pos
 			camera.ptz({ rpan: arg1, rtilt: arg2, rzoom: arg3 * 100, autofocus: "on" });
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: ptzset ${ptzcamName}`, true);
+			}
 			break;
 		case "ptzseta":
 			//absolute pos, pan tilt zoom autofocus focus 
@@ -891,11 +915,18 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				customPtz.focus = customFocus;
 			}
 			camera.ptz(customPtz);
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: ptzseta ${ptzcamName}`, true);
+			}
 			break;
 		case "ptzgetinfo":
 			let cpos = await camera.getPosition();
 			if (cpos && cpos.pan != null) {
-				controller.connections.twitch.send(channel, `PTZ Info (${currentScene}): ${cpos.pan}p |${cpos.tilt}t |${cpos.zoom}z |af ${cpos.autofocus || "n/a"} |${cpos.focus || "n/a"}f`);
+				if (channel === 'ptzapi') {
+					controller.connections.api.sendAPI(`PTZ Info (${currentScene}): ${cpos.pan}p |${cpos.tilt}t |${cpos.zoom}z |af ${cpos.autofocus || "n/a"} |${cpos.focus || "n/a"}f`);
+				} else {
+					controller.connections.twitch.send(channel, `PTZ Info (${currentScene}): ${cpos.pan}p |${cpos.tilt}t |${cpos.zoom}z |af ${cpos.autofocus || "n/a"} |${cpos.focus || "n/a"}f`);
+				}
 			} else {
 				logger.log("Failed to get ptz position");
 			}
@@ -917,6 +948,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			} else {
 				camera.setIRCutFilter("auto");
 			}
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: ptzir ${ptzcamName} ${arg1}`, true);
+			}
 			break;
 		case "ptzirlight":
 			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
@@ -925,6 +959,30 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				camera.disableIR();
 			} else {
 				camera.disableIR();
+			}
+			break;
+		case "ptzfetchimg":
+			if (channel === 'ptzapi') {
+				// Fetch the screenshot 
+				const imageBase64 = await camera.fetchImage();
+				if (imageBase64) {
+					// Prepare the message
+					const message = {
+						image: imageBase64,
+						camera: specificCamera || currentScene,
+						preset: arg1, // Include preset name
+						user: user
+					};
+
+					// Send the message to the API websocket.
+					controller.connections.api.sendBroadcastMessage(message, 'image');
+					logger.log("Sending image");
+				} else {
+					logger.log("Failed to fetch image after saving preset");
+				}
+
+			} else {
+				return;
 			}
 			break;
 		case "ptzsave":
@@ -945,6 +1003,23 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 					} else {
 						controller.connections.database[currentScene].lastKnownPosition = currentPosition;
 					}
+				}
+				controller.connections.api.sendBroadcastMessage(`ptzsave ${specificCamera} ${arg1}`, 'backend');
+
+				// Fetch the screenshot after saving the preset
+				const imageBase64 = await camera.fetchImage();
+				if (imageBase64) {
+					// Prepare the message
+					const message = {
+						image: imageBase64,
+						camera: specificCamera || currentScene,
+						preset: arg1 // Include preset name
+					};
+
+					// Send the message to the API websocket. 
+					controller.connections.api.sendBroadcastMessage(message, 'image');
+				} else {
+					logger.log("Failed to fetch image after saving preset");
 				}
 
 			} else {
@@ -997,6 +1072,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 					camera.ptz({ pan: previous.pan, tilt: previous.tilt, zoom: previous.zoom });
 				}
 			}
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: ptzload ${specificCamera} ${arg1}`, true);
+			}
 			break;
 		case "ptzremove":
 			if (specificCamera != "") {
@@ -1005,6 +1083,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 					//2nd argument provided
 					if (controller.connections.database[specificCamera].presets[arg1] != null) {
 						let response = delete controller.connections.database[specificCamera].presets[arg1];
+						if (response === true) {
+							controller.connections.api.sendBroadcastMessage(`ptzremove ${specificCamera} ${arg1}`, 'backend');
+						}
 						if (response != true) {
 							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
 						}
@@ -1029,6 +1110,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 					if (controller.connections.database[specificCamera].presets[arg1] != null) {
 						controller.connections.database[specificCamera].presets[arg2] = controller.connections.database[specificCamera].presets[arg1];
 						let response = delete controller.connections.database[specificCamera].presets[arg1];
+						if (response === true) {
+							controller.connections.api.sendBroadcastMessage(`ptzrename ${specificCamera} ${arg1} ${arg2}`, 'backend');
+						}
 						if (response != true) {
 							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
 						}
@@ -1061,11 +1145,18 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			break;
 		case "ptzlist":
 			if (specificCamera) {
-				controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`)
+				if (channel === 'ptzapi') {
+					controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
+				} else {
+					controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
+				}
 			} else {
-				controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`)
+				if (channel === 'ptzapi') {
+					controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
+				} else {
+					controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
+				}
 			}
-
 			break;
 		case "ptzgetfocus":
 			let pos = await camera.getPosition();
@@ -1077,7 +1168,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				} catch (e) {
 					//logger.log("Error getting focus")
 				}
-
 			}
 			break;
 		case "ptzroam":
@@ -1348,7 +1438,7 @@ async function checkNuthouseCommand(controller, userCommand, accessProfile, chan
 	return true;
 }
 
-async function checkCustomCamCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
+async function checkCustomCamCommand(controller, userCommand, accessProfile, channel, message, currentScene, user) {
 	if (userCommand == null || currentScene != "custom") {
 		return false;
 	}
@@ -1430,7 +1520,7 @@ async function checkCustomCamCommand(controller, userCommand, accessProfile, cha
 	return true;
 }
 
-async function checkExtraCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
+async function checkExtraCommand(controller, userCommand, accessProfile, channel, message, currentScene, user) {
 	//extra
 	message = message.trim();
 	let messageArgs = message.split(" ");
@@ -1518,6 +1608,9 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			camname = config.customCommandAlias[camname] || camname; // allow for cam name aliases
 			camname = "fullcam " + camname;
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, camname);
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: resetcam ${camname}`, true);
+			}
 			break;
 		case "setalveusscene":
 			controller.connections.obs.local.setScene(fullArgs);
@@ -1759,7 +1852,24 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs);
 			}
 			break;
+		case "apigetperms":
+			if (channel === 'ptzapi') {
+				// Check the user's permissions
+				for (let group of config.userPermissions.commandPriority) {
+				// Check if the user exists in the corresponding command group array
+					if (config.userPermissions[group].includes(user)) {
+						// Send the API response
+						controller.connections.api.sendAPI(`${user} has ${group} permissions`);
+						break; 
+							}
+						}
+			}
+			break;
 		case "scenecams":
+			if (currentScene != "custom") {
+				return false;
+			}
+
 			let output = "";
 			if (arg1 == "json") {
 				output = JSON.stringify(currentCamList);
@@ -1781,7 +1891,31 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				}
 			}
 
-			controller.connections.twitch.send(channel, output)
+			const sceneCommand = controller.connections.database["customcamscommand"];
+			
+			// Create finaloutput with both scene and cams
+			const finaloutput = {
+				scene: sceneCommand,
+				cams: output
+			};
+
+			// Determine the correct output format and send it
+			if (arg1 == "json" || arg1 == "jsonmap") {
+				// For JSON formats, stringify the finaloutput
+				if (channel === 'ptzapi') {
+					controller.connections.api.sendAPI(JSON.stringify(finaloutput));
+				} else {
+					controller.connections.twitch.send(channel, JSON.stringify(finaloutput));
+				}
+			} else {
+				// For plain text or other formats, manually format and include both scene and cams
+				const formattedOutput = `Scene: ${finaloutput.scene} \nCams: ${finaloutput.cams}`;
+				if (channel === 'ptzapi') {
+					controller.connections.api.sendAPI(formattedOutput);
+				} else {
+					controller.connections.twitch.send(channel, formattedOutput);
+				}
+			}
 			break;
 		case "swapcam":
 			if (currentScene != "custom") {
@@ -1869,6 +2003,10 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 
 				logger.log(`Swap Cam ${cam1} to ${cam2} - fullargs: ${fullArgs}`);
 				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs);
+				
+				if (channel === 'ptzapi') {
+					controller.connections.twitch.send(channel, `${user}: Swap ${arg1} ${arg2}`, true);
+				}
 			}
 			break;
 		// case "nightcams":
@@ -1955,6 +2093,9 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					controller.connections.obs.cloud.setInputVolume(config.globalMusicSource, scaledVol2);
 				}
 			}
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user}: setvolume ${arg1} ${arg2}`, true);
+			}
 			break;
 		case "getvolume":
 			if (arg1 == "" || arg1 == "all") {
@@ -2002,7 +2143,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				}
 
 				// logger.log('getvolume all',output);
-				controller.connections.twitch.send(channel, `Volumes: ${output}`)
+				if (channel === 'ptzapi') {
+					controller.connections.api.sendAPI(`Volumes: ${output}`)
+				} else {
+					controller.connections.twitch.send(channel, `Volumes: ${output}`)
+				}
 			} else {
 				let volName = arg1Clean;
 				if (arg1 == "mic" || arg1 == "mics" || arg1 == "cam" || arg1 == "cams") {
@@ -2026,7 +2171,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 						if (isMuted) {
 							muteStatus = "m";
 						}
-						controller.connections.twitch.send(channel, `Music Volume: ${correctedVol.toFixed(1).replace(/[.,]0$/, "")}${muteStatus}`)
+						if (channel === 'ptzapi') {
+							controller.connections.api.sendAPI(channel, `Music Volume: ${correctedVol.toFixed(1).replace(/[.,]0$/, "")}${muteStatus}`)
+						} else {
+							controller.connections.twitch.send(channel, `Music Volume: ${correctedVol.toFixed(1).replace(/[.,]0$/, "")}${muteStatus}`)
+						}
 					}
 				} else {
 					let dbVolume = await controller.connections.obs.local.getInputVolume(audioSource);
@@ -2040,7 +2189,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							muteStatus = "m";
 						}
 						// logger.log("Setting",correctedVol);
-						controller.connections.twitch.send(channel, `Volume: ${volName} - ${correctedVol.toFixed(1).replace(/[.,]0$/, "")}${muteStatus}`)
+						if (channel === 'ptzapi') {
+							controller.connections.api.sendAPI(channel, `Volume: ${volName} - ${correctedVol.toFixed(1).replace(/[.,]0$/, "")}${muteStatus}`)
+						} else {
+							controller.connections.twitch.send(channel, `Volume: ${volName} - ${correctedVol.toFixed(1).replace(/[.,]0$/, "")}${muteStatus}`)
+						}
 					}
 				}
 			}
@@ -2127,6 +2280,7 @@ function clearCustomCamsDB(controller) {
 
 async function switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs) {
 	console.log("switch", channel, accessProfile, userCommand, fullArgs);
+
 	let obsSources = await controller.connections.obs.local.getSceneItemList("Custom Cams") || [];  //controller.connections.obs.local.sceneList || [];
 	let obsList = [];
 	let currentCamList = [];
@@ -2324,6 +2478,13 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 		}
 		controller.connections.database["customcamscommand"] = userCommand;
 	}
+	// Send cam switch info to ptz-alv
+	const broadcastMessage = {
+		userCommand: userCommand,
+		fullArgs: fullArgs
+	};
+	controller.connections.api.sendBroadcastMessage(broadcastMessage);
+
 }
 
 async function setCustomCams(controller, obsSources, sceneName, camList, toggleMap, positions) {
@@ -2556,3 +2717,5 @@ function runAtSpecificTimeOfDay(hour, minutes, func) {
 		setInterval(func, twentyFourHours);
 	}, eta_ms);
 }
+module.exports = Object.assign(main, { onTwitchMessage });
+
