@@ -4,11 +4,11 @@
   "description": "alveus livestream chat bot",
   "main": "src/index.js",
   "scripts": {
-	 "prettify": "prettier -l --write \"**/*.js\"",
+    "prettify": "prettier -l --write \"**/*.js\"",
     "dev": "cross-env NODE_ENV=development node src/index.js",
-	  "dev2": "nodemon --inspect=0.0.0.0:9229 -L src/index.js",
+    "dev2": "nodemon --inspect=0.0.0.0:9229 -L src/index.js",
     "test": "node src/test.js",
-	"start": "node src/index.js"
+    "start": "node src/index.js"
   },
   "author": "SpaceVoyage",
   "license": "UNLICENSED",
@@ -21,11 +21,15 @@
     "@twurple/eventsub": "^5.2.7",
     "digest-fetch": "^2.0.1",
     "dotenv": "^16.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "node-cache": "^5.1.2",
     "obs-websocket-js": "^5.0.2",
     "obs-websocket-js-27": "npm:obs-websocket-js@^4.0.3",
     "on-change": "^4.0.2",
     "osc": "^2.4.4",
-    "unifi-client": "^0.11.0"
+    "reconnecting-websocket": "^4.4.0",
+    "unifi-client": "^0.11.0",
+    "ws": "^8.18.0"
   },
   "prettier": {
     "trailingComma": "all",
@@ -36,7 +40,7 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "prettier": "^3.0.1",
-	  "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.1"
   }
 }
