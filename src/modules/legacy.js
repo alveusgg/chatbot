@@ -1544,6 +1544,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 	if (currentCustomScene == "") {
 		currentCustomScene = currentScene
 	}
+
 	let currentSceneBase = config.customCommandAlias[currentCustomScene] ?? currentCustomScene;
 
 
@@ -1659,6 +1660,15 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			if (!invalid) {
 				controller.connections.database.cloudServer = arg1;
 			}
+			break;
+		case "showchat":
+			console.log("showing chat");
+			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Alveus Chat Overlay", true);
+			await controller.connections.obs.cloud.setSceneItemEnabled(controller.connections.obs.cloud.currentScene, "Alveus Chat Overlay", true);
+			break;
+		case "hidechat":
+			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Alveus Chat Overlay", false);
+			await controller.connections.obs.cloud.setSceneItemEnabled(controller.connections.obs.cloud.currentScene, "Alveus Chat Overlay", false);
 			break;
 		case "setmute":
 			let muteStatus = null;
@@ -2699,23 +2709,40 @@ async function setPTZRoamMode(controller, scene) {
 	roamTimeout = setTimeout(setPTZRoamMode, length * 1000, controller, scene);
 }
 
+// function runAtSpecificTimeOfDay(hour, minutes, func) {
+// 	const twentyFourHours = 86400000;
+// 	const now = new Date();
+// 	let eta_ms = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minutes, 0, 0).getTime() - now;
+// 	if (eta_ms < 0) {
+// 		eta_ms += twentyFourHours;
+// 	}
+// 	let nowMin = now.getUTCMinutes();
+// 	let nowHour = now.getUTCHours();
+// 	logger.log("check time: ",now,nowHour,nowMin,config);
+// 	logger.log("setup !livecam Timer for: ",eta_ms);
+// 	setTimeout(function () {
+// 		//run once
+// 		func();
+// 		// run every 24 hours from now on
+// 		setInterval(func, twentyFourHours);
+// 	}, eta_ms);
+// }
+
 function runAtSpecificTimeOfDay(hour, minutes, func) {
 	const twentyFourHours = 86400000;
 	const now = new Date();
-	let eta_ms = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minutes, 0, 0).getTime() - now;
-	if (eta_ms < 0) {
-		eta_ms += twentyFourHours;
+	let next = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minutes, 0, 0).getTime();
+	if (next < Date.now()) {
+	  next += twentyFourHours;
 	}
-	let nowMin = now.getUTCMinutes();
-	let nowHour = now.getUTCHours();
-	logger.log("check time: ",now,nowHour,nowMin,config);
-	logger.log("setup !livecam Timer for: ",eta_ms);
-	setTimeout(function () {
-		//run once
+  
+	setInterval(function () {
+	  if (next < Date.now()) {
 		func();
-		// run every 24 hours from now on
-		setInterval(func, twentyFourHours);
-	}, eta_ms);
-}
+		next += twentyFourHours;
+	  }
+	}, 60_000);
+  }
+
 module.exports = Object.assign(main, { onTwitchMessage });
 
