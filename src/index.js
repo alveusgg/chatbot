@@ -8,11 +8,13 @@ catch (err) {
 }
 
 const Controller = require("./controller");
+const Logger = require("./utils/logger");
 
 // Load any ENV variables from .env file
 const envFile = process.env.NODE_ENV == 'development' ? `.env.development.local` : '.env';
 require('dotenv').config({ path: join(process.cwd(), envFile) });
 
+const logger = new Logger('index')
 
 const main = async () => {
   // Create our controller object
@@ -21,8 +23,12 @@ const main = async () => {
   // Get all our connections
   await controller.load("./connections");
 
-  // Get all our modules
+  // Init legacy commands
   await controller.load("./modules");
+
+  controller.initCommandManager();
+
+  controller.initListeners();
 };
 
 main().catch((e) => {

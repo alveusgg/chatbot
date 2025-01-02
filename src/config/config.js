@@ -20,6 +20,98 @@ const notifyHours = {start:14,end:23};
 const restrictedHours = {start:14,end:23};
 const globalMusicSource = "Music Playlist Global";
 
+const useNewListeners = true;
+const useNewScheduler = true;
+/**
+ * @type {Set<string>}
+ */
+const useNewCommandSystem = new Set(['showchat', 'ptzstopaudio', 'ptzplayaudio', '']);
+
+const groups = /** @type {const} */ ({
+    admin: 0,
+    superUser: 1,
+    mod: 2,
+    operator: 3,
+    vip: 4,
+    user: 5,
+});
+
+/**
+ * Please also update {@link userPermissions} below while the migration between
+ *  command managers is underway.
+ *
+ * @type {Record<string, import('./types.d.ts').Group>}
+ */
+const groupMemberships = {
+    "spacevoyage": 'admin',
+    "maya": 'admin',
+    "theconnorobrien": 'admin',
+    "alveussanctuary": 'admin',
+
+    "ellaandalex": 'superUser',
+    "dionysus1911": 'superUser',
+    "dannydv": 'superUser',
+    "maxzillajr": 'superUser',
+    "illjx": 'superUser',
+    "kayla_alveus": 'superUser',
+    "alex_b_patrick": 'superUser',
+    "lindsay_alveus": 'superUser',
+    "strickknine": 'superUser',
+    "tarantulizer": 'superUser',
+    "spiderdaynightlive": 'superUser',
+    "srutiloops": 'superUser',
+    "evantomology": 'superUser',
+    "amanda2815": 'superUser',
+    "coltonactually": 'superUser',
+
+    "96allskills": 'mod',
+    "dansza": 'mod',
+    "echoskope": 'mod',
+    "loganrx_": 'mod',
+    "mattipv4": 'mod',
+    "mik_mwp": 'mod',
+    "pjeweb": 'mod',
+    "shrezno": 'mod',
+    "wazix11": 'mod',
+
+    "tfries_": 'vip',
+    "sivvii_": 'vip',
+    "ghandii_": 'vip',
+    "axialmars": 'vip',
+    "jazz_peru": 'vip',
+    "stealfydoge": 'vip',
+    "xano218": 'vip',
+    "experimentalcyborg": 'vip',
+    "klav___": 'vip',
+    "monkarooo": 'vip',
+    "nixxform": 'vip',
+    "madcharliekelly": 'vip',
+    "josh_raiden": 'vip',
+    "jateu": 'vip',
+    "storesE6": 'vip',
+    "rebecca_h9": 'vip',
+    "matthewde": 'vip',
+    "user_11_11": 'vip',
+    "huniebeexd": 'vip',
+    "kurtyykins": 'vip',
+    "breacherman": 'vip',
+    "bryceisrightjr": 'vip',
+    "sumaxu": 'vip',
+    "mariemellie": 'vip',
+    "ewok_626": 'vip',
+    "quokka64": 'vip',
+    "nov1cegg": 'vip',
+    "casualruffian": 'vip',
+    "likethecheesebri": 'vip',
+    "otsargh": 'vip',
+    "just_some_donkus": 'vip',
+    "fiveacross": 'vip',
+    "matthewboltz": 'vip',
+    "itszalndrin": 'vip',
+    "ohnonicoleio": 'vip',
+    "fishymeep": 'vip',
+}
+
 const userRanks = {
     mods: Symbol("mods"),
     vips: Symbol("vips"),
@@ -1331,6 +1423,11 @@ const scenePositions = {
 }
 
 module.exports = {
+    useNewListeners,
+    useNewScheduler,
+    useNewCommandSystem,
+    groups,
+    groupMemberships,
     commandPrefix,
     ptzPrefix,
     userRanks,
