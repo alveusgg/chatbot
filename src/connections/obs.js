@@ -1304,6 +1304,12 @@ const create = async (connection) => {
  * `controller.connections.obs.local` is the local OBS instance
  * `controller.connections.obs.cloud` is the cloud OBS instance
  * `controller.connections.obs.create` is a method to create new OBS instances
+ * 
+ * @typedef {{
+ *  local: OBS
+ *  cloud: OBS
+ *  create: create
+ * }} OBSConnection
  *
  * @param {import("../controller")} controller
  * @returns {Promise<void>}

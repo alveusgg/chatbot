@@ -45,6 +45,8 @@ class Database {
  *
  * `controller.connections.database` is the database connection
  *
+ *  @typedef {Database} DatabaseConnection
+ *
  * @param {import("../controller")} controller
  * @returns {Promise<void>}
  */

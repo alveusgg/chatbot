@@ -496,6 +496,8 @@ class Axis {
  *
  * `controller.connections.cameras` is an object of Axis camera connections
  *
+ * @typedef {Record<typeof config.axisCameras[number], Axis>} CamerasConnection
+ * 
  * @param {import("../controller")} controller
  * @returns {Promise<void>}
  */
