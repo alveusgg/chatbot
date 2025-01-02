@@ -220,7 +220,7 @@ const micGroups = {
 //ADD IP INFO IN ENV
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
-const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfswitch","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "toast","roach", "crow", "crowoutdoor", "fox", "foxden",
+const axisCameras = /** @type {const} */ ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfswitch","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "toast","roach", "crow", "crowoutdoor", "fox", "foxden",
     "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "pushpop", "marty", "bb","construction","chicken", "garden","speaker"];
 
 //Axis Camera Mapping to Command. Converting base to source name
