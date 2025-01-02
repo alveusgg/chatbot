@@ -289,6 +289,8 @@ class Courier {
  *
  * `controller.connections.courier` is the Courier instance
  *
+ *  @typedef {Courier} CourierConnection
+ *
  * @param {import("../controller")} controller
  * @returns {Promise<void>}
  */

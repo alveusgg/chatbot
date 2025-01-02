@@ -346,6 +346,8 @@ class OBSBot {
  *
  * `controller.connections.obsBot` is the OBSBot connection
  *
+ * @typedef {OBSBot} OBSBotConnection
+ * 
  * @param {import("../controller")} controller
  * @returns {Promise<void>}
  */

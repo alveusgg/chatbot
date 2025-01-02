@@ -271,6 +271,8 @@ class Twitch {
  *
  * `controller.connections.twitch` is the Twitch instance
  *
+ *  @typedef {Twitch} TwitchConnection
+ *
  * @param {import("../controller")} controller
  * @returns {Promise<void>}
  */
