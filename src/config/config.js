@@ -23,6 +23,72 @@ const throttleCommandLength = 700;
 const throttlePTZCommandLength = 1500;
 const throttleSwapCommandLength = 2000;
 
+const throttleConfigurations = /** @type {const} */ ({
+    'ptz': /** @type {import('./types.d.ts').ThrottleConfiguration} */ ({
+        durationMs: throttlePTZCommandLength,
+        exemptGroups: [
+            'mod',
+            'operator',
+            'vip'
+        ]
+    })
+});
+
+const useNewListeners = true;
+const useNewScheduler = true;
+/**
+ * @type {Set<string>}
+ */
+const useNewCommandSystem = new Set(['showchat', 'ptzstopaudio', 'ptzplayaudio']);
+
+const groups = /** @type {const} */ ({
+    admin: 0,
+    superUser: 1,
+    mod: 2,
+    operator: 3,
+    vip: 4,
+    user: 5,
+});
+
+/**
+ * Please also update {@link userPermissions} below while the migration between
+ *  command managers is underway.
+ *
+ * @type {Record<string, import('./types.d.ts').Group>}
+ */
+const groupMemberships = {
+    "spacevoyage": 'admin',
+    "maya": 'admin',
+    "theconnorobrien": 'admin',
+    "alveussanctuary": 'admin',
+
+    "ellaandalex": 'superUser',
+    "dionysus1911": 'superUser',
+    "dannydv": 'superUser',
+    "maxzillajr": 'superUser',
+    "illjx": 'superUser',
+    "kayla_alveus": 'superUser',
+    "alex_b_patrick": 'superUser',
+    "lindsay_alveus": 'superUser',
+    "strickknine": 'superUser',
+    "tarantulizer": 'superUser',
+    "spiderdaynightlive": 'superUser',
+    "srutiloops": 'superUser',
+    "evantomology": 'superUser',
+    "amandaexpress": 'superUser',
+    "coltonactually": 'superUser',
+    "tamarinsandjulie": 'superUser',
+};
+
+const newGroupsToOldMapping = /** @type {const} */ ({
+    admin: "commandAdmins",
+    superUser: "commandSuperUsers",
+    mod: "commandMods",
+    operator: "commandOperator",
+    vip: "commandVips",
+    user: "commandUsers"
+})
+
 const userRanks = {
     mods: Symbol("mods"),
     vips: Symbol("vips"),
@@ -1380,6 +1446,12 @@ const scenePositions = {
 }
 
 module.exports = {
+    useNewListeners,
+    useNewScheduler,
+    useNewCommandSystem,
+    groups,
+    groupMemberships,
+    newGroupsToOldMapping,
     commandPrefix,
     ptzPrefix,
     userRanks,

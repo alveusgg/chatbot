@@ -8,6 +8,10 @@ const { RefreshingAuthProvider } = require("@twurple/auth");
 const Logger = require("../utils/logger");
 const config = require("../config/config");
 
+/**
+ * @typedef {Twitch} TwitchConnection
+ */
+
 class Twitch {
   #logger;
   #auth;
@@ -155,9 +159,10 @@ class Twitch {
    *
    * @param {string} channel Channel to send message to
    * @param {string} message Message to send
+   * @param {boolean} [api=false] 
    * @returns {Promise<boolean>} Whether the message was sent successfully
    */
-  async send(channel, message, api) {
+  async send(channel, message, api = false) {
     try {
       // send twitch message to alveusgg channel if api is true 
       if (api === true) {
