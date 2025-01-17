@@ -111,7 +111,7 @@ function assertCommand(file, command) {
     throw new TypeError(`${file}: expected enabled to be a boolean, got ${typeof command.enabled}`)
   }
 
-  if (typeof command.permission !== 'undefined' && typeof command.permission === 'object') {
+  if (typeof command.permission !== 'undefined' && typeof command.permission !== 'object') {
     throw new TypeError(`${file}: expected permission to be undefined or object, got ${typeof command.name}`)
   }
 
