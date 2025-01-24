@@ -1613,6 +1613,15 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				controller.connections.twitch.send(channel, `${user}: resetcam ${camname}`, true);
 			}
 			break;
+		case "raidvideo":
+			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Raid", true);
+			setTimeout(()=> controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Raid", false),40000)
+			// controller.connections.obs.local.restartSource("raidvideo");
+			break;
+		case "stopraidvideo":
+			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Raid", false);
+			// controller.connections.obs.local.stopSource("raidvideo");
+			break;
 		case "setalveusscene":
 			controller.connections.obs.local.setScene(fullArgs);
 			clearCustomCamsDB(controller);
@@ -2111,6 +2120,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			if (arg1 == "" || arg1 == "all") {
 				let output = "";
 				for (const source in config.micGroups["livecams"]) {
+					// logger.log('getvolume all',currentSceneBase,arg1Clean, source);
 					let dbVolume = await controller.connections.obs.local.getInputVolume(config.micGroups["livecams"][source].name);
 					dbVolume = parseInt(dbVolume);
 					if (!isNaN(dbVolume)) {

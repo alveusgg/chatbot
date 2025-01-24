@@ -512,6 +512,37 @@ class OBS {
       return null;
     }
   }
+  async stopSource(sourceName) {
+    //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY
+    //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE
+    //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_STOP
+    //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART
+    //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_NEXT
+    //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PREVIOUS
+    let param = {
+      inputName: sourceName,
+      mediaAction: "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_STOP",
+    };
+    try {
+      let response = null;
+      if (this.oldWS) {
+        response = await this.client.send("StopMedia", {
+          sourceName: sourceName,
+        });
+      } else {
+        response = await this.client.call("TriggerMediaInputAction", param);
+      }
+      this.utils.log(
+        `Stop Source (${sourceName}): ${JSON.stringify(response)}`,
+      );
+      return true;
+    } catch (e) {
+      this.utils.log(
+        `Error Stopping Source (${sourceName}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
   async nextMediaSource(sourceName) {
     //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY
     //OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE
