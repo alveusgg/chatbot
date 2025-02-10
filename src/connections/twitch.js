@@ -8,6 +8,10 @@ const { RefreshingAuthProvider } = require("@twurple/auth");
 const Logger = require("../utils/logger");
 const config = require("../config/config");
 
+/**
+ * @typedef {Twitch} TwitchConnection
+ */
+
 class Twitch {
   #logger;
   #auth;
@@ -270,8 +274,6 @@ class Twitch {
  * Establishes connections to the Twitch API
  *
  * `controller.connections.twitch` is the Twitch instance
- *
- *  @typedef {Twitch} TwitchConnection
  *
  * @param {import("../controller")} controller
  * @returns {Promise<void>}

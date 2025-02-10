@@ -1,4 +1,4 @@
-// @ts-check
+'use strict';
 
 const { userBlacklist, commandPrefix } = require('../config/config')
 const { groupMemberships, groups } = require('../config/config2.js')
@@ -29,16 +29,49 @@ class CommandManager {
   }
 
   async loadCommands() {
+    // Grab all .js files in this directory other than this one
     const files = (await getAllFiles(__dirname)).filter(path => path.endsWith('.js') && path !== 'index.js')
 
-    for (const path of files) {
+    for (const file of files) {
+      /**
+       * Require the file, noteworthy this will throw if something's wrong with it
+       * @type {import('./types.d.ts').CommandRegister}
+       */
       const module = require(path)
 
-      const commands = Array.isArray(module) ? module : [module]
+      if (typeof module !== 'function') {
+        throw new TypeError(`expected ${file} to export function, got ${typeof module} instead`)
+      }
+
+      let commands = module(this.#controller);
+
+      if (!Array.isArray(commands)) {
+        commands = [commands];
+      }
+
       for (const command of commands) {
-        assertCommand(path, command)
+        assertCommand(file, command);
+
+        if (!command.enabled) {
+          // Command disabled, skipping
+          continue
+        }
+
+        if (command.name in this.#commands) {
+          throw new TypeError(`${file}: command ${command.name} already registered`)
+        }
 
         this.#commands[command.name] = command
+
+        if (command.aliases) {
+          for (const alias of command.aliases) {
+            if (alias in this.#commands) {
+              throw new TypeError(`${file}: command ${command.name} already registered`)
+            }
+
+            this.#commands[alias] = command
+          }
+        }
       }
     }
   }
@@ -76,21 +109,16 @@ class CommandManager {
       return;
     }
 
-    if (!canUserPerformCommand(user, command)) {
+    if (!canUserPerformCommand(user, command.permission)) {
       return
     }
 
-    const result = command.run({
-      controller: this.#controller,
+    await Promise.resolve(command.run({
       channel,
       user,
       args,
       msg
-    })
-
-    if (typeof result?.then === 'function') {
-      await result
-    }
+    }))
   }
 }
 
@@ -105,6 +133,16 @@ function assertCommand(file, command) {
 
   if (typeof command.name !== 'string') {
     throw new TypeError(`${file}: expected name to be a string, got ${typeof command.name}`)
+  }
+
+  if (typeof command.aliases !== 'undefined') {
+    if (!Array.isArray(command.aliases)) {
+      throw new TypeError(`${file}: expected aliases to be an array`);
+    }
+
+    if (command.aliases.length > 0 && typeof command.aliases[0] !== 'string') {
+      throw new TypeError(`${file}: expected aliases to be an array of strings but element is a ${typeof command.aliases[0]}`)
+    }
   }
 
   if (typeof command.enabled !== 'boolean') {
@@ -122,10 +160,10 @@ function assertCommand(file, command) {
 
 /**
  * @param {string} user 
- * @param {import('./types.d.ts').Command} arg1
+ * @param {import('./types.d.ts').CommandPermissionInfo | undefined} permission
  * @returns {boolean} 
  */
-function canUserPerformCommand(user, { permission }) {
+function canUserPerformCommand(user, permission) {
   if (!permission) {
     // Command doesn't have permissions listed
     return true

@@ -1,27 +1,23 @@
-const aliases = [
-  'ptzplayaudio',
-  'playclip',
-  'playaudio'
-]
+'use strict'
 
 /**
- * @type {Array<import('./types.d.ts').Command>}
+ * @type {import('./types.d.ts').CommandRegister}
  */
-const commands = aliases.map(alias => ({
-  name: alias,
-  enabled: true,
-  permission: {
-    group: 'operator'
-  },
-  run: async ({ controller }) => {
-    if (!controller.connections.cameras) {
-      return;
+module.exports = (controller) => {
+  return {
+    name: 'ptzstopaudio',
+    aliases: [
+      'stopclip',
+      'stopaudio'
+    ],
+    enabled: controller.connections.cameras !== undefined,
+    permission: {
+      group: 'operator'
+    },
+    run: async () => {
+      const speaker = controller.connections.cameras.speaker
+      
+      await speaker.stopAudioClip()
     }
-
-    const speaker = controller.connections.cameras.speaker
-
-    await speaker.stopAudioClip()
   }
-}))
-
-module.exports = commands;
+};
