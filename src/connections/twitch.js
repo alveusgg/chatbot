@@ -8,6 +8,10 @@ const { RefreshingAuthProvider } = require("@twurple/auth");
 const Logger = require("../utils/logger");
 const config = require("../config/config");
 
+/**
+ * @typedef {Twitch} TwitchConnection
+ */
+
 class Twitch {
   #logger;
   #auth;
