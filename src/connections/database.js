@@ -6,6 +6,10 @@ const onChangePromise = import("on-change"); // ESM-only module
 const defaults = { cloudServer: "space", timeRestrictionDisabled: false };
 const file = "data/database.json";
 
+/**
+ * @typedef {Database} DatabaseConnection
+ */
+
 class Database {
   #data = {};
   #file = "";
@@ -44,8 +48,6 @@ class Database {
  * Loads the database and adds it to the controller
  *
  * `controller.connections.database` is the database connection
- *
- *  @typedef {Database} DatabaseConnection
  *
  * @param {import("../controller")} controller
  * @returns {Promise<void>}

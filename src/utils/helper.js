@@ -71,6 +71,10 @@ function getUserRank(userProfile){
     return userRank;
 }
 
+/**
+ * @param {string} input 
+ * @returns {string}
+ */
 function cleanName(input){
     let newInput = input;
     try{

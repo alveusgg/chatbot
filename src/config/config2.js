@@ -1,4 +1,4 @@
-// @ts-check
+'use strict';
 
 // temp file just to leave config.js alone for now
 

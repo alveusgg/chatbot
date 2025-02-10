@@ -1,3 +1,7 @@
+'use strict';
+
+const toNumber = require('./utils/toNumber.js');
+
 /**
  * @type {Record<string, number>}
  */
@@ -13,47 +17,42 @@ const audioNameToIdMap = {
   dog: 44
 }
 
-const aliases = [
-  'ptzplayaudio',
-  'playclip',
-  'playaudio'
-]
-
 /**
- * @type {Array<import('./types.d.ts').Command>}
+ * @type {import('./types.d.ts').CommandRegister}
  */
-const commands = aliases.map(alias => ({
-  name: alias,
-  enabled: true,
-  permission: {
-    group: 'operator'
-  },
-  run: async ({ controller, args }) => {
-    if (!controller.connections.cameras) {
-      return;
-    }
+module.exports = (controller) => {
+  return {
+    name: 'ptzplayaudio',
+    aliases: [
+      'playclip',
+      'playaudio'
+    ],
+    enabled: controller.connections.cameras !== undefined,
+    permission: {
+      group: 'operator'
+    },
+    run: async ({ args }) => {
+      const speaker = controller.connections.cameras.speaker
+      
+      const [, audioName] = args
+  
+      // Defaults to alarm
+      let audioId = 37
+      if (audioName) {
+        if (audioName in audioNameToIdMap) {
+          audioId = audioNameToIdMap[audioName]
+        } else if (audioName !== '') {
+          const result = toNumber(audioName)
+          if (!result) {
+            // Invalid id
+            return;
+          }
 
-    const speaker = controller.connections.cameras.speaker
-    
-    const [, audioName] = args
-
-    // Defaults to alarm
-    let audioId = 37 // Default to alarm
-    if (audioName) {
-      if (audioName in audioNameToIdMap) {
-        audioId = audioNameToIdMap[audioName]
-      } else if (audioName !== '') {
-        const result = Number.parseInt(audioName)
-        if (isNaN(result)) {
-          return;
+          audioId = result
         }
-
-        audioId = result
       }
+  
+      await speaker.playAudioClip(audioId)
     }
-
-    await speaker.playAudioClip(audioId)
   }
-}))
-
-module.exports = commands
+}

@@ -4,6 +4,12 @@ const Logger = require("../utils/logger");
 const config = require("../config/config");
 
 /**
+ * Export the Axis type:
+ * @typedef {Axis} Axis
+ * @typedef {Record<typeof config.axisCameras[number], Axis>} CamerasConnection
+ */
+
+/**
  * Axis Camera Vapix Class
  *
  * https://www.axis.com/vapix-library/subjects/t10175981/section/t10036011/display
@@ -495,8 +501,6 @@ class Axis {
  * Establishes connections to the Axis cameras
  *
  * `controller.connections.cameras` is an object of Axis camera connections
- *
- * @typedef {Record<typeof config.axisCameras[number], Axis>} CamerasConnection
  * 
  * @param {import("../controller")} controller
  * @returns {Promise<void>}

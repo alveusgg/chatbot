@@ -2,6 +2,10 @@ const osc = require("osc");
 
 const Logger = require("../utils/logger");
 
+/**
+ * @typedef {OBSBot} OBSBotConnection
+ */
+
 class OBSBot {
   #logger;
   #client;
@@ -345,8 +349,6 @@ class OBSBot {
  * Establishes connections to the OBSBot camera
  *
  * `controller.connections.obsBot` is the OBSBot connection
- *
- * @typedef {OBSBot} OBSBotConnection
  * 
  * @param {import("../controller")} controller
  * @returns {Promise<void>}

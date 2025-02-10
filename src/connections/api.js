@@ -5,6 +5,10 @@ const ReconnectingWebSocket = require('reconnecting-websocket');
 const jwt = require('jsonwebtoken');
 const NodeCache = require('node-cache'); // Import node-cache
 
+/**
+ * @typedef {API} APIConnection
+ */
+
 class API {
   #ws;
   #logger;
@@ -156,9 +160,6 @@ class API {
   }
 }
 
-/**
- * @typedef {API} APIConnection
- */
 module.exports = (controller) => {
   const wsUrl = process.env.PUBLIC_WS_URL; // Get the Public WS server URL
   const secretKey = process.env.JWT_SECRET; // Get the JWT decrypt token

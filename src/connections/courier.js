@@ -4,6 +4,10 @@ const Logger = require("../utils/logger");
 
 const logger = new Logger("connections/courier");
 
+/**
+ * @typedef {Courier} CourierConnection
+ */
+
 class Courier {
   #client;
 
@@ -288,8 +292,6 @@ class Courier {
  * Establishes connections to the Courier API
  *
  * `controller.connections.courier` is the Courier instance
- *
- *  @typedef {Courier} CourierConnection
  *
  * @param {import("../controller")} controller
  * @returns {Promise<void>}
