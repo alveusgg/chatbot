@@ -802,7 +802,7 @@ function setupCustomCamAlias(aliasList) {
     return convertedList;
 }
 
-const scenePositions = {
+const scenePositions = /** @type {const} */ {
     "1box": {
         1: { //fullscreen
             cropBottom: 0,

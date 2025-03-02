@@ -1,13 +1,13 @@
 'use strict'
 
-const ptzCommandSetup = require('./utils/ptzCommandSetup.js');
+const ptzCommandSetup = require('../utils/ptzCommandSetup.js');
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = ({ connections: { obs, cameras, database, twitch } }) => {
   return {
-    name: 'ptztilt',
+    name: 'ptzpan',
     enabled: !!obs && !!cameras && !!database,
     permission: {
       group: 'operator'
@@ -29,11 +29,11 @@ module.exports = ({ connections: { obs, cameras, database, twitch } }) => {
         return;
       }
 
-      camera.tiltCamera(arg1);
+      camera.panCamera(arg1);
       camera.enableAutoFocus();
 
       if (channel === 'ptzapi') {
-        twitch.send(channel, `${user}: ptztilt ${ptzCameraName} ${args[1]}`, true);
+        twitch.send(channel, `${user}: ptzpan ${ptzCameraName} ${args[1]}`, true);
       }
     }
   }

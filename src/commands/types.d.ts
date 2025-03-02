@@ -36,4 +36,4 @@ export interface Command {
   run: (args: CommandArgs) => void | Promise<void>
 }
 
-export type CommandRegister = (controller: import('../controller.js')) => Command | Array<Command>
+export type CommandRegister = (controller: import('../controller.js')) => Command | Array<ScheduledTask>;

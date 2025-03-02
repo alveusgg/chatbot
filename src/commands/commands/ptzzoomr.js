@@ -1,13 +1,13 @@
 'use strict'
 
-const ptzCommandSetup = require('./utils/ptzCommandSetup.js');
+const ptzCommandSetup = require('../utils/ptzCommandSetup.js');
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = ({ connections: { obs, cameras, database } }) => {
   return {
-    name: 'ptzcfocus',
+    name: 'ptzzoomr',
     enabled: !!obs && !!cameras && !!database,
     permission: {
       group: 'operator'
@@ -23,17 +23,13 @@ module.exports = ({ connections: { obs, cameras, database } }) => {
         return;
       }
 
-      const arg1Lower = args[1].toLowerCase();
-      if (arg1Lower === 'off') {
-        camera.continuousFocus(0);
+      const arg1 = Number(args[1]);
+      if (isNaN(arg1)) {
         return;
       }
 
-      const arg1 = Number(arg1Lower);
-
-      if (!isNaN(arg1)) {
-        camera.continuousFocus(arg1);
-      }
+      camera.ptz({ areazoom: `960,540,${arg1}` });
+      camera.enableAutoFocus();
     }
   }
 };

@@ -1,6 +1,6 @@
 'use strict';
 
-const toNumber = require('./utils/toNumber.js');
+const toNumber = require('../utils/toNumber.js');
 
 /**
  * @type {Record<string, number>}
@@ -18,7 +18,7 @@ const audioNameToIdMap = {
 }
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = (controller) => {
   return {
