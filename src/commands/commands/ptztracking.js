@@ -1,9 +1,9 @@
 'use strict'
 
-const ptzCommandSetup = require('./utils/ptzCommandSetup.js');
+const ptzCommandSetup = require('../utils/ptzCommandSetup.js');
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = ({ connections: { obs, cameras, database } }) => {
   return {

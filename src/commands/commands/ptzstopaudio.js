@@ -1,7 +1,7 @@
 'use strict'
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = (controller) => {
   return {

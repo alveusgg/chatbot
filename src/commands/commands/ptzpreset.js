@@ -1,19 +1,20 @@
 'use strict'
 
-const ptzCommandSetup = require('./utils/ptzCommandSetup.js');
+const ptzCommandSetup = require('../utils/ptzCommandSetup.js');
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = ({ connections: { obs, cameras, database } }) => {
   return {
-    name: 'ptzzoomr',
+    name: 'ptzpreset',
     enabled: !!obs && !!cameras && !!database,
     permission: {
       group: 'operator'
     },
     run: async ({ args: _args }) => {
       const {
+        specificCamera,
         camera,
         args
       } = ptzCommandSetup(obs, cameras, database, _args);
@@ -23,12 +24,13 @@ module.exports = ({ connections: { obs, cameras, database } }) => {
         return;
       }
 
-      const arg1 = Number(args[1]);
-      if (isNaN(arg1)) {
-        return;
+      const arg1Lower = args[1].toLowerCase();
+      if (specificCamera && arg1Lower !== '') {
+        camera.goToPreset(arg1Lower);
+      } else {
+        camera.goToPreset(specificCamera);
       }
 
-      camera.ptz({ areazoom: `960,540,${arg1}` });
       camera.enableAutoFocus();
     }
   }

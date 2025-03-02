@@ -1,13 +1,13 @@
 'use strict'
 
-const ptzCommandSetup = require('./utils/ptzCommandSetup.js');
+const ptzCommandSetup = require('../utils/ptzCommandSetup.js');
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = ({ connections: { obs, cameras, database, twitch } }) => {
   return {
-    name: 'ptzmove',
+    name: 'ptzareazoom',
     enabled: !!obs && !!cameras && !!database,
     permission: {
       group: 'operator'
@@ -24,11 +24,11 @@ module.exports = ({ connections: { obs, cameras, database, twitch } }) => {
         return;
       }
 
-      camera.moveCamera(args[1]);
+      camera.ptz({ areazoom: `${args[1]},${args[2]},${args[3]}` })
       camera.enableAutoFocus();
 
       if (channel === 'ptzapi') {
-        twitch.send(channel, `${user}: ptzmove ${ptzCameraName} ${args[1]}`, true)
+        twitch.send(channel, `${user}: Clicked on ${ptzCameraName}`, true)
       }
     }
   }

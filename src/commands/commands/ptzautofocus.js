@@ -1,13 +1,13 @@
 'use strict'
 
-const ptzCommandSetup = require('./utils/ptzCommandSetup.js');
+const ptzCommandSetup = require('../utils/ptzCommandSetup.js');
 
 /**
- * @type {import('./types.d.ts').CommandRegister}
+ * @type {import('../types.d.ts').CommandRegister}
  */
 module.exports = ({ connections: { obs, cameras, database } }) => {
   return {
-    name: 'ptzfocus',
+    name: 'ptzautofocus',
     enabled: !!obs && !!cameras && !!database,
     permission: {
       group: 'operator'
@@ -24,16 +24,20 @@ module.exports = ({ connections: { obs, cameras, database } }) => {
       }
 
       const arg1Lower = args[1].toLowerCase();
-      const arg1 = Number(arg1Lower);
 
-      if (!isNaN(arg1)) {
-        if (arg1 >= 1 && arg1 <= 9999) {
-          camera.focusCameraExact(arg1);
-        }
-      } else if (['on', 'yes'].includes(arg1Lower)) {
-        camera.enableAutoFocus();
-      } else if (['off', 'no'].includes(arg1Lower)) {
-        camera.disableAutoFocus();
+      switch (arg1Lower) {
+        case '1':
+        case 'on':
+        case 'yes':
+          camera.enableAutoFocus();
+          break;
+        case '0':
+        case 'off':
+        case 'no':
+          camera.disableAutoFocus();
+          break;
+        default:
+          break;
       }
     }
   }

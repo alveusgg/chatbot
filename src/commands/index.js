@@ -35,7 +35,7 @@ class CommandManager {
     for (const file of files) {
       /**
        * Require the file, noteworthy this will throw if something's wrong with it
-       * @type {import('./types.d.ts').CommandRegister}
+       * @type {import('../types.d.ts').CommandRegister}
        */
       const module = require(path)
 
