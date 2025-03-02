@@ -1,25 +1,21 @@
-const { readdir } = require("node:fs/promises");
-const { resolve, relative } = require("node:path");
+const { relative } = require("node:path");
 
 const Logger = require("./utils/logger");
-
-/**
- * Get all files in a directory recursively
- *
- * @param {string} dir
- * @returns {Promise<string[]>}
- */
-const getAllFiles = (dir) =>
-  readdir(dir, { withFileTypes: true }).then((dirents) =>
-    Promise.all(
-      dirents.map((dirent) => {
-        const res = resolve(dir, dirent.name);
-        return dirent.isDirectory() ? getAllFiles(res) : res;
-      }),
-    ).then((files) => files.flat()),
-  );
+const { getAllFiles } = require("./utils/file");
 
 class Controller {
+  /**
+   * @type {{
+   *  api?: import('./connections/api').APIConnection
+   *  cameras?: import('./connections/cameras').CamerasConnection
+   *  courier?: import('./connections/courier').CourierConnection
+   *  database?: import('./connections/database').DatabaseConnection
+   *  obs?: import('./connections/obs').OBSConnection
+   *  obsBot?: import('./connections/obsbot').OBSBotConnection
+   *  twitch?: import('./connections/twitch').TwitchConnection
+   *  unifi?: object
+   * }}
+   */
   #connections = {};
   #logger = new Logger("controller");
 
