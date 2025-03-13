@@ -16,11 +16,30 @@ module.exports = ({ connections: { api, obs, cameras, database } }) => {
       group: 'operator'
     },
     run: async ({ args: _args }) => {
-      const { args, camera, specificCamera, currentScene } = ptzCommandSetup(obs, cameras, database, _args);
+      const { args, specificCamera, currentScene } = ptzCommandSetup(obs, cameras, database, _args);
       
       if (specificCamera) {
         if (args[1] && args[2]) {
-          
+          if (database[specificCamera].presets[args[1]] !== null) {
+            database[specificCamera].presets[args[2]] = database[specificCamera].presets[args[1]];
+
+            const response = delete database[specificCamera].presets[args[1]];
+
+            if (response) {
+              api.sendBroadcastMessage(`ptzrename ${specificCamera} ${args[1]} ${args[2]}`, 'backend')
+            } else {
+							logger.log(`Failed to remove preset ${args[1]}: ${response} ${database[specificCamera]}`);
+            }
+          }
+        } else {
+          if (database[currentScene].presets[specificCamera] !== null) {
+            database[currentScene].presets[args[1]] = database[currentScene].presets[specificCamera];
+
+            const response = delete database[currentScene].presets[specificCamera];
+            if (response) {
+              logger.log(`Failed to remove preset ${specificCamera}: ${response} ${database[currentScene]}`);
+            }
+          }
         }
       } else {
         if (database[currentScene].presets[args[1]] !== null) {
