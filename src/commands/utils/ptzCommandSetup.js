@@ -34,7 +34,7 @@ module.exports = (obs, cameras, database, args) => {
   };
 
   let ptzCameraName = getPtzCamName(args[1])
-  if (cameras[ptzCameraName]) {
+  if (cameras[ptzCameraName]) { 
     info.currentScene = ptzCameraName;
     info.specificCamera = ptzCameraName;
 

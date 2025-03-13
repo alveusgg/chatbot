@@ -1,3 +1,5 @@
+
+
 /**
  * Provides info on who's able to perform a command.
  * Note that each of these can be either or
@@ -31,9 +33,11 @@ export interface Command {
 
   enabled: boolean,
 
+  arguments?: Record<string, CommandArgument> | Array<Record<string, CommandArgument>>
+
   permission?: CommandPermissionInfo
 
   run: (args: CommandArgs) => void | Promise<void>
 }
 
-export type CommandRegister = (controller: import('../controller.js')) => Command | Array<ScheduledTask>;
+export type CommandRegister = (controller: import('../controller.js')) => Command | Array<Command>;
