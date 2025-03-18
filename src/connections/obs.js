@@ -909,8 +909,7 @@ class OBS {
           }
         }
       }
-      //no result
-      self.utils.log(`getSceneItemId: ${sceneName}-${sourceName}`, id);
+      //self.utils.log(`getSceneItemId: ${sceneName}-${sourceName}`, id);
       return id;
     } catch (e) {
       self.utils.log(
@@ -1145,7 +1144,7 @@ class OBS {
       }
     } catch (e) {
       self.utils.log(
-        `Error SetSceneItemEnabled (${sceneName},${sourceName},${sceneItemId}): ${JSON.stringify(
+        `Error SetSceneItemEnabled (${sceneName},${sourceName},${booleanStatus}): ${JSON.stringify(
           e,
         )}`,
       );

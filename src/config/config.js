@@ -287,7 +287,7 @@ const commandPermissionsExtra = {
     commandAdmins: ["testadminextra"],
     commandSuperUsers: ["testsuperextra", "resetcloudsource", "resetcloudsourcef", "setalveusscene", "setcloudscene", "changeserver", "setmute", "camclear"],
     commandMods: ["testmodextra", "resetsource","resetsourcef","camload", "camlist", "camsave", "camrename", "campresetremove", "customcams", "customcamsbig", "customcamstl", "customcamstr", "customcamsbl", "customcamsbr",
-        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam"],
+        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam","showrounds","hiderounds","checkmark","clearcheckmarks"],
     commandOperator: ["showchat","hidechat","raidvideo","stopraidvideo"],
     commandVips: ["getvolume", "setvolume", "resetvolume", "removecam", "swapcam", "scenecams", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", 
                 "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetbackpack2", "resetbackpack3", "resetpc", "resetlivecam", 
@@ -359,6 +359,19 @@ const customCamCommandMapping = {
     "wolfcam10":"wolfmulti5",
     "wolfcam11":"wolfswitch",
     "gardencam":"garden"
+}
+
+//CCam Argument for Command Mapping. Converting base to source name
+const roundsCommandMapping = {
+    "parrot": "checkmarkParrot",
+    "fox": "checkmarkFoxes",
+    "winnie": "checkmarkWinnie",
+    "donkey": "checkmarkDonkeys",
+    "stompy": "checkmarkStompy",
+    "marmoset": "checkmarkMarmosets",
+    "wolf": "checkmarkWolfdogs",
+    "crow": "checkmarkCrows",
+    "bug": "checkmarkBugs"
 }
 
 const commandSceneAlias = {
@@ -433,6 +446,10 @@ const commandSceneAlias = {
     wolfcam10: ["wolfcornermulticam","wolfcornerwolfincam","wolfcornerwolfinmulticam","wolfcwolfincam","wolfcwolficam"],
     wolfcam11: ["wolfswitchcam"],
     gardencam: ["pollinatorcam","plantcam"],
+    winniecam: ["cow","moo","winn"],
+    donkeycam: ["serrano","jalapeno","donk"],
+    stompycam: ["emucam","stomp","stompers"],
+    bugcam: ["insect","reptile","critter","cave","crittercave"],
 }
 
 const commandControlAlias = {
@@ -488,6 +505,10 @@ const commandControlAlias = {
     ptzgetfocus: ["getfocus"],
     ptzplayaudio: ["playclip","playaudio"],
     ptzstopaudio: ["stopclip","stopaudio"],
+    showrounds: ["enableround","roundson","startround"],
+    hiderounds: ["disableround","roundsoff","stopround"],
+    checkmark: ["finished","markdone","rounds","round","mark"],
+    clearcheckmarks: ["clearmark","clearcheck","clearcheckmark"],
 }
 
 let commandScenes = {
@@ -1343,5 +1364,6 @@ module.exports = {
     axisCameraCommandMapping,
     pauseCloudSceneChange,
     notifyHours,
-    restrictedHours
+    restrictedHours,
+    roundsCommandMapping
 };

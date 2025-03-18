@@ -1679,6 +1679,67 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Alveus Chat Overlay", false);
 			await controller.connections.obs.cloud.setSceneItemEnabled(controller.connections.obs.cloud.currentScene, "Alveus Chat Overlay", false);
 			break;
+		case "showrounds":
+			let roundsStatus = null;
+			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
+				roundsStatus = true;
+			} else if (arg1 == "off" || arg1 == "0" || arg1 == "no") {
+				roundsStatus = false;
+			} else {
+				roundsStatus = true;
+			}
+			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", roundsStatus);
+			break;
+		case "hiderounds":
+			let roundsStatus2 = null;
+			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
+				roundsStatus2 = true;
+			} else if (arg1 == "off" || arg1 == "0" || arg1 == "no") {
+				roundsStatus2 = false;
+			} else {
+				roundsStatus2 = false;
+			}
+			for (const source in config.roundsCommandMapping) {
+				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[source], false);
+			}
+			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", roundsStatus2);
+			break;
+		case "checkmark":
+			let checkmarkStatus = null;
+			if (arg2 == "1" || arg2 == "on" || arg2 == "yes" || arg2 == "done") {
+				checkmarkStatus = true;
+			} else if (arg2 == "off" || arg2 == "0" || arg2 == "no") {
+				checkmarkStatus = false;
+			} else {
+				checkmarkStatus = true;
+			}
+			if (arg1 == "all") {
+				for (const source in config.roundsCommandMapping) {
+					await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[source], checkmarkStatus);
+				}
+			} else {
+				if (config.roundsCommandMapping[arg1Base] != null){
+					await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[arg1Base], checkmarkStatus);
+				}
+			}
+			break;
+		case "clearcheckmarks":
+			let checkmarkStatus2 = null;
+			if (arg2 == "1" || arg2 == "on" || arg2 == "yes" || arg2 == "done") {
+				checkmarkStatus2 = true;
+			} else if (arg2 == "off" || arg2 == "0" || arg2 == "no") {
+				checkmarkStatus2 = false;
+			} else {
+				checkmarkStatus2 = false;
+			}
+			if (config.roundsCommandMapping[arg1Base] != null){
+				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[arg1Base], checkmarkStatus2);
+			} else {
+				for (const source in config.roundsCommandMapping) {
+					await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[source], checkmarkStatus2);
+				}
+			}
+			break;
 		case "setmute":
 			let muteStatus = null;
 			if (arg2 == "1" || arg2 == "on" || arg2 == "yes") {
