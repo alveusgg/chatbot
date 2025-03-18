@@ -17,7 +17,7 @@ const pauseCloudSceneChange = false;
 const announceChatSceneChange = false;
 //UTC TIME
 const notifyHours = {start:14,end:23};
-const restrictedHours = {start:14,end:23};
+const restrictedHours = {start:9,end:18};
 const globalMusicSource = "Music Playlist Global";
 
 const userRanks = {
@@ -37,12 +37,12 @@ let userPermissions = {
     commandOperator: ["stolenarmy_", "berlac", "merger3", "nitelitedf","fixterjake14",
                     "purplemartinconservation","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
                     "wolfone_", "jugglinggrenades", "lakel1","darkrow_","minipurrl","gnomechildboi","danman149","hunnybeehelen","strangecyan",
-                    "viphippo","bagel_deficient","rhinofriend","ponchobee","orophia","catonascreen","phoenickes"],
+                    "viphippo","bagel_deficient","rhinofriend","ponchobee","orophia","catonascreen","phoenickes","sidmaxwell10"],
     commandVips: [userRanks.vips, "tfries_", "sivvii_", "ghandii_", "axialmars",
         "jazz_peru", "stealfydoge", "xano218", "experimentalcyborg", "klav___", "monkarooo","nixxform","madcharliekelly",
         "josh_raiden", "jateu", "storesE6", "rebecca_h9", "matthewde", "user_11_11", "huniebeexd","kurtyykins",
         "breacherman", "bryceisrightjr","sumaxu","mariemellie","ewok_626","quokka64","nov1cegg",
-        "casualruffian","likethecheesebri","otsargh","just_some_donkus","fiveacross",
+        "casualruffian","likethecheesebri","otsargh","just_some_donkus","fiveacross", "matthewboltz",
         "itszalndrin","ohnonicoleio","fishymeep"],
     commandUsers: [userRanks.subs]
 }
@@ -55,7 +55,7 @@ const commandPermissionsScenes = {
     commandSuperUsers: ["testsuperscene", "backpackcam", "localbackpackcam", "serverpccam", "localpccam", "servernuthousecam", "phonecam"],
     commandMods: ["testmodscene", "alveusserver", "brbscreen", "georgiecambackup", "noodlecambackup", "hankcambackup", "hankcam2backup", "roachcambackup", "isopodcambackup",
         "noodlegeorgiecambackup", "georgienoodlecambackup", "3cambackup", "4cambackup", "ellaintro", "kaylaintro", "connorintro","intro","poboxintro","aqintro",
-        "accintro","accbrb","accending","ccintro","ccbrb","ccending","sntintro","sntbrb","sntending","nickintro","nickbrb","nickending",
+        "accintro","accbrb","accending","ccintro","ccbrb","ccending","abcintro","sntintro","sntbrb","sntending","nickintro","nickbrb","nickending",
         "noodlehidecambackup", "georgiewatercambackup", "parrotcambackup", "pasturecambackup", "crowcambackup", "crowcam2backup", "crowcam3backup",
         "foxcambackup", "foxcam2backup", "foxcam3backup", "foxcam4backup",
         "4camoutdoorbackup", "marmosetcambackup", "marmosetcam2backup", "marmosetcam3backup"],
@@ -329,10 +329,10 @@ const customCamCommandMapping = {
     "3cam": "georgie noodle toast",
     "4cam": "georgie noodle patchy toast",
     "4camoutdoor": "pasture parrot marmoset fox",
-    "nightcams": "wolfswitch pasture parrot foxcorner crow marmoset",
-    "nightcamsbig": "wolfswitch pasture parrot foxcorner crow marmoset",
-    "indoorcams": "georgie noodle toast chin isopod roach",
-    "indoorcamsbig": "georgie noodle toast chin isopod roach",
+    "nightcams": "wolf pasture parrot fox crow marmoset",
+    "nightcamsbig": "wolf pasture parrot fox crow marmoset",
+    "indoorcams": "georgie noodle toast chin patchy roach",
+    "indoorcamsbig": "georgie noodle toast chin patchy roach",
     "chincam": "chin",
     "chincam2": "chin2",
     "chincam3": "chin3",
@@ -411,6 +411,7 @@ const commandSceneAlias = {
     accintro: ["acintro"],
     accbrb: ["acbrb"],
     accending: ["acending","accend","acend"],
+    abcintro: ["abcintro","bookclubintro","bookintro"],
     ccintro: ["cintro","ccintro2","cintro2","evanintro","allisonintro"],
     ccbrb: ["cbrb"],
     ccending: ["cending","ccend","cend"],
@@ -504,6 +505,7 @@ let commandScenes = {
     accintro: "ACCIntro",
     accbrb: "ACCBRB",
     accending: "ACCEnding",
+    abcintro: "ABCIntro",
     ccintro: "CCIntro",
     ccbrb: "CCBRB",
     ccending: "CCEnding",
@@ -559,6 +561,7 @@ let commandScenesCloud = {
     accintro: "ACCIntro",
     accbrb: "ACCBRB",
     accending: "ACCEnding",
+    abcintro: "ABCIntro",
     ccintro: "CCIntro",
     ccbrb: "CCBRB",
     ccending: "CCEnding",

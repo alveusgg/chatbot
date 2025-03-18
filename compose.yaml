@@ -16,6 +16,6 @@ services:
       NODE_ENV: production
     restart: always
     volumes:
-      - /opt/docker/alveuscontroller/data:/home/node/app/src/data
-      - /opt/docker/alveuscontroller/tokens:/home/node/app/src/tokens/
-      - /opt/docker/alveuscontroller/.env:/home/node/app/src/.env
+      - ./data:/home/node/app/src/data
+      - ./tokens:/home/node/app/src/tokens/
+      - ./.env:/home/node/app/src/.env
