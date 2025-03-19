@@ -17,7 +17,7 @@ const pauseCloudSceneChange = false;
 const announceChatSceneChange = false;
 //UTC TIME
 const notifyHours = {start:14,end:23};
-const restrictedHours = {start:9,end:18};
+const restrictedHours = {start:14,end:23};
 const globalMusicSource = "Music Playlist Global";
 
 const userRanks = {
