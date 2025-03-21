@@ -1,6 +1,6 @@
-const UtilsModule = require("../utils/utilsModule");
 const config = require("../config/config");
 const helper = require("../utils/helper");
+const schedule = require("../utils/schedule");
 const Logger = require("../utils/logger");
 
 const logger = new Logger("modules/legacy");
@@ -41,7 +41,7 @@ const main = async controller => {
 		setPTZRoamMode(controller, currentScene);
 	}
 
-	runAtSpecificTimeOfDay(config.restrictedHours.start - 1, 55, () => {
+	schedule(config.restrictedHours.start - 1, 55, () => {
 		try {
 			let now = new Date();
 			let minutes = now.getUTCMinutes();
@@ -2780,40 +2780,4 @@ async function setPTZRoamMode(controller, scene) {
 	roamTimeout = setTimeout(setPTZRoamMode, length * 1000, controller, scene);
 }
 
-// function runAtSpecificTimeOfDay(hour, minutes, func) {
-// 	const twentyFourHours = 86400000;
-// 	const now = new Date();
-// 	let eta_ms = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minutes, 0, 0).getTime() - now;
-// 	if (eta_ms < 0) {
-// 		eta_ms += twentyFourHours;
-// 	}
-// 	let nowMin = now.getUTCMinutes();
-// 	let nowHour = now.getUTCHours();
-// 	logger.log("check time: ",now,nowHour,nowMin,config);
-// 	logger.log("setup !livecam Timer for: ",eta_ms);
-// 	setTimeout(function () {
-// 		//run once
-// 		func();
-// 		// run every 24 hours from now on
-// 		setInterval(func, twentyFourHours);
-// 	}, eta_ms);
-// }
-
-function runAtSpecificTimeOfDay(hour, minutes, func) {
-	const twentyFourHours = 86400000;
-	const now = new Date();
-	let next = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minutes, 0, 0).getTime();
-	if (next < Date.now()) {
-	  next += twentyFourHours;
-	}
-  
-	setInterval(function () {
-	  if (next < Date.now()) {
-		func();
-		next += twentyFourHours;
-	  }
-	}, 60_000);
-  }
-
 module.exports = Object.assign(main, { onTwitchMessage });
-
