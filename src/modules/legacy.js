@@ -1616,6 +1616,9 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "raidvideo":
 			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Raid", true);
 			setTimeout(()=> controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Raid", false),40000)
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user} started the Raid video`, true);
+			}
 			// controller.connections.obs.local.restartSource("raidvideo");
 			break;
 		case "stopraidvideo":
@@ -1680,29 +1683,21 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			await controller.connections.obs.cloud.setSceneItemEnabled(controller.connections.obs.cloud.currentScene, "Alveus Chat Overlay", false);
 			break;
 		case "showrounds":
-			let roundsStatus = null;
-			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
-				roundsStatus = true;
-			} else if (arg1 == "off" || arg1 == "0" || arg1 == "no") {
-				roundsStatus = false;
+			let now = new Date();
+			var hour = now.getUTCHours();
+			if (hour > 0 && hour < 12){
+				//nighttime
+				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsNightGraphic", true);
 			} else {
-				roundsStatus = true;
+				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", true);
 			}
-			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", roundsStatus);
 			break;
 		case "hiderounds":
-			let roundsStatus2 = null;
-			if (arg1 == "1" || arg1 == "on" || arg1 == "yes") {
-				roundsStatus2 = true;
-			} else if (arg1 == "off" || arg1 == "0" || arg1 == "no") {
-				roundsStatus2 = false;
-			} else {
-				roundsStatus2 = false;
-			}
 			for (const source in config.roundsCommandMapping) {
 				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[source], false);
 			}
-			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", roundsStatus2);
+			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", false);
+			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsNightGraphic", false);
 			break;
 		case "checkmark":
 			let checkmarkStatus = null;

@@ -505,10 +505,10 @@ const commandControlAlias = {
     ptzgetfocus: ["getfocus"],
     ptzplayaudio: ["playclip","playaudio"],
     ptzstopaudio: ["stopclip","stopaudio"],
-    showrounds: ["enableround","roundson","startround"],
-    hiderounds: ["disableround","roundsoff","stopround"],
-    checkmark: ["finished","markdone","rounds","round","mark"],
-    clearcheckmarks: ["clearmark","clearcheck","clearcheckmark"],
+    showrounds: ["enableround","roundson","startround","startrounds"],
+    hiderounds: ["disableround","roundsoff","stopround","stoprounds"],
+    checkmark: ["finished","markdone","mark","check"],
+    clearcheckmarks: ["clearmark","clearcheck","clearcheckmark","clearcheck"],
 }
 
 let commandScenes = {
