@@ -5,7 +5,7 @@ class Logger {
   #context = "";
   #level = 0;
 
-  constructor(context, level = "info") {
+  constructor(context = require.main.filename, level = "info") {
     this.#context = context;
     if (level) this.level = level;
   }
