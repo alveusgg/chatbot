@@ -169,6 +169,10 @@ function canUserPerformCommand(user, permission) {
     return true
   }
 
+  if (permission.users && permission.users.includes(user.toLowerCase())) {
+    return true
+  }
+
   if (permission.group && user in groupMemberships) {
     const userGroup = groupMemberships[user]
     if (permission.group === userGroup) {
@@ -197,10 +201,6 @@ function canUserPerformCommand(user, permission) {
       // User has permission
       return true;
     }
-  }
-
-  if (permission.users && permission.users.includes(user.toLowerCase())) {
-    return true
   }
 
   return false
