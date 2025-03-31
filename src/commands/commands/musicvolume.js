@@ -10,7 +10,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'musicvolume',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ args }) => {
       const amount = Number(args[1]) || 0;

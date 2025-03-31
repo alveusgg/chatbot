@@ -11,7 +11,7 @@ module.exports = ({ connections: { api, obs, cameras, database, twitch } }) => {
     aliases: ['ptzhome'],
     enabled: !!api && !!obs && !!cameras && !!database,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ channel, args: _args }) => {
       const { args, camera, specificCamera } = ptzCommandSetup(obs, cameras, database, _args);

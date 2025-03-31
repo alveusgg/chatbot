@@ -8,7 +8,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'resetphonef',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: () => {
 			obs.cloud.restartSource("RTMP Mobile");

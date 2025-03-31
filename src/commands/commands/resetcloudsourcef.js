@@ -8,7 +8,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'resetcloudsourcef',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'superUser'
     },
     run: ({ args }) => {
       obs.cloud.restartSource(args.splice(1));

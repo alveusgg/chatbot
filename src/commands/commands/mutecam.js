@@ -12,7 +12,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'mutecam',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ args }) => {
       const currentScene = getCurrentScene(obs);

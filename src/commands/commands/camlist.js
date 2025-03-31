@@ -8,7 +8,7 @@ module.exports = ({ connections: { database, twitch } }) => {
     name: 'camlist',
     enabled: !!database,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: ({ channel }) => {
       const cameras = Object.keys(database['layoutpresets']).toString();

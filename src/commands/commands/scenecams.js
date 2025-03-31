@@ -12,7 +12,7 @@ module.exports = ({ connections: { api, database, obs, twitch } }) => {
     name: 'scenecams',
     enabled: !!database && !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ channel, args }) => {
       const currentScene = getCurrentScene(obs);

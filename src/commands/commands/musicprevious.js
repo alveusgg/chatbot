@@ -10,7 +10,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'musicprevious',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async () => {
       obs.local.prevMediaSource(globalMusicSource);

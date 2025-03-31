@@ -15,7 +15,7 @@ module.exports = ({ connections: { obs, database } }) => {
     name: 'addcam',
     enabled: !!obs && !!database,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: ({ args }) => {
       const currentScene = getCurrentScene(obs);

@@ -15,7 +15,7 @@ module.exports = ({ connections: { obs, database, twitch } }) => {
     name: 'swapcam',
     enabled: !!obs && !!database,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ channel, user, args }) => {
       const currentScene = getCurrentScene(obs);

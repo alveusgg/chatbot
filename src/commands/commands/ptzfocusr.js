@@ -10,7 +10,7 @@ module.exports = ({ connections: { obs, cameras, database } }) => {
     name: 'ptzfocusr',
     enabled: !!obs && !!cameras && !!database,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ args: _args }) => {
       const {

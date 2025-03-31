@@ -5,13 +5,13 @@
  */
 module.exports = ({ connections: { twitch, unifi } }) => {
   return {
-    name: 'apsignal',
+    name: 'apclientinfo',
     enabled: !!unifi,
     permission: {
-      group: 'mod'
+      group: 'superUser'
     },
     run: async ({ channel }) => {
-      const apClient = await unifi.getSignal('liveu');
+      const apClient = await unifi.getSignal(args[1]);
 
       let chatMessage;
       if (apClient) {

@@ -8,7 +8,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'resetpcf',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: () => {
 			obs.cloud.restartSource("Maya RTMP 3");

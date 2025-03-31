@@ -11,7 +11,7 @@ module.exports = ({ connections: { obs, obsBot, cameras, database } }) => {
     name: 'ptzpreset',
     enabled: !!obs && !!obsBot && !!cameras && !!database,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ args: _args }) => {
       const currentScene = getCurrentScene();

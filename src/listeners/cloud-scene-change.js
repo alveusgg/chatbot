@@ -6,7 +6,6 @@ const Logger = require('../utils/logger.js');
 const logger = new Logger();
 
 /**
- * 
  * @param {import('../controller.js')} controller 
  * @param {string} name 
  * @param {string} oldName 

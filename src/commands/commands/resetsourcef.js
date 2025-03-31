@@ -8,7 +8,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'resetsourcef',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: ({ args }) => {
       obs.local.restartSource(args);

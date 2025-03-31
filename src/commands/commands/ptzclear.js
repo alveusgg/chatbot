@@ -5,12 +5,12 @@ const ptzCommandSetup = require('../utils/ptzCommandSetup.js');
 /**
  * @type {import('../types.d.ts').CommandRegister}
  */
-module.exports = ({ connections: { api, obs, cameras, database, twitch } }) => {
+module.exports = ({ connections: { api, obs, cameras, database } }) => {
   return {
     name: 'ptzclear',
     enabled: !!api && !!obs && !!cameras && !!database,
     permission: {
-      group: 'operator'
+      group: 'superUser'
     },
     run: async ({ args: _args }) => {
       const { specificCamera, currentScene } = ptzCommandSetup(obs, cameras, database, _args);

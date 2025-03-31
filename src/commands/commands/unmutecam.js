@@ -12,7 +12,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'unmutecam',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: async ({ args }) => {
       const currentScene = getCurrentScene(obs);

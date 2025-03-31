@@ -10,7 +10,7 @@ module.exports = ({ connections: { api, obs } }) => {
     name: 'apigetperms',
     enabled: !!api && !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ channel, user }) => {
       if (channel !== 'ptzapi') {

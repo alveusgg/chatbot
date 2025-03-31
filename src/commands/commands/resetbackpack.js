@@ -8,7 +8,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'resetbackpack',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: () => {
 			obs.cloud.restartSceneItem(obs.cloud.currentScene, "Maya RTMP 1");

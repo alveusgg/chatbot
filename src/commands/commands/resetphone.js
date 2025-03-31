@@ -8,7 +8,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'resetphone',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: () => {
 			obs.cloud.restartSceneItem(obs.cloud.currentScene, "RTMP Mobile");

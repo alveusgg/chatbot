@@ -12,7 +12,7 @@ module.exports = ({ connections: { database } }) => {
     name: 'camsave',
     enabled: !!database,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: ({ args }) => {
       const currentCamList = database['customcam'] ?? [];

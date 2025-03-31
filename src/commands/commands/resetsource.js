@@ -6,17 +6,12 @@
 module.exports = ({ connections: { obs } }) => {
   return {
     name: 'resetsource',
-    aliases: ['resetcloudsource'],
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
-    run: ({ args: _args }) => {
-      const [command, args] = _args;
-      
-      const source = command === 'resetsource' ? obs.local : obs.cloud;
-
-      source.restartSceneItem(source.currentScene, args);
+    run: ({ args }) => {
+      obs.local.restartSceneItem(source.currentScene, args.slice(1));
     }
   }
 };

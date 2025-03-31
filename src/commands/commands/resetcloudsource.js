@@ -5,13 +5,13 @@
  */
 module.exports = ({ connections: { obs } }) => {
   return {
-    name: 'resetextra',
+    name: 'resetcloudsource',
     enabled: !!obs,
     permission: {
-      group: 'vip'
+      group: 'superUser'
     },
-    run: () => {
-			obs.cloud.restartSceneItem(obs.cloud.currentScene, "Space RTMP Extra");
+    run: ({ args }) => {
+      obs.cloud.restartSceneItem(source.currentScene, args.slice(1));
     }
   }
 };

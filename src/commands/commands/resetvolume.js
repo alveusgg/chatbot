@@ -10,7 +10,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'resetvolume',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async () => {
       for (const source in micGroups.livecams) {

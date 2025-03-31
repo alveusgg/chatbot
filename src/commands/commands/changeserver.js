@@ -12,7 +12,7 @@ module.exports = ({ connections: { obs, database, twitch } }) => {
     name: 'changeserver',
     enabled: !!obs && !!database,
     permission: {
-      group: 'operator'
+      group: 'superUser'
     },
     run: async ({ channel, args }) => {
       const arg1 = args[1].trim().toLowerCase();

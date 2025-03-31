@@ -12,7 +12,7 @@ module.exports = (controller) => {
     name: 'camload',
     enabled: !!database,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: ({ channel, args }) => {
       const arg1 = args[1].trim().toLowerCase();

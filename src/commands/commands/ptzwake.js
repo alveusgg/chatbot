@@ -7,10 +7,10 @@ const getCurrentScene = require('../utils/getCurrentScene.js');
  */
 module.exports = ({ connections: { obsBot } }) => {
   return {
-    name: 'ptzhome',
+    name: 'ptzwake',
     enabled: !!obsBot,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: async () => {
       if (getCurrentScene() !== 'nuthouse') {

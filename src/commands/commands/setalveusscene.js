@@ -9,7 +9,7 @@ module.exports = ({ connections: { obs, database } }) => {
     aliases: ['setcloudscene'],
     enabled: !!obs && !!database,
     permission: {
-      group: 'operator'
+      group: 'superUser'
     },
     run: async ({ args: _args }) => {
       const [command, args] = _args;

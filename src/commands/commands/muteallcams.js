@@ -10,7 +10,7 @@ module.exports = ({ connections: { obs } }) => {
     name: 'muteallcams',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: () => {
       for (const source in micGroups.livecams) {

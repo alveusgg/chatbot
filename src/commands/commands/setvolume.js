@@ -11,7 +11,7 @@ module.exports = ({ connections: { obs, twitch } }) => {
     name: 'setvolume',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ channel, args }) => {
       const cameraName = args[1].trim().toLowerCase();

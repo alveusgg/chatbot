@@ -11,7 +11,7 @@ module.exports = ({ connections: { obs, twitch } }) => {
     name: 'resetcam',
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: ({ user, channel, args }) => {
       const cleanedArg1 = cleanName(args[1]) ?? '';

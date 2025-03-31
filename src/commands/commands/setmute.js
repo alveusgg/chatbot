@@ -12,7 +12,7 @@ module.exports = ({ connections: { database, obs } }) => {
     name: 'setmute',
     enabled: !!obs && !!database,
     permission: {
-      group: 'operator'
+      group: 'superUser'
     },
     run: async ({ args }) => {
       let muteStatus;

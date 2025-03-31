@@ -12,7 +12,7 @@ module.exports = ({ connections: { database } }) => {
     name: 'campresetremove',
     enabled: !!database,
     permission: {
-      group: 'operator'
+      group: 'mod'
     },
     run: ({ args }) => {
       const arg1 = args[1].trim().toLowerCase();

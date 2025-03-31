@@ -8,7 +8,7 @@ module.exports = ({ connections: { database } }) => {
     name: 'camclear',
     enabled: !!database,
     permission: {
-      group: 'operator'
+      group: 'superUser'
     },
     run: () => {
       database['layoutpresets'] = {};

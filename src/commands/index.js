@@ -169,6 +169,8 @@ function canUserPerformCommand(user, permission) {
     return true
   }
 
+  // TODO time restriction
+
   if (permission.users && permission.users.includes(user.toLowerCase())) {
     return true
   }

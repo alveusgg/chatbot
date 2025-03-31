@@ -11,7 +11,7 @@ module.exports = ({ connections: { obs } }) => {
     aliases: ['unmutemusic'],
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async ({ args }) => {
       const value = args[0] === 'mutemusic' ? true : false;

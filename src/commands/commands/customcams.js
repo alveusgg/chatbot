@@ -15,7 +15,7 @@ module.exports = ({ connections: { obs } }) => {
     ],
     enabled: !!obs,
     permission: {
-      group: 'operator'
+      group: 'mods'
     },
     run: async ({ args }) => {
       const fullArgs = args.slice(1);

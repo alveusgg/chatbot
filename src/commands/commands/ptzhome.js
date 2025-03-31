@@ -10,7 +10,7 @@ module.exports = ({ connections: { obsBot } }) => {
     name: 'ptzhome',
     enabled: !!obsBot,
     permission: {
-      group: 'operator'
+      group: 'vip'
     },
     run: async () => {
       if (getCurrentScene() !== 'nuthouse') {
