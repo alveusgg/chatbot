@@ -4,6 +4,7 @@
 import { join } from 'node:path';
 import { getAllFiles } from '../utils/file';
 import Logger from '../utils/logger.js';
+import runAtTime from '../utils/schedule.js';
 
 const logger = new Logger('scheduler');
 
@@ -47,7 +48,7 @@ class Scheduler {
           continue;
         }
 
-        runAtSpecificTimeOfDay(task.runAt.hour, task.runAt.minute, task.run);
+        runAtTime(task.runAt.hour, task.runAt.minute, task.run);
       }
     }
   }
@@ -85,27 +86,6 @@ function assertTask(file, task) {
   if (typeof task.run !== 'function') {
     throw new TypeError(`${file}: expected run to be a function, got ${typeof task.run}`)
   }
-}
-
-/**
- * @param {number} hour 
- * @param {number} minutes 
- * @param {(...any) => any} func 
- */
-function runAtSpecificTimeOfDay(hour, minutes, func) {
-	const twentyFourHours = 86400000;
-	const now = new Date();
-	let next = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minutes, 0, 0).getTime();
-	if (next < Date.now()) {
-	  next += twentyFourHours;
-	}
-  
-	setInterval(function () {
-	  if (next < Date.now()) {
-      func();
-      next += twentyFourHours;
-	  }
-	}, 60_000);
 }
 
 module.exports = Scheduler;
