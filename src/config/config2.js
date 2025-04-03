@@ -71,6 +71,7 @@ const groupMemberships = {
   "rhinofriend": 'operator',
   "ponchobee": 'operator',
   "orophia": 'operator',
+  "sidmaxwell10": 'operator',
 
   "tfries_": 'vip',
   "sivvii_": 'vip',
@@ -106,7 +107,8 @@ const groupMemberships = {
   "fiveacross": 'vip',
   "itszalndrin": 'vip',
   "ohnonicoleio": 'vip',
-  "fishymeep": 'vip'
+  "fishymeep": 'vip',
+  'matthewboltz': 'vip'
 }
 
 module.exports = {

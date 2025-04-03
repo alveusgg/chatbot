@@ -1,8 +1,8 @@
 'use strict';
 
 const { userBlacklist, commandPrefix } = require('../config/config')
-const { groupMemberships, groups } = require('../config/config2.js')
 const { getAllFiles } = require('../utils/file.js')
+const canUserPerformCommand = require('./utils/canUserPerformCommand.js');
 
 class CommandManager {
   /**
@@ -27,7 +27,7 @@ class CommandManager {
 
     controller.connections.twitch.onMessage(this.#handleTwitchMessage)
   }
-
+// TODO make sure the scene permissions are being taken into consideration
   async loadCommands() {
     // Grab all .js files in this directory other than this one
     const files = (await getAllFiles(__dirname)).filter(path => path.endsWith('.js') && path !== 'index.js')
@@ -102,14 +102,19 @@ class CommandManager {
       return;
     }
 
-    const commandName = args[0].substring(1)
+    // Trim off the prefix & make it lowercased
+    args[0] = args[0]
+      .substring(commandPrefix.length)
+      .toLowerCase();
+
+    const commandName = args[0]
     const command = this.#commands[commandName]
     if (!command || !command.enabled) {
       // Command doesn't exist or it's disabled
       return;
     }
 
-    if (!canUserPerformCommand(user, command.permission)) {
+    if (!canUserPerformCommand(user, command, this.#controller)) {
       return
     }
 
@@ -156,56 +161,6 @@ function assertCommand(file, command) {
   if (typeof command.run !== 'function') {
     throw new TypeError(`${file}: expected run to be a function, got ${typeof command.run}`)
   }
-}
-
-/**
- * @param {string} user 
- * @param {import('./types.d.ts').CommandPermissionInfo | undefined} permission
- * @returns {boolean} 
- */
-function canUserPerformCommand(user, permission) {
-  if (!permission) {
-    // Command doesn't have permissions listed
-    return true
-  }
-
-  // TODO time restriction
-
-  if (permission.users && permission.users.includes(user.toLowerCase())) {
-    return true
-  }
-
-  if (permission.group && user in groupMemberships) {
-    const userGroup = groupMemberships[user]
-    if (permission.group === userGroup) {
-      // User is in the exact group required
-      return true;
-    }
-
-    // At this point, the user is in a group but it's not the one that's listed.
-    //  They can still run the command however if their group outranks the
-    //  group that's listed (i.e. admin can run mod commands, but operator
-    //  can't run mod commands)
-    //
-    // Noteworthy that the ranks are defined in reverse order, meaning a group
-    //  with a rank of 0 has a higher ranking than a group of 1.
-    
-    const minimumRank = groups[permission.group]
-    const userRank = groups[userGroup]
-
-    if (minimumRank === userRank) {
-      // Different group, same rank. Shouldn't happen, but there's also nothing
-      //  preventing it from happening
-      return false;
-    }
-
-    if (minimumRank > userRank) {
-      // User has permission
-      return true;
-    }
-  }
-
-  return false
 }
 
 module.exports = CommandManager

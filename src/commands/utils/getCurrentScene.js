@@ -7,7 +7,7 @@ const { cleanName } = require('../../utils/helper.js')
  * @returns {string}
  */
 module.exports = (obs) => {
-  const currentScene = obs.local?.currentScene
+  const currentScene = obs.local?.currentScene ?? '';
 
-  return currentScene ? cleanName(currentScene) : ''
+  return cleanName(currentScene)
 }

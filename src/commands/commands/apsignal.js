@@ -26,7 +26,7 @@ module.exports = ({ connections: { twitch, unifi } }) => {
         chatMessage = `LiveU Not Found`;
       }
 
-      twitch.send(channel, chatMessage);
+      await twitch.send(channel, chatMessage);
     }
   }
 };
