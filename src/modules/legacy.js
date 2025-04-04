@@ -1574,6 +1574,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			break;
 		case "resetphonef":
 			controller.connections.obs.cloud.restartSource("RTMP Mobile");
+			controller.connections.obs.cloud.restartSource("Space RTMP Phone");
 			break;
 		case "resetsource":
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, fullArgs);
