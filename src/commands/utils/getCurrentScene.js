@@ -1,13 +1,13 @@
-'use strict'
+'use strict';
 
-const { cleanName } = require('../../utils/helper.js')
+const { cleanName } = require('../../utils/helper.js');
 
 /**
- * @param {import('../../connections/obs.js').OBSConnection} obs 
+ * @param {import('../../connections/obs.js').OBSConnection} obs
  * @returns {string}
  */
 module.exports = (obs) => {
-  const currentScene = obs.local?.currentScene ?? '';
+    const currentScene = obs.local?.currentScene ?? '';
 
-  return cleanName(currentScene)
-}
+    return cleanName(currentScene);
+};

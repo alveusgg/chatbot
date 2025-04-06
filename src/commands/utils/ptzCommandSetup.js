@@ -1,5 +1,5 @@
 // @ts-check
-'use strict'
+'use strict';
 
 const { axisCameraCommandMapping } = require('../../config/config');
 const { cleanName } = require('../../utils/helper.js');
@@ -18,46 +18,46 @@ const getPtzCamName = require('./getPtzCamName');
  */
 
 /**
- * @param {import('../../connections/obs.js').OBSConnection} obs 
- * @param {import('../../connections/cameras.js').CamerasConnection} cameras 
- * @param {import('../../connections/database.js').DatabaseConnection} database 
- * @param {Array<string>} args 
+ * @param {import('../../connections/obs.js').OBSConnection} obs
+ * @param {import('../../connections/cameras.js').CamerasConnection} cameras
+ * @param {import('../../connections/database.js').DatabaseConnection} database
+ * @param {Array<string>} args
  * @returns {PtzCommandInfo}
  */
 module.exports = (obs, cameras, database, args) => {
-  /**
-   * @type {PtzCommandInfo}
-   */
-  const info = {
-    currentScene: getCurrentScene(obs),
-    args: args
-  };
+    /**
+     * @type {PtzCommandInfo}
+     */
+    const info = {
+        currentScene: getCurrentScene(obs),
+        args: args,
+    };
 
-  let ptzCameraName = getPtzCamName(args[1])
-  if (cameras[ptzCameraName]) { 
-    info.currentScene = ptzCameraName;
-    info.specificCamera = ptzCameraName;
-
-    // Remove the camera arg
-    info.args = info.args.splice(0, 1);
-  } else if (info.currentScene === 'custom') {
-    // No specific modifier
-    const currentCamList = database['customcam']
-
-    const firstScene = cleanName(currentCamList[0] || '')
-    ptzCameraName = axisCameraCommandMapping[firstScene] ?? firstScene
-
+    let ptzCameraName = getPtzCamName(args[1]);
     if (cameras[ptzCameraName]) {
-      info.currentScene = ptzCameraName;
-      info.specificCamera = ptzCameraName;
+        info.currentScene = ptzCameraName;
+        info.specificCamera = ptzCameraName;
+
+        // Remove the camera arg
+        info.args = info.args.splice(0, 1);
+    } else if (info.currentScene === 'custom') {
+        // No specific modifier
+        const currentCamList = database['customcam'];
+
+        const firstScene = cleanName(currentCamList[0] || '');
+        ptzCameraName = axisCameraCommandMapping[firstScene] ?? firstScene;
+
+        if (cameras[ptzCameraName]) {
+            info.currentScene = ptzCameraName;
+            info.specificCamera = ptzCameraName;
+        }
     }
-  }
 
-  info.camera = getCamera(cameras, info.currentScene)
+    info.camera = getCamera(cameras, info.currentScene);
 
-  if (args[0] !== 'ptzroaminfo') {
-    database[info.currentScene].isRoaming = false;
-  }
+    if (args[0] !== 'ptzroaminfo') {
+        database[info.currentScene].isRoaming = false;
+    }
 
-  return info;
-}
+    return info;
+};
