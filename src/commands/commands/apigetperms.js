@@ -1,6 +1,6 @@
 'use strict'
 
-const { groupMemberships } = require('../../config/config2.js');
+const { groupMemberships } = require('../../config/config.js');
 
 /**
  * @type {import('../types.d.ts').CommandRegister}

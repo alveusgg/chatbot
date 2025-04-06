@@ -171,7 +171,7 @@ async function setCustomCams(obs, obsSources, sceneName, camList, toggleMap, pos
 /**
  * @param {import('../controller')} controller 
  * @param {string} channel 
- * @param {keyof typeof import('../config/config2').groups | undefined} userGroup Group that the user causing the switch is in
+ * @param {keyof typeof import('../config/config').groups | undefined} userGroup Group that the user causing the switch is in
  * @param {string} commandName 
  * @param {string} [fullArgs=''] 
  */

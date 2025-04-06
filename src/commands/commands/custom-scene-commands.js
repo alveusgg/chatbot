@@ -1,7 +1,7 @@
 'use strict'
 
 const { customSceneCommands, customCommandAlias } = require('../../config/config.js');
-const { groupMemberships } = require('../../config/config2.js');
+const { groupMemberships } = require('../../config/config.js');
 const switchToCustomCams = require('../../utils/switchToCustomCams.js');
 
 /**

@@ -1,7 +1,7 @@
 'use strict'
 
 const { sceneAudioSource, customCommandAlias, globalMusicSource, micGroups } = require('../../config/config.js');
-const { groupMemberships } = require('../../config/config2.js');
+const { groupMemberships } = require('../../config/config.js');
 const { cleanName } = require('../../utils/helper.js');
 const getCurrentScene = require('../utils/getCurrentScene.js');
 

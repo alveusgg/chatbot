@@ -1,13 +1,13 @@
 'use strict'
 
 const { timeRestrictedCommands, restrictedHours } = require('../../config/config.js');
-const { groupMemberships, groups } = require('../../config/config2.js');
+const { groupMemberships, groups } = require('../../config/config.js');
 
 /**
  * Checks if a user has access to perform a command
  * 
  * @param {string} user 
- * @param {keyof typeof import('../../config/config2.js').groups | undefined} userGroup 
+ * @param {keyof typeof import('../../config/config.js').groups | undefined} userGroup 
  * @param {import('../types.d.ts').CommandPermissionInfo | undefined} permission
  * @returns {boolean} 
  */
@@ -54,7 +54,7 @@ function doesUserHaveAccessToCommand(user, userGroup, permission) {
 }
 
 /**
- * @param {keyof typeof import('../../config/config2.js').groups | undefined} userGroup 
+ * @param {keyof typeof import('../../config/config.js').groups | undefined} userGroup 
  * @param {import('../types.d.ts').Command} command
  * @param {import('../../controller.js')} controller
  * @returns {boolean} 

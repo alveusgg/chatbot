@@ -1,7 +1,7 @@
 'use strict'
 
 const { customCommandAlias } = require('../../config/config.js');
-const { groupMemberships } = require('../../config/config2.js');
+const { groupMemberships } = require('../../config/config.js');
 const { cleanName } = require('../../utils/helper.js');
 const Logger = require('../../utils/logger.js');
 const switchToCustomCams = require('../../utils/switchToCustomCams.js');
