@@ -54,7 +54,7 @@ const commandPermissionsScenes = {
     commandAdmins: ["testadminscene"],
     commandSuperUsers: ["testsuperscene", "backpackcam", "localbackpackcam", "serverpccam", "localpccam", "servernuthousecam", "phonecam"],
     commandMods: ["testmodscene", "alveusserver", "brbscreen", "georgiecambackup", "noodlecambackup", "hankcambackup", "hankcam2backup", "roachcambackup", "isopodcambackup",
-        "noodlegeorgiecambackup", "georgienoodlecambackup", "3cambackup", "4cambackup", "ellaintro", "kaylaintro", "connorintro","intro","poboxintro","aqintro",
+        "noodlegeorgiecambackup", "georgienoodlecambackup", "3cambackup", "4cambackup", "ellaintro", "kaylaintro", "lukasintro","connorintro","intro","poboxintro","aqintro",
         "accintro","accbrb","accending","ccintro","ccbrb","ccending","abcintro","sntintro","sntbrb","sntending","nickintro","nickbrb","nickending",
         "noodlehidecambackup", "georgiewatercambackup", "parrotcambackup", "pasturecambackup", "crowcambackup", "crowcam2backup", "crowcam3backup",
         "foxcambackup", "foxcam2backup", "foxcam3backup", "foxcam4backup",
@@ -84,7 +84,7 @@ const commandPermissionsCustomCam = {
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam","gardencam"],
     commandOperator: ["constructioncam"],
-    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam","pushpopcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
+    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam","pushpopcam","pushpopindoorcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
         "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "chincam2", "chincam3", "chincam4", "ratcam","ratcam2","ratcam3","ratcam4","orangeisopodcam"],
     commandUsers: []
 }
@@ -221,7 +221,7 @@ const micGroups = {
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
 const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfswitch","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "toast","roach", "crow", "crowoutdoor", "fox", "foxden",
-    "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "pushpop", "marty", "bb","construction","chicken", "garden","speaker"];
+    "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "pushpop","pushpopindoor", "marty", "bb","construction","chicken", "garden","speaker"];
 
 //Axis Camera Mapping to Command. Converting base to source name
 const axisCameraCommandMapping = {
@@ -258,6 +258,7 @@ const axisCameraCommandMapping = {
     "chin":"chin", 
     "puppy":"puppy", 
     "pushpop":"pushpop", 
+    "pushpopcam2":"pushpopindoor", 
     "isopod":"marty", 
     "orangeisopod":"bb",
     "construction":"construction",
@@ -358,6 +359,7 @@ const customCamCommandMapping = {
     "wolfcam9":"wolfmulti4", 
     "wolfcam10":"wolfmulti5",
     "wolfcam11":"wolfswitch",
+    "pushpopcam2":"pushpopindoor",
     "gardencam":"garden"
 }
 
@@ -445,6 +447,8 @@ const commandSceneAlias = {
     wolfcam9: ["wolfden2multicam","wolfwolfden2multicam","wolfwolfden2cam"],
     wolfcam10: ["wolfcornermulticam","wolfcornerwolfincam","wolfcornerwolfinmulticam","wolfcwolfincam","wolfcwolficam"],
     wolfcam11: ["wolfswitchcam"],
+    pushpopcam: ["pushpopcam","pushcam","popcam","poppycam"],
+    pushpopcam2: ["pushpopindoorcam","pushindoorcam","pushpopinsidecam","pushpopin","poppyin","pushin","popin","popinside","poppyinside","poppyindoor"],
     gardencam: ["pollinatorcam","plantcam"],
     winniecam: ["cow","moo","winn"],
     donkeycam: ["serrano","jalapeno","donk"],
@@ -520,6 +524,7 @@ let commandScenes = {
     brbscreen: "BRB", //Cloud server
     ellaintro: "EllaIntro",
     kaylaintro: "KaylaIntro",
+    lukasintro: "LukasIntro",
     connorintro: "ConnorIntro",
     poboxintro: "POBoxIntro",
     aqintro: "AQIntro",
@@ -576,6 +581,7 @@ let commandScenesCloud = {
     servernuthousecam: "Alveus Nuthouse",
     ellaintro: "EllaIntro",
     kaylaintro: "KaylaIntro",
+    lukasintro: "LukasIntro",
     connorintro: "ConnorIntro",
     poboxintro: "POBoxIntro",
     aqintro: "AQIntro",

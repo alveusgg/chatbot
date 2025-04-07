@@ -305,6 +305,17 @@ const onSceneChangeCloud = async (controller, name, oldName) => {
 }
 
 /**
+ * Handle cloud OBS scene changes
+ *
+ * @param {import("../controller")} controller
+ * @param {string} message
+ * @returns {Promise<void>}
+ */
+const onFeederMessage = async (controller, message) => {
+	logger.log(`Feeder Message: ${message}`);
+}
+
+/**
  * Handle incoming Twitch chat messages
  *
  * @param {import("../controller")} controller
