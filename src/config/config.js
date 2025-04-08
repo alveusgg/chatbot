@@ -31,7 +31,7 @@ let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
     commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick", 
-                        "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology","amanda2815",
+                        "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology","amandaexpress",
                         "coltonactually"],
     commandMods: [userRanks.mods,"96allskills","dansza","echoskope","loganrx_","mattipv4","mik_mwp","pjeweb","shrezno","wazix11"],
     commandOperator: ["stolenarmy_", "berlac", "merger3", "nitelitedf","fixterjake14",
