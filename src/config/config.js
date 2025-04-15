@@ -31,8 +31,8 @@ let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
     commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick", 
-                        "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology","amanda2815",
-                        "coltonactually"],
+                        "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology","amandaexpress",
+                        "coltonactually","tamarinsandjulie"],
     commandMods: [userRanks.mods,"96allskills","dansza","echoskope","loganrx_","mattipv4","mik_mwp","pjeweb","shrezno","wazix11"],
     commandOperator: ["stolenarmy_", "berlac", "merger3", "nitelitedf","fixterjake14",
                     "purplemartinconservation","lazygoosepxls","alxiszzz","shutupleonard","taizun","lumberaxe1","glennvde",
@@ -84,7 +84,7 @@ const commandPermissionsCustomCam = {
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam2", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam","gardencam"],
     commandOperator: ["constructioncam"],
-    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam","pushpopcam","pushpopindoorcam", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
+    commandVips: ["georgiecam", "noodlecam","patchycam","toastcam","pushpopcam","pushpopcam2","pushpopcam3", "puppycam", "hankcam", "hankcam2", "hankcam3", "hankmulti", "roachcam", "isopodcam",
         "noodlehidecam", "georgiewatercam", "georgiemulticam", "indoorcams", "indoorcamsbig", "chincam", "chincam2", "chincam3", "chincam4", "ratcam","ratcam2","ratcam3","ratcam4","orangeisopodcam"],
     commandUsers: []
 }
@@ -160,6 +160,9 @@ const sceneAudioSource = {
     "marmosetindoor": "marmoset mic",
     "marmosetoutdoor": "marmoset mic",
     "marmosetmulti": "marmoset mic",
+    "pushpop": "Pushpop Cam",
+    "pushpopindoor": "Pushpop Cam",
+    "pushpopcrunch": "Pushpop Crunch Cam",
     "nuthouse": "nuthouse local",
     "nut": "nuthouse local",
     "phone": "alveus rtmp mobile",
@@ -221,7 +224,7 @@ const micGroups = {
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
 const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfswitch","wolfden2","wolfden","georgie", "georgiewater", "noodle","patchy", "toast","roach", "crow", "crowoutdoor", "fox", "foxden",
-    "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "pushpop","pushpopindoor", "marty", "bb","construction","chicken", "garden","speaker"];
+    "foxcorner", "hank", "hankcorner", "marmoset", "marmosetindoor", "chin", "pushpop","pushpopindoor","pushpopcrunch","marty", "bb","construction","chicken", "garden","speaker"];
 
 //Axis Camera Mapping to Command. Converting base to source name
 const axisCameraCommandMapping = {
@@ -259,12 +262,13 @@ const axisCameraCommandMapping = {
     "puppy":"puppy", 
     "pushpop":"pushpop", 
     "pushpopcam2":"pushpopindoor", 
+    "pushpopcam3":"pushpopcrunch", 
     "isopod":"marty", 
-    "orangeisopod":"bb",
-    "construction":"construction",
-    "chickencam":"chicken",
-    "gardencam":"garden",
-    "speaker":"speaker",
+    "orangeisopod":"bb", 
+    "construction":"construction", 
+    "chickencam":"chicken", 
+    "gardencam":"garden", 
+    "speaker":"speaker", 
     // "ratcam":"rat"
 }
 
@@ -360,6 +364,7 @@ const customCamCommandMapping = {
     "wolfcam10":"wolfmulti5",
     "wolfcam11":"wolfswitch",
     "pushpopcam2":"pushpopindoor",
+    "pushpopcam3":"pushpopcrunch",
     "gardencam":"garden"
 }
 
@@ -449,6 +454,7 @@ const commandSceneAlias = {
     wolfcam11: ["wolfswitchcam"],
     pushpopcam: ["pushpopcam","pushcam","popcam","poppycam"],
     pushpopcam2: ["pushpopindoorcam","pushindoorcam","pushpopinsidecam","pushpopin","poppyin","pushin","popin","popinside","poppyinside","poppyindoor"],
+    pushpopcam3: ["pushpopcrunchcam","pushcrunchcam","popcrunchcam","poppycrunchcam","crunchcam"],
     gardencam: ["pollinatorcam","plantcam"],
     winniecam: ["cow","moo","winn"],
     donkeycam: ["serrano","jalapeno","donk"],
