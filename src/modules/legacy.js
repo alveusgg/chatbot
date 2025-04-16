@@ -12,17 +12,19 @@ let roamTimeout = null;
  * @param {import("../controller")} controller
  */
 const main = async controller => {
-	// Bind event handlers
-	if (controller.connections.obs?.local) {
-		controller.connections.obs.local.sceneChange(onSceneChange.bind(null, controller));
-	} else {
-		logger.warn("Local OBS connection not found. Scene changes will not be handled.");
-	}
+	if (!config.useNewListeners) {
+		// Bind event handlers
+		if (controller.connections.obs?.local) {
+			controller.connections.obs.local.sceneChange(onSceneChange.bind(null, controller));
+		} else {
+			logger.warn("Local OBS connection not found. Scene changes will not be handled.");
+		}
 
-	if (controller.connections.obs?.cloud) {
-		controller.connections.obs.cloud.sceneChange(onSceneChangeCloud.bind(null, controller));
-	} else {
-		logger.warn("Cloud OBS connection not found. Scene changes will not be handled.");
+		if (controller.connections.obs?.cloud) {
+			controller.connections.obs.cloud.sceneChange(onSceneChangeCloud.bind(null, controller));
+		} else {
+			logger.warn("Cloud OBS connection not found. Scene changes will not be handled.");
+		}
 	}
 
 	if (controller.connections.twitch) {
@@ -41,20 +43,22 @@ const main = async controller => {
 		setPTZRoamMode(controller, currentScene);
 	}
 
-	schedule(config.restrictedHours.start - 1, 55, () => {
-		try {
-			let now = new Date();
-			let minutes = now.getUTCMinutes();
-			let hour = now.getUTCHours();
-			logger.log("check time",now,hour,minutes,config.restrictedHours);
-			logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
-			controller.connections.twitch.send("alveusgg", `!nightcams`);
-			controller.connections.obs.local.setMute(config.sceneAudioSource["fox"], true);
-			switchToCustomCams(controller, "alveusgg", { allowed: true, accessLevel: 'commandAdmins' }, "customcamsbig", config.customCamCommandMapping["nightcams"]);
-		} catch (e) {
-			logger.log(`Error: Failed to run timer - ${e}`);
-		}
-	});
+	if (!config.useNewScheduler) {
+		schedule(config.restrictedHours.start - 1, 55, () => {
+			try {
+				let now = new Date();
+				let minutes = now.getUTCMinutes();
+				let hour = now.getUTCHours();
+				logger.log("check time",now,hour,minutes,config.restrictedHours);
+				logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
+				controller.connections.twitch.send("alveusgg", `!nightcams`);
+				controller.connections.obs.local.setMute(config.sceneAudioSource["fox"], true);
+				switchToCustomCams(controller, "alveusgg", { allowed: true, accessLevel: 'commandAdmins' }, "customcamsbig", config.customCamCommandMapping["nightcams"]);
+			} catch (e) {
+				logger.log(`Error: Failed to run timer - ${e}`);
+			}
+		});
+	}
 
 	// for (let hour = 1; hour < 5; hour++) {
 	// 	for (let min = 0; min < 60; min += 10) {
@@ -339,6 +343,11 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 	let userCommand = helper.commandCheck(message);
 	if (userCommand == null) {
 		//not a command
+		return;
+	}
+
+	if (config.useNewCommandSystem.has(userCommand) && userCommand !== 'uselegacy') {
+		controller.commandManager.handleTwitchMessage(channel, user, message, tags);
 		return;
 	}
 
@@ -1562,6 +1571,18 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 	// logger.log("Extra Command",accessProfile,userCommand,fullArgs,currentScene,currentCamList);
 
 	switch (userCommand) {
+		case "uselegacy":
+			if (arg1.length !== 0) {
+				config.useNewCommandSystem.add(arg1);
+			} else {
+				config.useNewCommandSystem.clear();
+			}
+			break;
+		case "usenew":
+			if (arg1.length !== 0) {
+				config.useNewCommandSystem.delete(arg1);
+			}
+			break;
 		case "resetsourcef":
 			controller.connections.obs.local.restartSource(fullArgs);
 			break;
