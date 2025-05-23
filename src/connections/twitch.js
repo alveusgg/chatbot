@@ -264,6 +264,22 @@ class Twitch {
       return null;
     }
   }
+
+  /**
+   * Retrieves the subscription data for a given user to a given broadcaster from broadcaster auth token.
+   *
+   * @param {string | number} broadcasterId ID of the user/channel
+   * @param {string | number} userId ID of the user/channel
+   * @returns {Promise<import("@twurple/api").HelixSubscription | null>} A (paid) subscription of a user to a broadcaster.
+   */
+  async checkSubscription(broadcasterId, userId) {
+    try {
+      return await this.#client.subscriptions.getSubscriptionForUser(broadcasterId,userId);
+    } catch (e) {
+      this.#logger.error(`Failed to get subscription info (${broadcasterId},${userId}): ${e}`);
+      return null;
+    }
+  }
 }
 
 /**

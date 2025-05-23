@@ -31,6 +31,7 @@ function isAllowed(userCommand,userProfile){
             //see if in correct category
             if (userCommand.toLowerCase() == command.toLowerCase()){
                 //go through ranks to check if user is allowed
+                //commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
                 for (const priority of config.userPermissions.commandPriority){
                     let userRank = getUserRank(userProfile);
                     if (config.userPermissions[priority].includes(userProfile.userName.toLowerCase())){

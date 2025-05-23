@@ -3,7 +3,7 @@ const { join } = require("node:path");
 
 const onChangePromise = import("on-change"); // ESM-only module
 
-const defaults = { cloudServer: "space", timeRestrictionDisabled: false };
+const defaults = { cloudServer: "space", timeRestrictionDisabled: false, blockedUsers: {}, enabledSubs: false };
 const file = "data/database.json";
 
 class Database {

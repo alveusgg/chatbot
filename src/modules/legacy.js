@@ -6,6 +6,9 @@ const Logger = require("../utils/logger");
 const logger = new Logger("modules/legacy");
 
 let roamTimeout = null;
+let timeSinceThrottled = {};
+let timeSinceThrottledPTZ = {};
+
 /**
  * Legacy controller implementation, handling scene changes and Twitch chat commands
  *
@@ -342,27 +345,74 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		return;
 	}
 
-	// logger.log("userCommand", userCommand)
+	// logger.log("Valid Command",user,userCommand, tags.userInfo);
 
 	let accessProfile = helper.isAllowed(userCommand, tags.userInfo);
-	if (accessProfile == null || !accessProfile.allowed) {
-		//no permission
-		// logger.log("NOT valid user",user,userCommand);
-		return;
-	}
-	//logger.log("valid user",user,userCommand,config.commandScenes[userCommand],accessProfile);
-
-	// //check Throttled
-	// if (config.throttledCommands.includes(userCommand)){
-	// 	let now = new Date();
-	// 	let before = timeSinceThrottled[userCommand];
-	// 	let differenceMS = now.getTime() - timeSinceThrottled.getTime();
-	// 	if (differenceMS < config.throttleCommandLength){
-	// 		return;
-	// 	}
+	// if (accessProfile == null || !accessProfile.allowed) {
+	// 	//no permission
+	// 	logger.log("NOT valid user",user,userCommand,accessProfile);
+	// 	return;
 	// }
 
-	let currentScene = controller.connections.obs.local.currentScene || "";
+ 	//check if subscriber in alveus
+    //returns {broadcasterDisplayName,broadcasterId,broadcasterName,isGift,tier}
+    if ((accessProfile == null || !accessProfile.allowed ) && channel.toLowerCase() == "alveusgg"){
+        let status = await controller.connections.twitch.checkSubscription("636587384",tags.userInfo.userId);
+        if (status != null){
+			//recheck if allowed with new status
+			let chatuser = {displayName: tags.userInfo.displayName, isBroadcaster: tags.userInfo.isBroadcaster,
+							isFounder: tags.userInfo.isFounder, isMod: tags.userInfo.isMod, isSubscriber: true,
+							isVip: tags.userInfo.isVip, userId: tags.userInfo.userId, userName: tags.userInfo.userName,
+							userType: tags.userInfo.userType, badges: tags.userInfo.badges, badgeInfo: tags.userInfo.badgeInfo}
+			accessProfile = helper.isAllowed(userCommand,chatuser);
+			// logger.log("subscriber: ",user,accessProfile,chatuser);
+        }
+    }
+	if (accessProfile == null || !accessProfile.allowed) {
+		//no permission
+		logger.log("NOT valid user",user,userCommand,accessProfile);
+		return;
+	}
+
+
+	if (!controller.connections.database.enabledSubs && accessProfile.accessLevel == "commandUsers"){
+		//no permission
+		logger.log("NO Sub Permission",user,userCommand,accessProfile);
+		return;
+	}
+	
+	if (controller.connections.database["blockedUsers"][user]){
+		//no permission
+		logger.log("Blocked User: ",user,userCommand);
+		return;
+	}
+
+	//logger.log("valid user",user,userCommand,config.commandScenes[userCommand],accessProfile);
+
+	//check Throttled
+	// commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
+	let now = new Date();
+	if (accessProfile.accessLevel != "commandAdmins" && 
+		accessProfile.accessLevel != "commandSuperUsers" &&
+		!config.unthrottledCommands.includes(userCommand)){
+		let before = timeSinceThrottled[userCommand];
+		if (before != null){
+			let differenceMS = now.getTime() - before.getTime();
+			if ((userCommand == "swapcam" && differenceMS < config.throttleSwapCommandLength ) || 
+				differenceMS < config.throttleCommandLength){
+				console.log("throttled command: ",userCommand,now-before,before,now);
+				return;
+			} else {
+				timeSinceThrottled[userCommand] = now;
+			}
+		} else {
+			timeSinceThrottled[userCommand] = now;
+		}
+	} else {
+		timeSinceThrottled[userCommand] = now;
+	}
+
+	let currentScene = await controller.connections.obs.local.getScene() || controller.connections.obs.local.currentScene || "";
 	currentScene = helper.cleanName(currentScene);
 
 	let parameters = { controller, userCommand, accessProfile, channel, message, currentScene, user }
@@ -462,27 +512,14 @@ async function checkLocalSceneCommand(controller, userCommand, accessProfile, ch
 		//specific mod time restrictions
 		hasAccess = checkTimeAccess(controller, userCommand, accessProfile);
 
+		
+
 		//MultiCommand swapping
 		if (!hasAccess) {
-			let currentScene = await controller.connections.obs.local.getScene() || "";
-			currentScene = helper.cleanName(currentScene);
-
-			for (const baseCommand in config.multiCommands) {
-				let fullList = config.multiCommands[baseCommand] || [];
-				//find usercommand in MultiCommands
-				if (fullList.includes(userCommand)) {
-					//get Scene names for matching Command
-					let fullSceneList = config.multiScenes[baseCommand] || [];
-					for (let i = 0; i < fullSceneList.length; i++) {
-						let scene = fullSceneList[i] || "";
-						scene = helper.cleanName(scene);
-						//check if current scene is in current commands Multiscenes
-						if (scene != "" && currentScene == scene) {
-							hasAccess = true;
-							break;
-						}
-					}
-				}
+			let newCamBase = config.multiCustomCamScenesConverted[userCommand];
+			let currentCamBase = config.multiCustomCamScenesConverted[currentScene];
+			if (newCamBase == currentCamBase && newCamBase != null){
+				hasAccess = true;
 			}
 
 			//One Direction Swapping (if on scene, allow subscene)
@@ -497,6 +534,10 @@ async function checkLocalSceneCommand(controller, userCommand, accessProfile, ch
 		if (hasAccess) {
 			await controller.connections.obs.local.setScene(config.commandScenes[userCommand]);
 			sceneCommand = true;
+			const broadcastMessage = {
+				currentScene: currentScene,
+			}; 
+			// controller.connections.api.sendBroadcastMessage(broadcastMessage); 
 
 			// if (userCommand == "hankcam2" && !controller.connections.database["hankIR"].status) {
 			// 	//enable ir
@@ -571,6 +612,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	let arg4 = messageArgs[4] ?? "";
 	let arg5 = messageArgs[5] ?? "";
 
+	let parentScene = currentScene;
 	let specificCamera = "";
 	let ptzcamName = helper.cleanName(arg1);
 	//convert to clean base command
@@ -595,7 +637,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			clip = 33;
 		} else if (arg1 == "hello"){
 			clip = 1;
-		} else if (arg1 == "despacito "){
+		} else if (arg1 == "despacito"){
 			clip = 0;
 		} else if (arg1 == "ringtone"){
 			//35-36
@@ -614,6 +656,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		return;
 	}
 
+	let noSpecificCam = false;
 	if (controller.connections.cameras[ptzcamName] != null) {
 		specificCamera = ptzcamName;
 		currentScene = ptzcamName;
@@ -635,6 +678,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (controller.connections.cameras[ptzcamName] != null) {
 				specificCamera = ptzcamName;
 				currentScene = ptzcamName;
+				noSpecificCam = true;
 			}
 		}
 	}
@@ -648,6 +692,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 
 	let currentCamList = controller.connections.database["customcam"];
 	let camera = controller.connections.cameras[currentScene] || null;
+	
 	if (camera == null) {
 		//multiscene/extra scene
 		let parentScene = "";
@@ -697,6 +742,33 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	}
 
 	let zoom = 100;
+
+	//check Throttled
+	// commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
+	let now = new Date();
+	let throttledName = currentScene+userCommand;
+	if (accessProfile.accessLevel != "commandAdmins" && 
+		accessProfile.accessLevel != "commandSuperUsers" &&
+		accessProfile.accessLevel != "commandMods" &&
+		accessProfile.accessLevel != "commandOperator" &&
+		accessProfile.accessLevel != "commandVips" &&
+		!config.unthrottledCommands.includes(throttledName)){
+		let before = timeSinceThrottledPTZ[throttledName];
+		if (before != null){
+			let differenceMS = now.getTime() - before.getTime();
+			if (differenceMS < config.throttlePTZCommandLength){
+				console.log("throttled command: ",throttledName,before,now);
+				return;
+			} else {
+				timeSinceThrottledPTZ[throttledName] = now;
+			}
+		} else {
+			timeSinceThrottledPTZ[throttledName] = now;
+		}
+	} else {
+		timeSinceThrottledPTZ[throttledName] = now;
+	}
+
 	switch (userCommand) {
 		case "ptzpan":
 			// logger.log('ptzpan',arg1);
@@ -713,28 +785,29 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				controller.connections.twitch.send(channel, `${user}: ptztilt ${ptzcamName} ${arg1}`, true);
 			}
 			break;
-		case "ptzzoom":
-			let zscaledAmount = arg1 * 100 || 0;
-			camera.zoomCamera(zscaledAmount);
+		case "ptzzooma":
+			//(1 to 9999)
+			// let zscaledAmount = arg1 * 100 || 0;
+			camera.zoomCameraExact(arg1);
 			camera.enableAutoFocus();
 			break;
-		case "ptzzoomr":
+		case "ptzzoom":
 			camera.ptz({ areazoom: `960,540,${arg1}` });
 			camera.enableAutoFocus();
 			break;
-		case "ptzfocus":
+		case "ptzfocusa":
 			if (Number(arg1) >= 1 && Number(arg1) <= 9999) {
 				camera.focusCameraExact(arg1);
-			} else if (arg1 == "on" || arg1 == "yes") {
+			} else if (arg1 == "on" || arg1 == "yes"|| arg1 == "auto") {
 				camera.enableAutoFocus();
 			} else if (arg1 == "off" || arg1 == "no") {
 				camera.disableAutoFocus();
 			}
 			break;
-		case "ptzfocusr":
+		case "ptzfocus":
 			if (Number(arg1) >= -9999 && Number(arg1) <= 9999) {
 				camera.focusCamera(arg1);
-			} else if (arg1 == "on" || arg1 == "yes") {
+			} else if (arg1 == "on" || arg1 == "yes"|| arg1 == "auto") {
 				camera.enableAutoFocus();
 			} else if (arg1 == "off" || arg1 == "no") {
 				camera.disableAutoFocus();
@@ -818,7 +891,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			let yCord = parseInt(arg2, 10);
 
 			if (isNaN(xCord) || isNaN(yCord)) {
-				return;
+				break;
 			}
 
 			let clickedCam = findBox(xCord, yCord);
@@ -839,7 +912,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			zoom = parseInt(arg3, 10);
 
 			if (isNaN(xcord) || isNaN(ycord) || isNaN(zoom)) {
-				return;
+				break;
 			}
 
 			const clickbox = findBox(xcord, ycord);
@@ -852,7 +925,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (channel === 'ptzapi') {
 				controller.connections.twitch.send(channel, `${user} clicked on ${clickbox.zone + 1}: ${clickbox.ptzcamName}`, true);
 			} else {
-			controller.connections.twitch.send(channel, `Clicked on ${clickbox.zone + 1}: ${clickbox.ptzcamName}`);
+				controller.connections.twitch.send(channel, `Clicked on ${clickbox.zone + 1}: ${clickbox.ptzcamName}`);
 			}
 			break;
 		case "ptzdraw":
@@ -974,6 +1047,21 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			break;
 		case "ptzfetchimg":
 			if (channel === 'ptzapi') {
+				//check if current cam
+				let allowedCam = false;
+				for (let i = 0; i < currentCamList.length; i++) {
+					let currentPTZName = helper.cleanName(currentCamList[i]);
+					let currentBaseName = config.customCommandAlias[currentPTZName] ?? currentPTZName;
+					if (baseName == currentBaseName){
+						allowedCam = true;
+						break;
+					}
+				}
+				if (!allowedCam){
+					logger.log(`Fetch Image: Invalid Permission - ${specificCamera}`);
+					break;
+				}
+
 				// Fetch the screenshot 
 				const imageBase64 = await camera.fetchImage();
 				if (imageBase64) {
@@ -992,8 +1080,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 					logger.log("Failed to fetch image after saving preset");
 				}
 
-			} else {
-				return;
 			}
 			break;
 		case "ptzsave":
@@ -1015,23 +1101,23 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 						controller.connections.database[currentScene].lastKnownPosition = currentPosition;
 					}
 				}
-				controller.connections.api.sendBroadcastMessage(`ptzsave ${specificCamera} ${arg1}`, 'backend');
+				// controller.connections.api.sendBroadcastMessage(`ptzsave ${specificCamera} ${arg1}`, 'backend');
 
 				// Fetch the screenshot after saving the preset
-				const imageBase64 = await camera.fetchImage();
-				if (imageBase64) {
-					// Prepare the message
-					const message = {
-						image: imageBase64,
-						camera: specificCamera || currentScene,
-						preset: arg1 // Include preset name
-					};
+				// const imageBase64 = await camera.fetchImage();
+				// if (imageBase64) {
+				// 	// Prepare the message
+				// 	const message = {
+				// 		image: imageBase64,
+				// 		camera: specificCamera || currentScene,
+				// 		preset: arg1 // Include preset name
+				// 	};
 
-					// Send the message to the API websocket. 
-					controller.connections.api.sendBroadcastMessage(message, 'image');
-				} else {
-					logger.log("Failed to fetch image after saving preset");
-				}
+				// 	// Send the message to the API websocket. 
+				// 	controller.connections.api.sendBroadcastMessage(message, 'image');
+				// } else {
+				// 	logger.log("Failed to fetch image after saving preset");
+				// }
 
 			} else {
 				logger.log("Failed to get ptz position");
@@ -1095,7 +1181,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 					if (controller.connections.database[specificCamera].presets[arg1] != null) {
 						let response = delete controller.connections.database[specificCamera].presets[arg1];
 						if (response === true) {
-							controller.connections.api.sendBroadcastMessage(`ptzremove ${specificCamera} ${arg1}`, 'backend');
+							// controller.connections.api.sendBroadcastMessage(`ptzremove ${specificCamera} ${arg1}`, 'backend');
 						}
 						if (response != true) {
 							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
@@ -1122,7 +1208,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 						controller.connections.database[specificCamera].presets[arg2] = controller.connections.database[specificCamera].presets[arg1];
 						let response = delete controller.connections.database[specificCamera].presets[arg1];
 						if (response === true) {
-							controller.connections.api.sendBroadcastMessage(`ptzrename ${specificCamera} ${arg1} ${arg2}`, 'backend');
+							// controller.connections.api.sendBroadcastMessage(`ptzrename ${specificCamera} ${arg1} ${arg2}`, 'backend');
 						}
 						if (response != true) {
 							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
@@ -1155,18 +1241,31 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			}
 			break;
 		case "ptzlist":
-			if (specificCamera) {
+			logger.log("ptzlist",specificCamera,arg1);
+			if (specificCamera && !noSpecificCam) {
 				if (channel === 'ptzapi') {
 					controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
 				} else {
 					controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
 				}
 			} else {
-				if (channel === 'ptzapi') {
-					controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
-				} else {
-					controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
+				// if (channel === 'ptzapi') {
+				// 	controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
+				// } else {
+				// 	controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
+				// }
+				let output = "";
+				for (let i = 0; i < currentCamList.length; i++) {
+					ptzcamName = helper.cleanName(currentCamList[i]);
+					baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+					ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+					output = `${output}${i + 1}: ${ptzcamName}`;
+					if (i != currentCamList.length - 1) {
+						output = `${output}, `;
+					}
 				}
+				const formattedOutput = `Current Scene: ${parentScene.toLowerCase()} \nCams: ${output}`;
+				controller.connections.twitch.send(channel, formattedOutput);
 			}
 			break;
 		case "ptzgetfocus":
@@ -1175,7 +1274,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			if (!isNaN(currentFocus)) {
 				//is number
 				try {
-					controller.connections.twitch.send(channel, `PTZ Focus (1-9999): ${currentFocus}`)
+					controller.connections.twitch.send(channel, `PTZ Focus (1-9999): ${currentFocus} |af ${pos.autofocus || "n/a"}`)
 				} catch (e) {
 					//logger.log("Error getting focus")
 				}
@@ -1253,6 +1352,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			logger.log(`Invalid PTZ Command: ${userCommand}`);
 			return false;
 	}
+
 	return true;
 
 	function findBox(xcord, ycord) {
@@ -1570,22 +1670,22 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			break;
 		case "resetbackpackf":
 			controller.connections.obs.cloud.restartSource("Maya RTMP 1");
-			controller.connections.obs.cloud.restartSource("RTMP Mobile");
 			controller.connections.obs.cloud.restartSource("Space RTMP Backpack");
+			controller.connections.obs.cloud.restartSource("RTMP Mobile");
 			break;
 		case "resetlivecamf":
+			controller.connections.obs.cloud.restartSource("Space RTMP Server");
 			controller.connections.obs.cloud.restartSource("Maya RTMP 2");
 			controller.connections.obs.cloud.restartSource("RTMP AlveusStudio");
-			controller.connections.obs.cloud.restartSource("Space RTMP Server");
 			break;
 		case "resetpcf":
+			controller.connections.obs.cloud.restartSource("Space RTMP Desktop");
 			controller.connections.obs.cloud.restartSource("Maya RTMP 3");
 			controller.connections.obs.cloud.restartSource("RTMP AlveusDesktop");
-			controller.connections.obs.cloud.restartSource("Space RTMP Desktop");
 			break;
 		case "resetphonef":
-			controller.connections.obs.cloud.restartSource("RTMP Mobile");
 			controller.connections.obs.cloud.restartSource("Space RTMP Phone");
+			controller.connections.obs.cloud.restartSource("RTMP Mobile");
 			break;
 		case "resetsource":
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, fullArgs);
@@ -1609,8 +1709,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Space RTMP Desktop");
 			break
 		case "resetphone":
-			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "RTMP Mobile");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Space RTMP Phone");
+			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "RTMP Mobile");
 			break
 		case "resetextra":
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Space RTMP Extra");
@@ -1636,6 +1736,14 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "stopraidvideo":
 			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Raid", false);
 			// controller.connections.obs.local.stopSource("raidvideo");
+			break;
+		case "crunchvideo":
+			await controller.connections.obs.local.setSceneItemEnabled("fullcam pushpopcrunch", "crunchCamVideo", true);
+			setTimeout(()=> controller.connections.obs.local.setSceneItemEnabled("fullcam pushpopcrunch", "crunchCamVideo", false),15000)
+			if (channel === 'ptzapi') {
+				controller.connections.twitch.send(channel, `${user} started the CrunchCam video`, true);
+			}
+			// controller.connections.obs.local.restartSource("raidvideo");
 			break;
 		case "setalveusscene":
 			controller.connections.obs.local.setScene(fullArgs);
@@ -1695,21 +1803,24 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			await controller.connections.obs.cloud.setSceneItemEnabled(controller.connections.obs.cloud.currentScene, "Alveus Chat Overlay", false);
 			break;
 		case "showrounds":
-			let now = new Date();
-			var hour = now.getUTCHours();
-			if (hour > 0 && hour < 12){
-				//nighttime
-				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsNightGraphic", true);
-			} else {
-				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", true);
-			}
+			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "roundsweboverlay", true);
+			logger.log("Starting Rounds");
+			// let now = new Date();
+			// var hour = now.getUTCHours();
+			// if (hour > 0 && hour < 12){
+			// 	//nighttime
+			// 	await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsNightGraphic", true);
+			// } else {
+			// 	await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", true);
+			// }
 			break;
 		case "hiderounds":
-			for (const source in config.roundsCommandMapping) {
-				await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[source], false);
-			}
-			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", false);
-			await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsNightGraphic", false);
+			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "roundsweboverlay", false);
+			// for (const source in config.roundsCommandMapping) {
+			// 	await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[source], false);
+			// }
+			// await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsGraphic", false);
+			// await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", "roundsNightGraphic", false);
 			break;
 		case "checkmark":
 			let checkmarkStatus = null;
@@ -1746,6 +1857,42 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					await controller.connections.obs.local.setSceneItemEnabled("RoundsOverlay", config.roundsCommandMapping[source], checkmarkStatus2);
 				}
 			}
+			break;
+		// case "feederstatus":
+		// 	let m = "Feed the animals in the pasture by donating at least $5 through Streamelements (https://alveus.gg/go/feed-donate) or cheering 500 bits, while using !feed in your donation message. "
+		// 	// let feedinfo = await controller.connections.feeder.getTank();
+		// 	controller.connections.twitch.send(channel, `${m}`);
+		// 	break;
+		case "runfeeder":
+			let feedresp = await controller.connections.feeder.feed();
+			controller.connections.twitch.send(channel, `Feeder: ${feedresp}`);
+			break;
+		case "blockuser":
+			controller.connections.database["blockedUsers"][arg1];
+
+			controller.connections.twitch.send(channel, `Blocked: ${arg1}`);
+			let blocklist = Object.keys(controller.connections.database["blockedUsers"]);
+			logger.log(`Blocked Users (${blocklist.length}): ${blocklist}`);
+			break;
+		case "unblockuser":
+			if (controller.connections.database["blockedUsers"][arg1]){
+				delete controller.connections.database["blockedUsers"][arg1];
+				controller.connections.twitch.send(channel, `Unblocked: ${arg1}`);
+				let blocklist2 = Object.keys(controller.connections.database["blockedUsers"]);
+				logger.log(`Blocked Users (${blocklist2.length}): ${blocklist2}`);
+			}
+			break;
+		case "listblocked":
+			let blocklist3 = Object.keys(controller.connections.database["blockedUsers"]);
+			logger.log(`Blocked Users (${blocklist3.length}): ${blocklist3}`);
+			break;
+		case "enablesubs":
+			controller.connections.database.enabledSubs = true;
+			logger.log(`Sub Commands Enabled`);
+			break;
+		case "disablesubs":
+			controller.connections.database.enabledSubs = false;
+			logger.log(`Sub Commands Disabled`);
 			break;
 		case "setmute":
 			let muteStatus = null;
@@ -1953,10 +2100,6 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			}
 			break;
 		case "scenecams":
-			if (currentScene != "custom") {
-				return false;
-			}
-
 			let output = "";
 			if (arg1 == "json") {
 				output = JSON.stringify(currentCamList);
@@ -1983,6 +2126,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			// Create finaloutput with both scene and cams
 			const finaloutput = {
 				scene: sceneCommand,
+				currentScene: currentScene,
 				cams: output
 			};
 
@@ -1996,13 +2140,20 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				}
 			} else {
 				// For plain text or other formats, manually format and include both scene and cams
-				const formattedOutput = `Scene: ${finaloutput.scene} \nCams: ${finaloutput.cams}`;
+				const formattedOutput = `Scene: ${finaloutput.scene} \nCurrent Scene: ${finaloutput.currentScene} \nCams: ${finaloutput.cams}`;
 				if (channel === 'ptzapi') {
 					controller.connections.api.sendAPI(formattedOutput);
 				} else {
 					controller.connections.twitch.send(channel, formattedOutput);
 				}
 			}
+			break;
+		case "axislist":
+			let output2 = "";
+			for (let cam of config.axisCameras){
+				output2 += `${cam}, `
+			}
+			controller.connections.twitch.send(channel, `Axis Cams: ${output2}`);
 			break;
 		case "swapcam":
 			if (currentScene != "custom") {
@@ -2065,10 +2216,12 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			//if not, replace pos1 with cam2
 			let newList = currentCamList.slice();
 
+			// let hasAccess = false;
 			if (pos1 != null && pos2 != null) {
 				let temp1 = newList[pos1];
 				newList[pos1] = newList[pos2];
 				newList[pos2] = temp1;
+				// hasAccess = true;
 			} else if (pos1 != null) {
 				newList[pos1] = cam2;
 			} else if (pos2 != null) {
@@ -2076,6 +2229,32 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			} else {
 				break;
 			}
+
+			// if (!hasAccess) {
+			// 	    //Admin
+			// 	if (config.userPermissions.commandPriority[0] == accessProfile.accessLevel) {
+			// 		hasAccess = true;
+			// 		//Superuser
+			// 	} else if (config.userPermissions.commandPriority[1] == accessProfile.accessLevel) {
+			// 		hasAccess = true;
+			// 		//Mod
+			// 	} else if (config.userPermissions.commandPriority[2] == accessProfile.accessLevel) {
+			// 		hasAccess = true;
+			// 		//commandOperator
+			// 	} else if (config.userPermissions.commandPriority[3] == accessProfile.accessLevel) {
+			// 		hasAccess = true;
+			// 		//commandVips
+			// 	} else if (config.userPermissions.commandPriority[4] == accessProfile.accessLevel) {
+			// 		hasAccess = true;
+			// 	}   else {
+			// 		//too low of permission
+			// 		logger.log("Swap Cams: Too Low Permission", accessProfile, fullArgs);
+			// 	}
+			// }
+			//No Access to swap new cams in
+			// if (!hasAccess){
+			// 	break;
+			// }
 
 			//fill empty slots with nocam
 			for (let i = 0; i < newList.length; i++) {
@@ -2456,14 +2635,14 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 		}
 
 		if (!hasAccess) {
-			//Admin
+				//Admin
 			if (config.userPermissions.commandPriority[0] == accessProfile.accessLevel) {
 				hasAccess = true;
 				//Superuser
 			} else if (config.userPermissions.commandPriority[1] == accessProfile.accessLevel) {
 				hasAccess = true;
 				//Mod
-			} else if (!config.timeRestrictedScenes.includes(camName)) {
+			} else if (config.userPermissions.commandPriority[2] == accessProfile.accessLevel && !config.timeRestrictedScenes.includes(camName)) {
 				logger.log("Reached Regular Access", "Non time restricted", camName);
 				hasAccess = true;
 			} else if (config.userPermissions.commandPriority[2] == accessProfile.accessLevel) {
@@ -2571,7 +2750,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 		userCommand: userCommand,
 		fullArgs: fullArgs
 	};
-	controller.connections.api.sendBroadcastMessage(broadcastMessage);
+	// controller.connections.api.sendBroadcastMessage(broadcastMessage);
 
 }
 
