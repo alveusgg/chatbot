@@ -35,15 +35,15 @@ function isAllowed(userCommand,userProfile){
                 for (const priority of config.userPermissions.commandPriority){
                     let userRank = getUserRank(userProfile);
                     if (config.userPermissions[priority].includes(userProfile.userName.toLowerCase())){
-                        return {allowed:true,accessLevel:priority};
+                        return {user:userProfile.userName.toLowerCase(),allowed:true,accessLevel:priority, userRank};
                     } else if (config.userPermissions[priority].includes(config.userRanks.mods) && userRank >= 4){
-                        return {allowed:true,accessLevel:priority};
+                        return {user:userProfile.userName.toLowerCase(),allowed:true,accessLevel:priority, userRank};
                     } else if (config.userPermissions[priority].includes(config.userRanks.vips) && userRank >= 3){
-                        return {allowed:true,accessLevel:priority};
+                        return {user:userProfile.userName.toLowerCase(),allowed:true,accessLevel:priority, userRank};
                     } else if (config.userPermissions[priority].includes(config.userRanks.subs) && userRank >= 2){
-                        return {allowed:true,accessLevel:priority};
+                        return {user:userProfile.userName.toLowerCase(),allowed:true,accessLevel:priority, userRank};
                     } else if (config.userPermissions[priority].includes(config.userRanks.all)){
-                        return {allowed:true,accessLevel:priority};
+                        return {user:userProfile.userName.toLowerCase(),allowed:true,accessLevel:priority, userRank};
                     } 
                     if (priority == permission){
                         //stop when priority rank reached
@@ -53,7 +53,7 @@ function isAllowed(userCommand,userProfile){
             }
         }
     }
-    return {allowed:false,accessLevel:null};
+    return {user:userProfile.userName.toLowerCase(),allowed:false,accessLevel:null, userRank:0};
 }
 
 function getUserRank(userProfile){
@@ -86,6 +86,26 @@ function cleanName(input){
     return input;
 }
 
+function formatTimestampToSeconds(timeStamp) {
+    var timeInSeconds = null;
+    let match = timeStamp.match(/^\W*[0-9]+(hours|hour|hr|h)?\W*[0-9]*(minutes|minute|mins|min|m)?\W*[0-9]*(seconds|second|sec|s)?/g);
+    if (match?.toString() == timeStamp) {
+        timeStamp.replace(/hours|hour|hr|h/ig, "h");
+        timeStamp.replace(/minutes|minute|min|m/ig, "m");
+        timeStamp.replace(/seconds|second|sec|s/ig, "s");
+        timeStamp.replace(/([0-9]+)[h|m|s]/ig, function (match, value) {
+            if (match.indexOf("h") > -1) {
+                timeInSeconds += value * 60 * 60;
+            } else if (match.indexOf("m") > -1) {
+                timeInSeconds += value * 60;
+            } else if (match.indexOf("s") > -1) {
+                timeInSeconds += value * 1;
+            }
+        });
+    }
+    return timeInSeconds;
+}
+
 /**
  * Takes all functions/objects from |sourceScope|
  * and adds them to |targetScope|.
@@ -101,4 +121,5 @@ module.exports = {
 	isAllowed,
     importAll,
     cleanName,
+    formatTimestampToSeconds
 }

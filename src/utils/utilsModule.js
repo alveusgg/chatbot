@@ -185,6 +185,27 @@ class UtilsModule {
         return formatted;
     }
 
+    formatTimestampToSeconds(timeStamp) {
+        var timeInSeconds = 0;
+        let match = timeStamp.match(/^\W*[0-9]*(hours|hour|hr|h)?\W*[0-9]*(minutes|minute|min|m)?\W*[0-9]*(seconds|second|sec|s)?/g)
+        if (match?.toString() == timeStamp) {
+            timeStamp.replace(/hours|hour|hr|h/ig, "h");
+            timeStamp.replace(/minutes|minute|min|m/ig, "m");
+            timeStamp.replace(/seconds|second|sec|s/ig, "s");
+            timeStamp.replace(/([0-9]+)[h|m|s]/ig, function (match, value) {
+                console.log("replace match", match, value);
+                if (match.indexOf("h") > -1) {
+                    timeInSeconds += value * 60 * 60;
+                } else if (match.indexOf("m") > -1) {
+                    timeInSeconds += value * 60;
+                } else if (match.indexOf("s") > -1) {
+                    timeInSeconds += value * 1;
+                }
+            });
+        }
+        return timeInSeconds;
+    }
+
     loadFile(filePath, defaults){
         try{
             const jsonString = fs.readFileSync(filePath);

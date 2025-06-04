@@ -273,7 +273,6 @@ const axisCameraCommandMapping = {
     "chickencam3":"chicken", 
     "garden":"garden", 
     "speaker":"speaker", 
-    "monitor":"monitor"
 }
 
 //Camera Commands
@@ -284,9 +283,9 @@ const commandPermissionsCamera = {
     commandMods: ["testmodcamera", "ptztracking", "ptzirlight", "ptzwake"],
     commandOperator: ["ptzhomeold","ptzseta","ptzset", "ptzpan", "ptztilt", "ptzmove", "ptzir", "ptzdry",
                      "ptzfov", "ptzstop", "ptzsave", "ptzremove", "ptzrename", "ptzcenter", "ptzclick", "ptzdraw",
-                     "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus","ptzplayaudio","ptzstopaudio","ptzfetchimg","apigetperms"],
+                     "ptzspeed", "ptzgetspeed", "ptzspin", "ptzcfocus","ptzplayaudio","ptzstopaudio","ptzfetchimg","apigetperms", "ptzroam", "ptzroaminfo"],
     commandVips: [],
-    commandUsers: ["ptzhome", "ptzpreset","ptzgetinfo","ptzgetcam", "ptzzoom","ptzzooma", "ptzload", "ptzlist", "ptzroam", "ptzroaminfo", "ptzfocusa", "ptzgetfocus", "ptzfocus", "ptzautofocus"]
+    commandUsers: ["ptzhome", "ptzpreset","ptzgetinfo","ptzgetcam", "ptzzoom","ptzzooma", "ptzload", "ptzlist", "ptzfocusa", "ptzgetfocus", "ptzfocus", "ptzautofocus"]
 }
 //timeRestrictedCommands = timeRestrictedCommands.concat(["ptzclear"]);
 unthrottledCommands = unthrottledCommands.concat(["apigetperms"]);
@@ -300,9 +299,10 @@ const commandPermissionsExtra = {
     commandOperator: ["showchat","hidechat","raidvideo","stopraidvideo","showrounds","hiderounds", "disablesubs","enablesubs",
                  "resetvolume", "removecam", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", 
                 "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetbackpack2", "resetbackpack3", "resetpc", "resetlivecam", 
-                "resetbackpackf", "resetpcf", "resetlivecamf", "resetextra","resetphone","resetphone2","resetphone3", "resetphonef","crunchvideo"], //"checkmark","clearcheckmarks"
+                "resetbackpackf", "resetpcf", "resetlivecamf", "resetextra","resetphone","resetphone2","resetphone3", "resetphonef","crunchvideo",
+                "lockcam","unlockcam","lockptz","unlockptz","lockallcam","unlockallcam"], //"checkmark","clearcheckmarks"
     commandVips: [],
-    commandUsers: ["feederstatus", "swapcam", "resetcam","getvolume", "setvolume", "scenecams","axislist"]
+    commandUsers: ["feederstatus", "swapcam", "resetcam","getvolume", "setvolume", "scenecams","axislist","listlocked"]
 }
 timeRestrictedCommands = timeRestrictedCommands.concat(["unmutecam", "unmuteallcams"]);
 unthrottledCommands = unthrottledCommands.concat(["runfeeder"]);
@@ -342,8 +342,8 @@ const customCamCommandMapping = {
     "3cam": "georgie noodle toast",
     "4cam": "georgie noodle patchy toast",
     "4camoutdoor": "pasture parrot marmoset fox",
-    "nightcams": "wolf pasture parrot fox crow marmoset",
-    "nightcamsbig": "wolf pasture parrot fox crow marmoset",
+    "nightcams": "wolf pasture fox crow marmoset georgie",
+    "nightcamsbig": "wolf pasture fox crow marmoset georgie",
     "indoorcams": "georgie noodle toast chin patchy roach",
     "indoorcamsbig": "georgie noodle toast chin patchy roach",
     "chincam": "chin",
@@ -535,7 +535,14 @@ const commandControlAlias = {
     listblocked: ["listblock","listbanned","blockedlist","blocklist"],
     enablesubs: ["startsubs","unlockcontrols"],
     disablesubs: ["stopsubs","lockcontrols"],
-    axislist: ["axiscamlist"]
+    axislist: ["axiscamlist"],
+    lockcam: ["lockout","lock","camlock"],
+    lockptz: ["lockptzcam","lockcamptz","ptzlock"],
+    lockallcam: ["lockoutall","lockall","camlockall"],
+    unlockcam: ["unlock","camunlock"],
+    unlockallcam: ["unlockall","camunlockall"],
+    unlockptz: ["unlockcamptz","unlockptzcam","ptzunlock"],
+    listlocked: ["listlock","lockedlist","locklist","getlocked","lockstatus","lockedstatus","lockedcams"],
 }
 
 let commandScenes = {
@@ -843,6 +850,10 @@ function setupCustomCamAlias(aliasList) {
             convertedList[newAliasCommand] = newConvertedBaseCommand;
         }
     }
+    for (const baseCommand in axisCameraCommandMapping) {
+        convertedList[baseCommand] = baseCommand;
+    }
+
     return convertedList;
 }
 
