@@ -59,14 +59,8 @@ const commandPermissionsScenes = {
     commandUsers: []
 }
 
-let timeRestrictedCommands = ["parrotcam", "pasturecam", "crowcam", "crowcam2", "crowcam3","crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor",
-    "marmosetcam", "marmosetcam2", "marmosetcam3",
-    "parrotcambackup", "pasturecambackup", "crowcambackup", "crowcam2backup", "crowcam3backup",
-    "foxcambackup", "foxcam2backup", "foxcam3backup", "foxcam4backup", "4camoutdoorbackup",
-    "marmosetcambackup", "marmosetcam2backup", "marmosetcam3backup"];
-
-
-let timeRestrictedScenes = ["parrot", "fox", "foxcorner", "foxmulti", "pasture", "crow", "crowmulti", "crowmulti2","crowoutdoor", "marmoset", "marmosetindoor", "marmosetmulti"];
+let timeRestrictedCommands = [];
+let timeRestrictedScenes = [];
 let unthrottledCommands = [];
 
 

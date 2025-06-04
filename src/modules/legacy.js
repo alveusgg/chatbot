@@ -44,20 +44,20 @@ const main = async controller => {
 		setPTZRoamMode(controller, currentScene);
 	}
 
-	schedule(config.restrictedHours.start - 1, 55, () => {
-		try {
-			let now = new Date();
-			let minutes = now.getUTCMinutes();
-			let hour = now.getUTCHours();
-			logger.log("check time", now, hour, minutes, config.restrictedHours);
-			logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
-			controller.connections.twitch.send("alveusgg", `!nightcams`);
-			controller.connections.obs.local.setMute(config.sceneAudioSource["fox"], true);
-			switchToCustomCams(controller, "alveusgg", { allowed: true, accessLevel: 'commandAdmins' }, "customcamsbig", config.customCamCommandMapping["nightcams"]);
-		} catch (e) {
-			logger.log(`Error: Failed to run timer - ${e}`);
-		}
-	});
+	// schedule(config.restrictedHours.start - 1, 55, () => {
+	// 	try {
+	// 		let now = new Date();
+	// 		let minutes = now.getUTCMinutes();
+	// 		let hour = now.getUTCHours();
+	// 		logger.log("check time", now, hour, minutes, config.restrictedHours);
+	// 		logger.log(`Timer (9:55am) - Send !nightcams !mute fox`);
+	// 		controller.connections.twitch.send("alveusgg", `!nightcams`);
+	// 		controller.connections.obs.local.setMute(config.sceneAudioSource["fox"], true);
+	// 		switchToCustomCams(controller, "alveusgg", { allowed: true, accessLevel: 'commandAdmins' }, "customcamsbig", config.customCamCommandMapping["nightcams"]);
+	// 	} catch (e) {
+	// 		logger.log(`Error: Failed to run timer - ${e}`);
+	// 	}
+	// });
 
 	// for (let hour = 1; hour < 5; hour++) {
 	// 	for (let min = 0; min < 60; min += 10) {
