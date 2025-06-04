@@ -2028,30 +2028,30 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "unlockcam":
 			let unlockList = [];
 			if (arg1 == "all") {
-				controller.connections.database.lockoutCams = {};
-				break;
-			}
-			for (let arg of argsList) {
-				if (arg != null && arg != "") {
+				unlockList = Object.keys(controller.connections.database.lockoutCams);
+			} else {
+				for (let arg of argsList) {
+					if (arg != null && arg != "") {
 
-					//check for cam name
-					let camName = helper.cleanName(arg);
+						//check for cam name
+						let camName = helper.cleanName(arg);
 
-					let overrideArgs = config.customCommandAlias[camName] || camName;
-					if (overrideArgs != null) {
-						//allow alias to change entire argument
-						let newArgs = overrideArgs.split(" ");
-						if (newArgs.length > 1) {
-							for (let newarg of newArgs) {
-								if (newarg != "") {
-									argsList.push(newarg);
+						let overrideArgs = config.customCommandAlias[camName] || camName;
+						if (overrideArgs != null) {
+							//allow alias to change entire argument
+							let newArgs = overrideArgs.split(" ");
+							if (newArgs.length > 1) {
+								for (let newarg of newArgs) {
+									if (newarg != "") {
+										argsList.push(newarg);
+									}
 								}
+								continue;
 							}
-							continue;
+							unlockList.push(overrideArgs);
 						}
-						unlockList.push(overrideArgs);
-					}
 
+					}
 				}
 			}
 
@@ -2131,30 +2131,30 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "unlockptz":
 			let unlockPTZList = [];
 			if (arg1 == "all") {
-				controller.connections.database.lockoutPTZ = {};
-				break;
-			}
-			for (let arg of argsList) {
-				if (arg != null && arg != "") {
+				unlockPTZList = Object.keys(controller.connections.database.lockoutPTZ);
+			} else {
+				for (let arg of argsList) {
+					if (arg != null && arg != "") {
 
-					//check for cam name
-					let camName = helper.cleanName(arg);
+						//check for cam name
+						let camName = helper.cleanName(arg);
 
-					let overrideArgs = config.customCommandAlias[camName] || camName;
-					if (overrideArgs != null) {
-						//allow alias to change entire argument
-						let newArgs = overrideArgs.split(" ");
-						if (newArgs.length > 1) {
-							for (let newarg of newArgs) {
-								if (newarg != "") {
-									argsList.push(newarg);
+						let overrideArgs = config.customCommandAlias[camName] || camName;
+						if (overrideArgs != null) {
+							//allow alias to change entire argument
+							let newArgs = overrideArgs.split(" ");
+							if (newArgs.length > 1) {
+								for (let newarg of newArgs) {
+									if (newarg != "") {
+										argsList.push(newarg);
+									}
 								}
+								continue;
 							}
-							continue;
+							unlockPTZList.push(overrideArgs);
 						}
-						unlockPTZList.push(overrideArgs);
-					}
 
+					}
 				}
 			}
 
@@ -2186,7 +2186,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				}
 			}
 			break;
-		case "lockallcam":
+		case "lockbothcam":
 			let lockoutallList = [];
 			let lockoutAllTime = 0;
 			for (let arg of argsList) {
@@ -2223,7 +2223,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 
 			if (lockoutallList.length > 0) {
 				fullArgs = lockoutallList.join(',');
-				logger.log(`Lock Cams - ${accessProfile.user}(${lockoutAllTime}s): ${fullArgs}`);
+				// logger.log(`Lock Cams - ${accessProfile.user}(${lockoutAllTime}s): ${fullArgs}`);
 				let now = new Date();
 				for (let cam of lockoutallList) {
 					controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutAllTime, timestamp: now };
@@ -2231,33 +2231,33 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				}
 			}
 			break;
-		case "unlockallcam":
+		case "unlockbothcam":
 			let unlockallList = [];
 			if (arg1 == "all") {
-				controller.connections.database.lockoutCams = {};
-				break;
-			}
-			for (let arg of argsList) {
-				if (arg != null && arg != "") {
-
-					//check for cam name
-					let camName = helper.cleanName(arg);
-
-					let overrideArgs = config.customCommandAlias[camName] || camName;
-					if (overrideArgs != null) {
-						//allow alias to change entire argument
-						let newArgs = overrideArgs.split(" ");
-						if (newArgs.length > 1) {
-							for (let newarg of newArgs) {
-								if (newarg != "") {
-									argsList.push(newarg);
+				unlockallList = [...new Set([...Object.keys(controller.connections.database.lockoutCams), ...Object.keys(controller.connections.database.lockoutPTZ)])]
+			} else {
+				for (let arg of argsList) {
+					if (arg != null && arg != "") {
+	
+						//check for cam name
+						let camName = helper.cleanName(arg);
+	
+						let overrideArgs = config.customCommandAlias[camName] || camName;
+						if (overrideArgs != null) {
+							//allow alias to change entire argument
+							let newArgs = overrideArgs.split(" ");
+							if (newArgs.length > 1) {
+								for (let newarg of newArgs) {
+									if (newarg != "") {
+										argsList.push(newarg);
+									}
 								}
+								continue;
 							}
-							continue;
+							unlockallList.push(overrideArgs);
 						}
-						unlockallList.push(overrideArgs);
+	
 					}
-
 				}
 			}
 
@@ -2266,27 +2266,44 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				for (let camName of unlockallList) {
 					//check permission level
 					let cam = controller.connections.database.lockoutCams[camName];
-					if (cam == null) {
-						//not locked
-						continue;
-					}
-					let camPermission = cam.accessLevel;
-					let userPermission = accessProfile.accessLevel;
-					let permissionRanks = config.userPermissions.commandPriority;
+					if (cam != null) {
+						let camPermission = cam.accessLevel;
+						let userPermission = accessProfile.accessLevel;
+						let permissionRanks = config.userPermissions.commandPriority;
 
-					let camIndex = permissionRanks.indexOf(camPermission);
-					let userIndex = permissionRanks.indexOf(userPermission);
-					//combine admin and superuser access
-					if (camIndex == 0) {
-						camIndex++;
-					}
+						let camIndex = permissionRanks.indexOf(camPermission);
+						let userIndex = permissionRanks.indexOf(userPermission);
+						//combine admin and superuser access
+						if (camIndex == 0) {
+							camIndex++;
+						}
 
-					if (camIndex !== -1 && userIndex !== -1) {
-						if (userIndex <= camIndex) {
-							delete controller.connections.database.lockoutCams[camName];
-							delete controller.connections.database.lockoutPTZ[camName];
+						if (camIndex !== -1 && userIndex !== -1) {
+							if (userIndex <= camIndex) {
+								delete controller.connections.database.lockoutCams[camName];
+							}
 						}
 					}
+					let ptz = controller.connections.database.lockoutPTZ[camName];
+					if (ptz != null) {
+						let ptzPermission = ptz.accessLevel;
+						let userPermission = accessProfile.accessLevel;
+						let permissionRanks = config.userPermissions.commandPriority;
+
+						let ptzIndex = permissionRanks.indexOf(ptzPermission);
+						let userIndex = permissionRanks.indexOf(userPermission);
+						//combine admin and superuser access
+						if (ptzIndex == 0) {
+							ptzIndex++;
+						}
+
+						if (ptzIndex !== -1 && userIndex !== -1) {
+							if (userIndex <= ptzIndex) {
+								delete controller.connections.database.lockoutPTZ[camName];
+							}
+						}
+					}
+					
 				}
 			}
 			break;

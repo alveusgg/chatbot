@@ -300,7 +300,7 @@ const commandPermissionsExtra = {
                  "resetvolume", "removecam", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", 
                 "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetbackpack2", "resetbackpack3", "resetpc", "resetlivecam", 
                 "resetbackpackf", "resetpcf", "resetlivecamf", "resetextra","resetphone","resetphone2","resetphone3", "resetphonef","crunchvideo",
-                "lockcam","unlockcam","lockptz","unlockptz","lockallcam","unlockallcam"], //"checkmark","clearcheckmarks"
+                "lockcam","unlockcam","lockptz","unlockptz","lockbothcam","unlockbothcam"], //"checkmark","clearcheckmarks"
     commandVips: [],
     commandUsers: ["feederstatus", "swapcam", "resetcam","getvolume", "setvolume", "scenecams","axislist","listlocked"]
 }
@@ -538,9 +538,9 @@ const commandControlAlias = {
     axislist: ["axiscamlist"],
     lockcam: ["lockout","lock","camlock"],
     lockptz: ["lockptzcam","lockcamptz","ptzlock"],
-    lockallcam: ["lockoutall","lockall","camlockall"],
+    lockbothcam: ["lockboth"],
     unlockcam: ["unlock","camunlock"],
-    unlockallcam: ["unlockall","camunlockall"],
+    unlockbothcam: ["unlockboth"],
     unlockptz: ["unlockcamptz","unlockptzcam","ptzunlock"],
     listlocked: ["listlock","lockedlist","locklist","getlocked","lockstatus","lockedstatus","lockedcams"],
 }
