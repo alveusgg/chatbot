@@ -71,7 +71,7 @@ const commandPermissionsCustomCam = {
     commandSuperUsers: ["nuthousecam", "localpccam", "backpackcam", "monitorcam","phonecam","phone2cam","phone3cam"],
     commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","parrotcam", "pasturecam",
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam3",
-        "nightcams", "nightcamsbig","chickencam","chickencam3","gardencam","constructioncam"],
+        "nightcams", "nightcamsbig","chickencam","chickencam3","gardencam","constructioncam","pasturecam2"],
     commandOperator: ["georgiecam", "noodlecam","patchycam","toastcam","pushpopcam","pushpopcam2","pushpopcam3", "puppycam", "hankcam", "hankcam2",
          "hankcam3", "hankmulti", "roachcam", "isopodcam", "noodlehidecam", "georgiecam2", "georgiecam3", "indoorcams", "indoorcamsbig", "chincam", "chincam2", 
          "chincam3", "chincam4","orangeisopodcam","chickencam2", "marmosetcam2"],
@@ -82,7 +82,7 @@ const commandPermissionsCustomCam = {
 //One Direction, If on OBS Scene, allow subscenes commands
 //scene names are lowercase, no spaces, no s/es
 let onewayCommands = {
-    "4camoutdoor": ["foxcam", "foxcam2", "foxcam3", "foxcam4", "pasturecam"]
+    "4camoutdoor": ["foxcam", "foxcam2", "foxcam3", "foxcam4", "pasturecam","pasturecam2"]
 }
 
 //Chat Command Swapping
@@ -95,7 +95,8 @@ let multiCommands = {
     chicken: ["chickencam","chickencam2","chickencam3"],
     pushpop: ["pushpopcam","pushpopcam2","pushpopcam3"],
     wolf: ["wolfcam", "wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","wolfcam11"],
-    marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"]
+    marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
+    pasture: ["pasturecam", "pasturecam2"],
 }
 
 //Notification Swapping
@@ -132,6 +133,7 @@ const notifyScenes = ["Parrots", "Parrots Muted Mic", "Crows", "Crows Outdoor", 
 const sceneAudioSource = {
     "music": globalMusicSource,
     "pasture": "Pasture Camera",
+    "pasturefeeder": "Pasture Feeder Camera",
     "fox": "fox mic",
     "foxden": "fox mic",
     "foxcorner": "fox mic",
@@ -190,7 +192,7 @@ const micGroups = {
         wolfindoor: { name: sceneAudioSource.wolfindoor, volume: -7.9 }, pushpop: { name: sceneAudioSource.pushpop, volume: -3.9 },
         pushpopcrunch: { name: sceneAudioSource.pushpopcrunch, volume: -2.9 }, georgie: { name: sceneAudioSource.georgie, volume: -3.9 },
         chicken: { name: sceneAudioSource.chicken, volume: -3.9 }, chickenindoor: { name: sceneAudioSource.chicken, volume: -3.9 },
-        chickenmulti: { name: sceneAudioSource.chickenmulti, volume: -3.9 }
+        chickenmulti: { name: sceneAudioSource.chickenmulti, volume: -3.9 }, pasturefeeder: { name: sceneAudioSource.pasturefeeder, volume: -2.4 }
     },
     restrictedcams: {
         fox: { name: sceneAudioSource.fox, volume: -2.4 }, 
@@ -215,7 +217,7 @@ const micGroups = {
 //ADD IP INFO IN ENV
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
-const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfswitch","wolfden2","wolfden","georgie", "georgiewater", 
+const axisCameras = ["pasture","pasturefeeder", "parrot","wolf","wolfindoor","wolfcorner","wolfswitch","wolfden2","wolfden","georgie", "georgiewater", 
     "noodle","patchy", "toast","roach", "crow", "crowindoor", "fox", "foxden", "foxcorner", "hank", "hankcorner", "marmoset", 
     "marmosetindoor", "chin", "pushpop","pushpopindoor","pushpopcrunch","marty", "bb","construction",
     "chicken", "chickenindoor", "garden","speaker"];
@@ -224,6 +226,7 @@ const axisCameras = ["pasture", "parrot","wolf","wolfindoor","wolfcorner","wolfs
 //cleanName()
 const axisCameraCommandMapping = {
     "pasture":"pasture",
+    "pasturecam2":"pasturefeeder",
     "parrot":"parrot", 
     "wolf":"wolf", 
     "wolfcam2":"wolfcorner", 
@@ -367,7 +370,9 @@ const customCamCommandMapping = {
     "gardencam":"garden",
     "chickencam":"chicken",
     "chickencam2":"chickenindoor",
-    "chickencam3":"chickenmulti"
+    "chickencam3":"chickenmulti",
+    "pasturecam":"pasture",
+    "pasturecam2":"pasturefeeder",
 }
 
 //CCam Argument for Command Mapping. Converting base to source name
@@ -461,7 +466,8 @@ const commandSceneAlias = {
     chickencam: ["chickenscam","chickenoutdoorcam","chickenoutsidecam"],
     chickencam2: ["chickenindoorcam","chickeninsidecam","chickenincam"],
     chickencam3: ["chickenmulticam"],
-    monitorcam: ["monitorcam","atomoscam","ndicam"]
+    monitorcam: ["monitorcam","atomoscam","ndicam"],
+    pasturecam2: ["pasturefeedercam","pasturefeedcam","pasturefcam","pasturecrunchcam"]
 }
 
 const commandControlAlias = {
