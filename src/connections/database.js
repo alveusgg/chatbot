@@ -6,6 +6,49 @@ const onChangePromise = import("on-change"); // ESM-only module
 const defaults = { cloudServer: "space", timeRestrictionDisabled: false, blockedUsers: {}, enabledSubs: false, lockoutCams: {}, lockoutPTZ: {} };
 const file = "data/database.json";
 
+/**
+ * @typedef {Database} DatabaseConnection
+ */
+
+/**
+ * @typedef {{
+ *  pan: number,
+ *  tilt: number,
+ *  zoom: number,
+ *  focus: number,
+ *  brightness: number,
+ *  autofocus: 'on' | 'off',
+ *  autoiris: 'on' | 'off'
+ * }} CameraPreset
+ * 
+ * @typedef {{
+ *  isRoaming: boolean,
+ *  roamTime?: string,
+ *  roamSpeed?: string,
+ *  roamIndex?: number,
+ *  roamDirection?: 'forward' | 'reverse',
+ *  roamList?: Array<string>,
+ *  speed?: number,
+ *  presets: Record<string
+ * }} CameraEntry
+ * 
+ * @typedef {{
+ *  list: Array<string>,
+ *  command: string
+ * }} LayoutPreset
+ * 
+ * @typedef {{
+ *  timeRestrictionDisabled: boolean,
+ *  customcam: Array<string>,
+ *  customcambig: true,
+ *  customcamsbig: true,
+ *  customcamscommand: string,
+ *  layoutpresets: Record<string, LayoutPreset>
+ * }} DatabaseProperties
+ * 
+ * @typedef {Record<string, CameraEntry> & DatabaseProperties} DatabaseFile
+ */
+
 class Database {
   #data = {};
   #file = "";
