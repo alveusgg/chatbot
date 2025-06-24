@@ -138,7 +138,7 @@ const commandPermissionsCustomCam = {
     commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","parrotcam", "pasturecam",
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam","chickencam3","gardencam","constructioncam","pasturecam2"],
-    commandOperator: ["georgiecam", "noodlecam","patchycam","toastcam","pushpopcam","pushpopcam2","pushpopcam3", "puppycam", "hankcam", "hankcam2",
+    commandOperator: ["georgiecam", "noodlecam","patchycam","toastcam","toastcam2","tarantulacam","tarantulacam2","pushpopcam","pushpopcam2","pushpopcam3", "puppycam", "hankcam", "hankcam2",
          "hankcam3", "hankmulti", "roachcam", "isopodcam", "noodlehidecam", "georgiecam2", "georgiecam3", "indoorcams", "indoorcamsbig", "chincam", "chincam2", 
          "chincam3", "chincam4","orangeisopodcam","chickencam2", "marmosetcam2"],
     commandVips: [],
@@ -155,6 +155,8 @@ let onewayCommands = {
 //allows swapping between matching bases
 let multiCommands = {
     georgie: ["georgiecam","georgiecam2","georgiecam3"],
+    toast: ["toastcam","toastcam2"],
+    tarantula: ["tarantulacam","tarantulacam2"],
     chin: ["chincam","chincam2","chincam3","chincam4","chincamall"],
     crow: ["crowcam", "crowcam2", "crowcam3","crowcam4"],
     fox: ["foxcam", "foxcam2", "foxcam3", "foxcam4", "foxcam5", "foxcam6"],
@@ -284,7 +286,7 @@ const micGroups = {
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
 const axisCameras = ["pasture","pasturefeeder", "parrot","wolf","wolfindoor","wolfcorner","wolfswitch","wolfden2","wolfden","georgie", "georgiewater", 
-    "noodle","patchy", "toast","roach", "crow", "crowindoor", "fox", "foxden", "foxcorner", "hank", "hankcorner", "marmoset", 
+    "noodle","patchy", "toast","toastcrunch","tarantula","tarantulaptz","roach", "crow", "crowindoor", "fox", "foxden", "foxcorner", "hank", "hankcorner", "marmoset", 
     "marmosetindoor", "chin", "pushpop","pushpopindoor","pushpopcrunch","marty", "bb","construction",
     "chicken", "chickenindoor", "garden","speaker"];
 
@@ -308,9 +310,12 @@ const axisCameraCommandMapping = {
     "georgie":"georgie", 
     "georgiecam2":"georgiewater", 
     "georgiecam3":"georgie", 
+    "tarantulacam":"tarantula", 
+    "tarantulacam2":"tarantulaptz", 
     "noodle":"noodle", 
     "patchy":"patchy", 
-    "toast":"toast", 
+    "toastcam":"toast", 
+    "toastcam2":"toastcrunch", 
     "roach":"roach", 
     "crow":"crow", 
     "crowcam2":"crowindoor", 
@@ -389,6 +394,10 @@ const customCamCommandMapping = {
     "georgiecam": "georgie",
     "georgiecam2": "georgiewater",
     "georgiecam3": "georgiemulti",
+    "toastcam": "toast",
+    "toastcam2": "toastcrunch",
+    "tarantulacam": "tarantula",
+    "tarantulacam2": "tarantulaptz",
     "crowcam": "crow",
     "crowcam2": "crowindoor",
     "crowcam3": "crowmulti",
@@ -405,8 +414,8 @@ const customCamCommandMapping = {
     "3cam": "georgie noodle toast",
     "4cam": "georgie noodle patchy toast",
     "4camoutdoor": "pasture parrot marmoset fox",
-    "nightcams": "wolf pasture fox crow marmoset georgie",
-    "nightcamsbig": "wolf pasture fox crow marmoset georgie",
+    "nightcams": "wolf pasture fox crow marmoset pushpop",
+    "nightcamsbig": "wolf pasture fox crow marmoset pushpop",
     "indoorcams": "georgie noodle toast chin patchy roach",
     "indoorcamsbig": "georgie noodle toast chin patchy roach",
     "chincam": "chin",
@@ -470,6 +479,10 @@ const commandSceneAlias = {
     georgiecam: ["georgcam"],
     georgiecam2: ["georgiewatercam","gerogiefishcam","fishcam","chendlercam","georgieunderwatercam"],
     georgiecam3: ["georigemulticam"],
+    toastcam: ["toastcam","strudelcam","skinkcam"],
+    toastcam2: ["toastcrunchcam","toastercrunchcam","strudelcrunchcam","skinkcrunchcam","toastccam"],
+    tarantulacam: ["tarantulacam","evacam","kiwicam","spidercam"],
+    tarantulacam2: ["tarantulaptzcam","spiderptzcam"],
     nuthousecambackup: ["nutcam"],
     servernuthousecam: ["servernutcam", "remotenutcam", "remotenuthousecam"],
     crowcam: ["crowoutdoorscam", "crowoutdoorcam","crowoutcam","crowocam"],
@@ -521,7 +534,7 @@ const commandSceneAlias = {
     wolfcam9: ["wolfden2multicam","wolfwolfden2multicam","wolfwolfden2cam"],
     wolfcam10: ["wolfcornermulticam","wolfcornerwolfincam","wolfcornerwolfinmulticam","wolfcwolfincam","wolfcwolficam"],
     wolfcam11: ["wolfswitchcam"],
-    pushpopcam: ["pushpopcam","pushcam","popcam","poppycam"],
+    pushpopcam: ["pushpopcam","pushcam","popcam","poppycam","pushout"],
     pushpopcam2: ["pushpopindoorptzcam","pushinptz","pushpopindoorcam","pushindoorcam","pushpopinsidecam","pushpopincam","poppyincam","pushincam","popincam","popinsidecam","poppyinsidecam","poppyindoorcam"],
     pushpopcam3: ["pushpopcrunchcam","pushcrunchcam","popcrunchcam","poppycrunchcam","crunchcam","pushccam","popccam"],
     gardencam: ["pollinatorcam","plantcam"],
@@ -1492,5 +1505,6 @@ module.exports = {
     pauseCloudSceneChange,
     notifyHours,
     restrictedHours,
-    roundsCommandMapping
+    roundsCommandMapping,
+    multiCommands
 };

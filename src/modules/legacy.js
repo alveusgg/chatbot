@@ -1970,8 +1970,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 
 					//check for cam name
 					let camName = helper.cleanName(arg);
-
 					let overrideArgs = config.customCommandAlias[camName];
+
 					if (overrideArgs != null) {
 						//allow alias to change entire argument
 						let newArgs = overrideArgs.split(" ");
@@ -1984,11 +1984,26 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							continue;
 						}
 						lockoutList.push(overrideArgs);
+					} else {
+						//allow "all" to add all matching cams
+						let match = camName.match(/(\w*?)all\W*/i);
+						if (match){
+							let basename = helper.cleanName(match[1]);
+							let convertedbasename = config.customCommandAlias[basename];
+							let matchingcams = config.multiCommands[convertedbasename];
+							if (matchingcams){
+								for (let newarg of matchingcams) {
+									if (newarg != "") {
+										argsList.push(newarg);
+									}
+								}
+								continue;
+							}
+						}
 					}
 
 				}
 			}
-
 			if (lockoutList.length > 0) {
 				fullArgs = lockoutList.join(',');
 				logger.log(`Lock Cams - ${accessProfile.user}(${lockoutTime}s): ${fullArgs}`);
@@ -1998,6 +2013,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					// controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutTime,timestamp:now};
 				}
 			}
+			await getLockedCams(controller,channel);
 			break;
 		case "unlockcam":
 			let unlockList = [];
@@ -2009,8 +2025,10 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 
 						//check for cam name
 						let camName = helper.cleanName(arg);
-
-						let overrideArgs = config.customCommandAlias[camName] || camName;
+						console.log("unlock cam",camName);
+						
+						let overrideArgs = config.customCommandAlias[camName];
+						console.log("unlock overrideArgs",overrideArgs);
 						if (overrideArgs != null) {
 							//allow alias to change entire argument
 							let newArgs = overrideArgs.split(" ");
@@ -2023,12 +2041,33 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 								continue;
 							}
 							unlockList.push(overrideArgs);
+						}  else {
+							//allow "all" to add all matching cams
+							let match = camName.match(/(\w*?)all\W*/i);
+							console.log("unlock match",match);
+							if (match){
+								let basename = helper.cleanName(match[1]);
+								console.log("unlock basename",basename);
+								let convertedbasename = config.customCommandAlias[basename];
+								console.log("unlock convertedbasename",convertedbasename);
+								let matchingcams = config.multiCommands[convertedbasename];
+								console.log("unlock matchingcams",matchingcams);
+								if (matchingcams){
+									for (let newarg of matchingcams) {
+										if (newarg != "") {
+											console.log("unlock newarg",newarg);
+											argsList.push(newarg);
+										}
+									}
+									continue;
+								}
+							}
 						}
 
 					}
 				}
 			}
-
+			console.log('unlock list',unlockList);
 			if (unlockList.length > 0) {
 				// logger.log(`Unlock Cams (${accessProfile.user}-${accessProfile.accessLevel}): ${unlockList}`);
 				for (let camName of unlockList) {
@@ -2057,6 +2096,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					}
 				}
 			}
+			await getLockedCams(controller,channel);
 			break;
 		case "lockptz":
 			let lockoutPTZList = [];
@@ -2088,6 +2128,22 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							continue;
 						}
 						lockoutPTZList.push(overrideArgs);
+					} else {
+						//allow "all" to add all matching cams
+						let match = camName.match(/(\w*?)all\W*/i);
+						if (match){
+							let basename = helper.cleanName(match[1]);
+							let convertedbasename = config.customCommandAlias[basename];
+							let matchingcams = config.multiCommands[convertedbasename];
+							if (matchingcams){
+								for (let newarg of matchingcams) {
+									if (newarg != "") {
+										argsList.push(newarg);
+									}
+								}
+								continue;
+							}
+						}
 					}
 
 				}
@@ -2101,6 +2157,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					controller.connections.database.lockoutPTZ[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutPTZTime, timestamp: now };
 				}
 			}
+			await getLockedCams(controller,channel);
 			break;
 		case "unlockptz":
 			let unlockPTZList = [];
@@ -2113,7 +2170,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 						//check for cam name
 						let camName = helper.cleanName(arg);
 
-						let overrideArgs = config.customCommandAlias[camName] || camName;
+						let overrideArgs = config.customCommandAlias[camName];
 						if (overrideArgs != null) {
 							//allow alias to change entire argument
 							let newArgs = overrideArgs.split(" ");
@@ -2125,7 +2182,24 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 								}
 								continue;
 							}
+
 							unlockPTZList.push(overrideArgs);
+						} else {
+							//allow "all" to add all matching cams
+							let match = camName.match(/(\w*?)all\W*/i);
+							if (match){
+								let basename = helper.cleanName(match[1]);
+								let convertedbasename = config.customCommandAlias[basename];
+								let matchingcams = config.multiCommands[convertedbasename];
+								if (matchingcams){
+									for (let newarg of matchingcams) {
+										if (newarg != "") {
+											argsList.push(newarg);
+										}
+									}
+									continue;
+								}
+							}
 						}
 
 					}
@@ -2159,6 +2233,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					}
 				}
 			}
+			await getLockedCams(controller,channel);
 			break;
 		case "lockbothcam":
 			let lockoutallList = [];
@@ -2189,7 +2264,24 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							}
 							continue;
 						}
+
 						lockoutallList.push(overrideArgs);
+					} else {
+						//allow "all" to add all matching cams
+						let match = camName.match(/(\w*?)all\W*/i);
+						if (match){
+							let basename = helper.cleanName(match[1]);
+							let convertedbasename = config.customCommandAlias[basename];
+							let matchingcams = config.multiCommands[convertedbasename];
+							if (matchingcams){
+								for (let newarg of matchingcams) {
+									if (newarg != "") {
+										argsList.push(newarg);
+									}
+								}
+								continue;
+							}
+						}
 					}
 
 				}
@@ -2204,6 +2296,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutAllTime,timestamp:now};
 				}
 			}
+			await getLockedCams(controller,channel);
 			break;
 		case "unlockbothcam":
 			let unlockallList = [];
@@ -2216,7 +2309,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 						//check for cam name
 						let camName = helper.cleanName(arg);
 	
-						let overrideArgs = config.customCommandAlias[camName] || camName;
+						let overrideArgs = config.customCommandAlias[camName];
 						if (overrideArgs != null) {
 							//allow alias to change entire argument
 							let newArgs = overrideArgs.split(" ");
@@ -2228,7 +2321,24 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 								}
 								continue;
 							}
+
 							unlockallList.push(overrideArgs);
+						} else {
+							//allow "all" to add all matching cams
+							let match = camName.match(/(\w*?)all\W*/i);
+							if (match){
+								let basename = helper.cleanName(match[1]);
+								let convertedbasename = config.customCommandAlias[basename];
+								let matchingcams = config.multiCommands[convertedbasename];
+								if (matchingcams){
+									for (let newarg of matchingcams) {
+										if (newarg != "") {
+											argsList.push(newarg);
+										}
+									}
+									continue;
+								}
+							}
 						}
 	
 					}
@@ -2280,42 +2390,10 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					
 				}
 			}
+			await getLockedCams(controller,channel);
 			break;
 		case "listlocked":
-			const lockedcamlist = [...new Set([...Object.keys(controller.connections.database.lockoutCams), ...Object.keys(controller.connections.database.lockoutPTZ)])]
-			let lockedouput = "";
-			for (let camName of lockedcamlist) {
-				//commandAdmins", "commandSuperUsers", "commandMods", "commandOperator"
-
-				let ptz = controller.connections.database.lockoutPTZ[camName];
-				let ptztext = "";
-				let camtext = "";
-				if (ptz) {
-					let ptzPermission = ptz.accessLevel;
-					if (ptzPermission == "commandAdmins" || ptzPermission == "commandSuperUsers") {
-						ptztext = "ptz[S]";
-					} else {
-						ptztext = "ptz";
-					}
-				}
-				let cam = controller.connections.database.lockoutCams[camName];
-				if (cam) {
-					let camPermission = cam.accessLevel;
-					if (camPermission == "commandAdmins" || camPermission == "commandSuperUsers") {
-						camtext = `cam[S]`
-					} else {
-						camtext = `cam`
-					}
-				}
-				if (ptztext && camtext) {
-					lockedouput += `${camName}(${camtext}|${ptztext}), `
-				} else if (ptztext) {
-					lockedouput += `${camName}(${ptztext}), `
-				} else if (camtext) {
-					lockedouput += `${camName}(${camtext}), `
-				}
-			}
-			controller.connections.twitch.send(channel, `Locked Cams: ${lockedouput}`);
+			await getLockedCams(controller,channel);
 			break;
 		case "enablesubs":
 			controller.connections.database.enabledSubs = true;
@@ -2447,7 +2525,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			userCommand = controller.connections.database["customcamscommand"] ?? "customcams";
 
 			let newListRemoveCam = currentCamList.slice();
-
+			let lockoutRemoveList = [];
 
 			for (let arg of argsList) {
 				if (arg != null && arg != "") {
@@ -2467,13 +2545,43 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							continue;
 						}
 						camName = overrideArgs;
+						
+						//removes all matching cam category
+						let baseCamName = config.multiCustomCamScenesConverted[overrideArgs] || overrideArgs;
+						let matchingcams = config.multiCommands[baseCamName];
+						for (let newarg of matchingcams) {
+							if (newarg != "" && newarg != arg && newarg != baseCamName && newarg != overrideArgs
+								&& !argsList.includes(newarg)) {
+								argsList.push(newarg);
+							}
+						}
+						
+					} else {
+						//allow "all" to add all matching cam category
+						let match = camName.match(/(\w*?)all\W*/i);
+						if (match){
+							let basename = helper.cleanName(match[1]);
+							let convertedbasename = config.customCommandAlias[basename];
+							let matchingcams = config.multiCommands[convertedbasename];
+							if (matchingcams){
+								for (let newarg of matchingcams) {
+									if (newarg != "") {
+										argsList.push(newarg);
+									}
+								}
+								continue;
+							}
+						}
 					}
-
 					//camName = "fullcam"+camName;
+
+					lockoutRemoveList.push(camName);
 
 					//remove cam
 					for (let i = 0; i < newListRemoveCam.length; i++) {
-						if (newListRemoveCam[i].includes(camName)) {
+						let cammapping = config.customCamCommandMapping[camName];
+						if (newListRemoveCam[i].includes(camName) || 
+							newListRemoveCam[i].includes(cammapping)) {
 							newListRemoveCam.splice(i, 1);
 						}
 					}
@@ -2490,6 +2598,19 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				logger.log(`Remove Cams: ${argsList} - new fullargs: ${fullArgs}`);
 				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs);
 			}
+			
+			if (lockoutRemoveList.length > 0) {
+				fullArgs = lockoutRemoveList.join(', ');
+				logger.log(`Lock Cams - ${accessProfile.user}: ${fullArgs}`);
+				let now = new Date();
+				let lockoutTime = 0;
+				for (let cam of lockoutRemoveList) {
+					controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+					// controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutTime,timestamp:now};
+				}
+				controller.connections.twitch.send(channel, `Removed and Locked Cams: ${fullArgs}`);
+			}
+
 			break;
 		case "addcam":
 			// logger.log("addcam",currentCamList,argsList,currentScene)
@@ -2931,6 +3052,44 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 	}
 
 	return true;
+}
+
+async function getLockedCams(controller,channel){
+	const lockedcamlist = [...new Set([...Object.keys(controller.connections.database.lockoutCams), ...Object.keys(controller.connections.database.lockoutPTZ)])]
+	let lockedouput = "";
+	for (let camName of lockedcamlist) {
+		//commandAdmins", "commandSuperUsers", "commandMods", "commandOperator"
+
+		let ptz = controller.connections.database.lockoutPTZ[camName];
+		let ptztext = "";
+		let camtext = "";
+		if (ptz) {
+			let ptzPermission = ptz.accessLevel;
+			if (ptzPermission == "commandAdmins" || ptzPermission == "commandSuperUsers") {
+				ptztext = "ptz[S]";
+			} else {
+				ptztext = "ptz";
+			}
+		}
+		let cam = controller.connections.database.lockoutCams[camName];
+		if (cam) {
+			let camPermission = cam.accessLevel;
+			if (camPermission == "commandAdmins" || camPermission == "commandSuperUsers") {
+				camtext = `cam[S]`
+			} else {
+				camtext = `cam`
+			}
+		}
+		if (ptztext && camtext) {
+			lockedouput += `${camName}(${camtext}|${ptztext}), `
+		} else if (ptztext) {
+			lockedouput += `${camName}(${ptztext}), `
+		} else if (camtext) {
+			lockedouput += `${camName}(${camtext}), `
+		}
+	}
+	controller.connections.twitch.send(channel, `Locked Cams: ${lockedouput}`);
+	return lockedouput;
 }
 
 async function checkUnifiCommand(controller, userCommand, accessProfile, channel, message, currentScene) {
