@@ -164,7 +164,7 @@ let multiCommands = {
     pushpop: ["pushpopcam","pushpopcam2","pushpopcam3"],
     wolf: ["wolfcam", "wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","wolfcam11"],
     marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
-    pasture: ["pasturecam", "pasturecam2"],
+    pasture: ["pasturecam", "pasturecam2","gardencam"],
 }
 
 //Notification Swapping
@@ -616,12 +616,12 @@ const commandControlAlias = {
     disablesubs: ["stopsubs","lockcontrols"],
     axislist: ["axiscamlist"],
     lockcam: ["lockout","lock","camlock"],
-    lockptz: ["lockptzcam","lockcamptz","ptzlock"],
-    lockbothcam: ["lockboth"],
     unlockcam: ["unlock","camunlock"],
-    unlockbothcam: ["unlockboth"],
+    lockptz: ["lockptzcam","lockcamptz","ptzlock"],
     unlockptz: ["unlockcamptz","unlockptzcam","ptzunlock"],
-    listlocked: ["listlock","lockedlist","locklist","getlocked","lockstatus","lockedstatus","lockedcams"],
+    lockbothcam: ["lockboth","lockall","lockb","lc"],
+    unlockbothcam: ["unlockboth","unlockall","unlockb","uc"],
+    listlocked: ["listlock","lockedlist","locklist","getlocked","lockstatus","lockedstatus","lockedcams","lockedcam","locked","ll"],
 }
 
 let commandScenes = {
@@ -1459,12 +1459,6 @@ const scenePositions = {
 }
 
 module.exports = {
-    useNewListeners,
-    useNewScheduler,
-    useNewCommandSystem,
-    groups,
-    groupMemberships,
-    newGroupsToOldMapping,
     commandPrefix,
     ptzPrefix,
     userRanks,
