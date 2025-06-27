@@ -9,7 +9,7 @@ module.exports = (controller) => {
     const { connections: { obsBot } } = controller;
 
     return ptzCommand(controller, {
-        name: 'ptzspin',
+        name: 'ptzstop',
         enabled: !!obsBot,
         permission: {
             group: 'operator',

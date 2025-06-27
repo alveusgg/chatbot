@@ -354,6 +354,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 	// logger.log("Valid Command",user,userCommand, tags.userInfo);
 
 	if (config.useNewCommandSystem.has(userCommand) && userCommand !== 'uselegacy') {
+		console.log("USE NEW COMMANDS");
 		controller.commandManager.handleTwitchMessage(channel, user, message, tags);
 		return;
 	}
@@ -1720,14 +1721,16 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 	switch (userCommand) {
 		case "uselegacy":
 			if (arg1.length !== 0) {
-				config.useNewCommandSystem.add(arg1);
+				config.useNewCommandSystem.delete(arg1);
 			} else {
 				config.useNewCommandSystem.clear();
 			}
 			break;
 		case "usenew":
+			console.log('adding use new',arg1);
 			if (arg1.length !== 0) {
-				config.useNewCommandSystem.delete(arg1);
+				config.useNewCommandSystem.add(arg1);
+				console.log('adding use new',arg1,config.useNewCommandSystem);
 			}
 			break;
 		case "resetsourcef":

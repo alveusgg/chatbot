@@ -149,11 +149,10 @@ function isCommandThrottled(user, userGroup, command) {
  */
 function canUserPerformCommand(user, command, controller) {
     const userGroup = groupMemberships[user];
-
     return (
         doesUserHaveAccessToCommand(user, userGroup, command.permission) &&
         !isCommandTimeRestricted(userGroup, command, controller) &&
-        !isCommandThrottled(userGroup, command)
+        !isCommandThrottled(user,userGroup, command)
     );
 }
 

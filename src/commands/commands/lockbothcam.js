@@ -11,6 +11,9 @@ module.exports = ({ connections: { database } }) => {
         name: 'lockbothcam',
         aliases: [
             "lockboth",
+            "lockall",
+            "lockb",
+            "lc"
         ],
         enabled: !!database,
         permission: {

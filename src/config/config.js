@@ -39,7 +39,7 @@ const useNewScheduler = true;
 /**
  * @type {Set<string>}
  */
-const useNewCommandSystem = new Set(['showchat', 'ptzstopaudio', 'ptzplayaudio']);
+const useNewCommandSystem = new Set(["ptzlist",'showchat', 'ptzstopaudio', 'ptzplayaudio']);
 
 const groups = /** @type {const} */ ({
     admin: 0,
@@ -363,7 +363,8 @@ const commandPermissionsExtra = {
     commandAdmins: ["testadminextra"],
     commandSuperUsers: ["testsuperextra", "resetcloudsource", "resetcloudsourcef", "setalveusscene", "setcloudscene", "changeserver", "setmute", "camclear"],
     commandMods: ["testmodextra", "resetsource","resetsourcef","camload", "camlist", "camsave", "camrename", "campresetremove", "customcams", "customcamsbig", "customcamstl", "customcamstr", "customcamsbl", "customcamsbr",
-        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam", "runfeeder","blockuser","unblockuser","listblocked"],
+        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam", "runfeeder","blockuser","unblockuser","listblocked",
+        "uselegacy","usenew"],
     commandOperator: ["showchat","hidechat","raidvideo","stopraidvideo","showrounds","hiderounds", "disablesubs","enablesubs",
                  "resetvolume", "removecam", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", 
                 "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal", "resetbackpack", "resetbackpack2", "resetbackpack3", "resetpc", "resetlivecam", 

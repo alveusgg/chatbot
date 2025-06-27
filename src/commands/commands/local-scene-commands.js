@@ -29,7 +29,7 @@ module.exports = (controller) => {
         const commandName = commandSceneKeys[i];
 
         commands[i] = {
-            name: commandName,
+            name: 'alveuspc'+commandName,
             enabled: !!obs,
             skipTimeRestrictionCheck: true,
             run: async ({ user }) => {

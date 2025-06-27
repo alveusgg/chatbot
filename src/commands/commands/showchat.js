@@ -12,6 +12,7 @@ module.exports = ({ connections: { obs } }) => {
             group: 'operator',
         },
         run: async ({ args }) => {
+            console.log("showchat args",args)
             const value = args[0] === 'showchat' ? true : false;
 
             await obs.local.setSceneItemEnabled(

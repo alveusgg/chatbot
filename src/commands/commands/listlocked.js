@@ -5,7 +5,7 @@
  */
 module.exports = ({ connections: { database, twitch } }) => {
     return {
-        name: 'listblocked',
+        name: 'listlocked',
         aliases: ["listlock","lockedlist","locklist","getlocked","lockstatus","lockedstatus","lockedcams"],
         enabled: !!database,
         permission: {

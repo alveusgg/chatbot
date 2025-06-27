@@ -25,15 +25,15 @@ class CommandManager {
 
         this.#controller = controller;
 
-        controller.connections.twitch.onMessage(this.handleTwitchMessage.bind(this));
+        // controller.connections.twitch.onMessage(this.handleTwitchMessage.bind(this));
+        this.loadCommands();
     }
 
     async loadCommands() {
         // Grab all .js files in this directory other than this one
-        const files = (await getAllFiles(__dirname)).filter(
+        const files = (await getAllFiles(__dirname + "/commands")).filter(
             (path) => path.endsWith('.js') && path !== 'index.js',
         );
-
         for (const file of files) {
             /**
              * Require the file, noteworthy this will throw if something's wrong with it
@@ -46,7 +46,6 @@ class CommandManager {
                     `expected ${file} to export function, got ${typeof module} instead`,
                 );
             }
-
             let commands = module(this.#controller);
 
             if (typeof commands.then === 'function') {
@@ -67,7 +66,7 @@ class CommandManager {
 
                 if (command.name in this.#commands) {
                     throw new TypeError(
-                        `${file}: command ${command.name} already registered`,
+                        `${file}: command ${command.name} already registered.`,
                     );
                 }
 
@@ -97,6 +96,7 @@ class CommandManager {
      * @returns {Promise<void>}
      */
     async handleTwitchMessage(channel, user, text, msg) {
+        console.log("Using New Commands",user.toLowerCase(),text);
         text = text.trim();
 
         if (text.length < 2) {
@@ -123,13 +123,14 @@ class CommandManager {
         const command = this.#commands[commandName];
         if (!command || !command.enabled) {
             // Command doesn't exist or it's disabled
+            console.log("command doesnt exist");
             return;
         }
-
+        
         if (!canUserPerformCommand(user, command, this.#controller)) {
+            console.log("user cant perform command");
             return;
         }
-
         await Promise.resolve(
             command.run({
                 channel,
