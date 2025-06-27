@@ -1,6 +1,10 @@
 const Logger = require("../utils/logger");
 
 /**
+ * @typedef {Feeder} FeederConnection
+ */
+
+/**
  * Feeder Class
  *
  * Board: Unexpected Maker FeatherS3
