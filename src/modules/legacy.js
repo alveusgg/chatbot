@@ -1983,6 +1983,9 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "lockcam":
 			let lockoutList = [];
 			let lockoutTime = 0;
+			if (arg1 == "all") {
+				argsList = config.axisCameras.slice();
+			} 
 			for (let arg of argsList) {
 				if (arg != null && arg != "") {
 
@@ -2069,7 +2072,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							unlockList.push(overrideArgs);
 						}  else {
 							//allow "all" to add all matching cams
-							let match = camName.match(/(\w*?)all\W*/i);
+							let match = camName.match(/(\w*?)(?:all|both)\W*/i);
 							console.log("unlock match",match);
 							if (match){
 								let basename = helper.cleanName(match[1]);
@@ -2127,6 +2130,9 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "lockptz":
 			let lockoutPTZList = [];
 			let lockoutPTZTime = 0;
+			if (arg1 == "all") {
+				argsList = config.axisCameras.slice();
+			} 
 			for (let arg of argsList) {
 				if (arg != null && arg != "") {
 
@@ -2264,6 +2270,9 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "lockbothcam":
 			let lockoutallList = [];
 			let lockoutAllTime = 0;
+			if (arg1 == "all") {
+				argsList = config.axisCameras.slice();
+			} 
 			for (let arg of argsList) {
 				if (arg != null && arg != "") {
 
