@@ -1459,6 +1459,12 @@ const scenePositions = {
 }
 
 module.exports = {
+    useNewListeners,
+    useNewScheduler,
+    useNewCommandSystem,
+    groups,
+    groupMemberships,
+    newGroupsToOldMapping,
     commandPrefix,
     ptzPrefix,
     userRanks,
