@@ -25,7 +25,7 @@ class CommandManager {
 
         this.#controller = controller;
 
-        controller.connections.twitch.onMessage(this.handleTwitchMessage);
+        controller.connections.twitch.onMessage(this.handleTwitchMessage.bind(this));
     }
 
     async loadCommands() {
