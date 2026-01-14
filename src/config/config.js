@@ -30,6 +30,7 @@ const userRanks = {
   all: Symbol("all")
 }
 
+// NOTE: https://www.streamweasels.com/tools/convert-twitch-username-%20to-user-id/ Twitch username to ID conversion tool.
 let userPermissions = {
   commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
   commandAdmins: ["171828515", "235835559", "551538396", "636587384"],
