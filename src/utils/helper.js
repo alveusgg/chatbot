@@ -34,7 +34,7 @@ function isAllowed(userCommand,userProfile){
                 //commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
                 for (const priority of config.userPermissions.commandPriority){
                     let userRank = getUserRank(userProfile);
-                    if (config.userPermissions[priority].includes(userProfile.userName.toLowerCase())){
+                    if (config.userPermissions[priority].includes(userProfile.userId)){
                         return {user:userProfile.userName.toLowerCase(),allowed:true,accessLevel:priority, userRank};
                     } else if (config.userPermissions[priority].includes(config.userRanks.mods) && userRank >= 4){
                         return {user:userProfile.userName.toLowerCase(),allowed:true,accessLevel:priority, userRank};
