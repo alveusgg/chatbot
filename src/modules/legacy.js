@@ -334,7 +334,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 	// logger.log("Message",message);
 
 	//check if blacklisted from commands
-	if (config.userBlacklist.includes(user.toLowerCase())) {
+	if (config.userBlacklist.includes(tags.userInfo.userId)) {
 		return;
 	}
 
@@ -383,7 +383,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		return;
 	}
 
-	if (controller.connections.database["blockedUsers"][user]) {
+	if (controller.connections.database["blockedUsers"][tags.userInfo.userId]) {
 		//no permission
 		logger.log("Blocked User: ", user, userCommand);
 		return;
