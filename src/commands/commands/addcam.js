@@ -1,5 +1,7 @@
 'use strict';
 
+//updated
+
 const { customCommandAlias } = require('../../config/config.js');
 const { groupMemberships } = require('../../config/config.js');
 const { cleanName } = require('../../utils/helper.js');
@@ -42,12 +44,6 @@ module.exports = (controller) => {
                 let camName = cleanName(arg);
 
                 const overrideArgs = customCommandAlias[camName];
-                logger.log(
-                    'addcam alias',
-                    customCommandAlias,
-                    camName,
-                    overrideArgs,
-                );
 
                 if (overrideArgs !== null) {
                     // Allow alias to change entire argument
@@ -77,7 +73,7 @@ module.exports = (controller) => {
             if (newListAddCam.length > 0) {
                 const fullArgs = newListAddCam.join(' ');
 
-                logger.level(`Add Cams: ${args} - new fullargs: ${fullArgs}`);
+                logger.log(`Add Cams New: ${args} - new fullargs: ${fullArgs}`);
                 switchToCustomCams(
                     controller,
                     channel,

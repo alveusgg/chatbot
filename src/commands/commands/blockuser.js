@@ -1,5 +1,7 @@
 'use strict';
 
+//updated
+
 const Logger = require('../../utils/logger.js');
 
 const logger = new Logger();
@@ -19,7 +21,7 @@ module.exports = ({ connections: { database, twitch } }) => {
             group: 'mod'
         },
         run: ({ args, channel }) => {
-            database["blockedUsers"][args[1]];
+            database["blockedUsers"][args[1]] = true;
 
 			twitch.send(channel, `Blocked: ${args[1]}`);
 			let blocklist = Object.keys(database["blockedUsers"]);

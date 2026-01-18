@@ -1,5 +1,7 @@
 'use strict';
 
+//updated
+
 /**
  * @type {import('../types.d.ts').CommandRegister}
  */

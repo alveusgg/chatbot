@@ -1,6 +1,6 @@
 'use strict';
 
-const { customCommandAlias } = require('../../config/config.js');
+const { customCommandAlias, multiCustomCamScenesConverted, multiCommands, safecams, customCamCommandMapping } = require('../../config/config.js');
 const { groupMemberships } = require('../../config/config.js');
 const { cleanName } = require('../../utils/helper.js');
 const Logger = require('../../utils/logger.js');
@@ -14,7 +14,7 @@ const logger = new Logger();
  */
 module.exports = (controller) => {
     const {
-        connections: { obs, database },
+        connections: { obs, database, twitch },
     } = controller;
 
     return {
@@ -33,7 +33,8 @@ module.exports = (controller) => {
             const currentCamList = database['customcam'];
             const userCommand = database['customcamscommand'] ?? 'customcams';
 
-            const newListRemoveCam = currentCamList.slice();
+            const newListRemovedCams = [];
+            const lockoutRemoveList = [];
 
             const argsList = args.slice(1);
             for (const arg of argsList) {
@@ -45,7 +46,7 @@ module.exports = (controller) => {
 
                 const overrideArgs = customCommandAlias[camName];
                 logger.log(
-                    'addcam alias',
+                    'removecam alias',
                     customCommandAlias,
                     camName,
                     overrideArgs,
@@ -66,18 +67,74 @@ module.exports = (controller) => {
                     }
 
                     camName = overrideArgs;
-                }
 
-                // Remove the camera
-                for (let i = 0; i < newListRemoveCam.length; i++) {
-                    if (newListRemoveCam[i].includes(camName)) {
-                        newListRemoveCam.splice(i, 1);
+                    //removes all matching cam category
+                    const baseCamName = multiCustomCamScenesConverted[overrideArgs] || overrideArgs;
+                    const matchingcams = multiCommands[baseCamName];
+                    if (matchingcams && matchingcams.length > 0){
+                        for (const newarg of matchingcams) {
+                            if (newarg != '' && newarg != arg && newarg != baseCamName && newarg != overrideArgs
+                                && !argsList.includes(newarg)) {
+                                argsList.push(newarg);
+                            }
+                        }
+                    }
+                } else {
+                    //allow "all" to add all matching cam category
+                    const match = camName.match(/(\w*?)all\W*/i);
+                    if (match){
+                        const basename = cleanName(match[1]);
+                        const convertedbasename = customCommandAlias[basename];
+                        const matchingcams = multiCommands[convertedbasename];
+                        if (matchingcams && matchingcams.length > 0){
+                            for (const newarg of matchingcams) {
+                                if (newarg != "") {
+                                    argsList.push(newarg);
+                                }
+                            }
+                            continue;
+                        }
                     }
                 }
+
+                lockoutRemoveList.push(camName);
             }
 
-            if (newListRemoveCam.length > 0) {
-                const fullArgs = newListRemoveCam.join(' ');
+            //remove cams
+			for (const i = 0; i < currentCamList.length; i++) {
+				let currcam = currentCamList[i];
+				currcam = cleanName(currcam);
+				let remove = false;
+				for (const removedcam of lockoutRemoveList){
+					if (currcam == removedcam){
+						remove = true;
+					} else {
+						const camMapping = customCamCommandMapping[removedcam];
+						if (currcam == camMapping){
+							remove = true;
+						}
+					}
+				}
+				if (remove){
+					for (const replace of safecams){
+						const camName = cleanName(replace);
+						const baseName = customCommandAlias[camName];
+						if (currentCamList.includes("fullcam"+replace) || currentCamList.includes("fullcam"+baseName)){
+							continue;
+						}
+						if (newListRemovedCams.includes(baseName)){
+							continue;
+						}
+                        newListRemovedCams.push(baseName);
+						break;
+					}
+				} else {
+					newListRemovedCams.push(currcam);
+				}
+			}
+
+            if (newListRemovedCams.length > 0) {
+                const fullArgs = newListRemovedCams.join(' ');
 
                 logger.level(
                     `Remove Cams: ${args} - new fullargs: ${fullArgs}`,
@@ -90,6 +147,19 @@ module.exports = (controller) => {
                     fullArgs,
                 );
             }
+
+            if (lockoutRemoveList.length > 0) {
+				const fullArgs = lockoutRemoveList.join(', ');
+				logger.log(`Lock Cams - ${user}: ${fullArgs}`);
+				const now = new Date();
+				const lockoutTime = 0;
+                const userGroup = config.groupMemberships[user];
+                const accessLevel = config.newGroupsToOldMapping[userGroup];
+				for (const cam of lockoutRemoveList) {
+					database.lockoutCams[cam] = { user: user, accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+				}
+				twitch.send(channel, `Removed and Locked Cams: ${fullArgs}`);
+			}
         },
     };
 };

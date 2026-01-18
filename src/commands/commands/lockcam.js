@@ -61,10 +61,10 @@ module.exports = ({ connections: { database } }) => {
             if (lockoutList.length > 0) {
                 const lockoutListString = lockoutList.join(',');
                 logger.log(`Lock Cams - ${user}(${lockoutTime}s): ${lockoutListString}`);
-                let now = new Date();
+                const now = new Date();
                 const userGroup = config.groupMemberships[user];
                 const accessLevel = config.newGroupsToOldMapping[userGroup];
-                for (let cam of lockoutList) {
+                for (const cam of lockoutList) {
                     database.lockoutCams[cam] = { user: user, accessLevel, locked: true, duration: lockoutTime, timestamp: now };
                 }
             }
