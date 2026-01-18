@@ -389,7 +389,7 @@ class Axis {
   async speedDry() {
     return this.ptz({ auxiliary: "speeddry" });
   }
-
+  
   /**
    * Set the IR cut filter state
    *

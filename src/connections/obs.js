@@ -13,12 +13,12 @@ const utilsModule = require("../utils/utilsModule");
 
 const connections = {
   localAlveus: {
-    name: "AlveusServer",
+    name: "LocalPC",
     address: process.env.OBS_WS,
     password: process.env.OBS_KEY,
   },
   localNuthouse: {
-    name: "NuthouseServer",
+    name: "LocalNuthouse",
     address: process.env.OBS_WS_NUTHOUSE,
     password: process.env.OBS_KEY_NUTHOUSE,
   },
@@ -43,6 +43,11 @@ const connections = {
     name: "CloudSpaceServer",
     address: process.env.OBS_WS_SPACE_CLOUD,
     password: process.env.OBS_KEY_SPACE_CLOUD,
+  },
+  cloudHost: {
+    name: "CloudHostServer",
+    address: process.env.OBS_WS_HOST_CLOUD,
+    password: process.env.OBS_KEY_HOST_CLOUD,
   },
 };
 
@@ -613,6 +618,57 @@ class OBS {
       return null;
     }
   }
+
+  async getBrowserSource(sourceName) {
+    let self = this;
+    let param = { inputName: sourceName };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        self.utils.log(`Old OBS Not Setup`);
+        return null;
+      } else {
+        response = await self.client.call("GetInputSettings", param);
+      }
+      if (response && response.inputKind == "browser_source"){
+        let url = response.inputSettings?.url;
+        return url;
+      }
+      self.utils.log(`get BrowserSource: ${sourceName}`, response);
+      return response;
+    } catch (e) {
+      self.utils.log(
+        `Error get BrowserSource (${sourceName}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
+
+  async setBrowserSource(sourceName,url) {
+    let self = this;
+    let param = { url: url };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        self.utils.log(`Old OBS Not Setup`);
+        return null;
+      } else {
+        response = await self.client.call("SetInputSettings", {
+          inputName: sourceName,
+          inputSettings: param,
+        });
+      }
+      //no result
+      self.utils.log(`Set BrowserSource URL: ${sourceName}: ${url}`);
+      return true;
+    } catch (e) {
+      self.utils.log(
+        `Error BrowserSource URL (${sourceName}:${url}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
+
   async setScene(sceneName) {
     let self = this;
     let param = { sceneName: sceneName };
@@ -1318,7 +1374,7 @@ const create = async (connection) => {
  */
 module.exports = async (controller) => {
   const local = await create("localAlveus");
-  const cloud = await create("cloudSpace");
+  const cloud = await create("cloudHost");
 
   controller.connections.obs = { local, cloud, create };
 };

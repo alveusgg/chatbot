@@ -26,25 +26,26 @@ class Twitch {
    * @param {string} name Name of the account (for logging)
    * @param {string} id Client ID for authentication
    * @param {string} secret Client secret for authentication
-   * @param {string} file File location to read/write token data
+   * @param {string} file file location to read/write token data
    * @param {string[]} channels List of channels to join
    * @returns {Promise<Twitch>}
    */
-  constructor(name, id, secret, file, channels) {
+  constructor(name, twitchId, id, secret, file, channels) {
     this.#logger = new Logger(`connections/twitch/${name}`);
-
+    
     // Authenticate and create the client
     this.#auth = new RefreshingAuthProvider(
       {
         clientId: id,
         clientSecret: secret,
-        onRefresh: (data) => {
-          this.#logger.log("Refreshing Twitch token");
-          writeFileSync(file, JSON.stringify(data, null, 4), "UTF-8");
-        },
-      },
-      JSON.parse(readFileSync(file, "UTF-8")), // "./tokens.json"
+      }
     );
+    this.#auth.onRefresh((userId, data) => {
+      this.#logger.log("Refreshing Twitch token");
+      writeFileSync(file, JSON.stringify(data, null, 4), "UTF-8");
+    })
+    this.#auth.addUser(twitchId,JSON.parse(readFileSync(file, "UTF-8")),[`chat`]);
+
     this.#client = new ApiClient({
       authProvider: this.#auth,
       logger: {
@@ -53,10 +54,10 @@ class Twitch {
     });
 
     // Connect to chat in the specified channels
-    if (
-      !this.#auth.currentScopes.includes("chat:read") ||
-      !this.#auth.currentScopes.includes("chat:edit")
-    ) {
+    try{
+      let scopes = this.#auth.getAccessTokenForIntent("chat",["chat:read","chat:edit"])
+      console.log(`Twitch client (${name}) has these scopes: ${scopes}`);
+    } catch(e){
       throw new Error(`Twitch client (${name}) is missing chat scopes`);
     }
     this.#channels = new Set(channels);
@@ -69,33 +70,33 @@ class Twitch {
     });
 
     // Register standard chat events
-    this.#chat.onRegister(() => {
+    this.#chat.onConnect(() => {
       this.#logger.log(`Chat connected (${[...this.#channels].join(", ")})`);
     });
     this.#chat.onJoin((channel, user) => {
-      this.#logger.log(`${user} joined ${channel.substring(1)}`);
-      this.#channels.add(channel.substring(1));
+      this.#logger.log(`${user} joined ${channel}`);
+      this.#channels.add(channel);
     });
     this.#chat.onJoinFailure((channel, reason) => {
-      this.#logger.warn(`Failed to join ${channel.substring(1)}: ${reason}`);
+      this.#logger.warn(`Failed to join ${channel}: ${reason}`);
     });
     this.#chat.onPart((channel, user) => {
-      this.#logger.log(`${user} parted ${channel.substring(1)}`);
-      this.#channels.delete(channel.substring(1));
+      this.#logger.log(`${user} parted ${channel}`);
+      this.#channels.delete(channel);
     });
     this.#chat.onMessageFailed((channel, reason) => {
       this.#logger.warn(
-        `Failed to send message (${channel.substring(1)}): ${reason}`,
+        `Failed to send message (${channel}): ${reason}`,
       );
     });
     this.#chat.onMessageRatelimit((channel, reason) => {
       this.#logger.warn(
-        `Chat message ratelimited (${channel.substring(1)}): ${reason}`,
+        `Chat message ratelimited (${channel}): ${reason}`,
       );
     });
     this.#chat.onNoPermission((channel, message) => {
       this.#logger.warn(
-        `No permission for chat action (${channel.substring(1)}): ${message}`,
+        `No permission for chat action (${channel}): ${message}`,
       );
     });
     this.#chat.onAuthenticationFailure((message) => {
@@ -108,7 +109,7 @@ class Twitch {
     });
 
     // Connect to Twitch
-    return this.#chat.connect().then(() => this);
+    return this.#chat.connect();
   }
 
   /**
@@ -118,7 +119,7 @@ class Twitch {
    */
   onMessage(func) {
     this.#chat.onMessage((channel, user, message, msg) =>
-      func(channel.substring(1).toLowerCase(), user, message.trim(), msg),
+      func(channel.toLowerCase(), user, message.trim(), msg),
     );
   }
 
@@ -301,7 +302,8 @@ module.exports = async (controller) => {
   if (
     !process.env.ALVEUS_CLIENT_ID ||
     !process.env.ALVEUS_CLIENT_SECRET ||
-    !process.env.ALVEUS_TOKEN_PATH
+    !process.env.ALVEUS_TOKEN_PATH ||
+    !process.env.ALVEUS_TWITCH_ID
   ) {
     logger.warn(
       "No Twitch API credentials found. Twitch connections will not be established. To enable Twitch connections, set the ALVEUS_CLIENT_ID, ALVEUS_CLIENT_SECRET, and ALVEUS_TOKEN_PATH environment variables.",
@@ -311,6 +313,7 @@ module.exports = async (controller) => {
 
   const twitch = await new Twitch(
     "AlveusSanctuary",
+    process.env.ALVEUS_TWITCH_ID,
     process.env.ALVEUS_CLIENT_ID,
     process.env.ALVEUS_CLIENT_SECRET,
     join(process.cwd(), process.env.ALVEUS_TOKEN_PATH),
