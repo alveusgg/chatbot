@@ -15,10 +15,9 @@
   "private": true,
   "dependencies": {
     "@trycourier/courier": "^4.1.0",
-    "@twurple/api": "^5.2.7",
-    "@twurple/auth": "^5.2.7",
-    "@twurple/chat": "^5.2.7",
-    "@twurple/eventsub": "^5.2.7",
+    "@twurple/api": "^7.4.0",
+    "@twurple/auth": "^7.4.0",
+    "@twurple/chat": "^7.4.0",
     "digest-fetch": "^2.0.1",
     "dotenv": "^16.0.3",
     "jsonwebtoken": "^9.0.2",

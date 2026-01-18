@@ -4,6 +4,10 @@ const Logger = require("../utils/logger");
 
 const logger = new Logger("connections/unifi");
 
+/**
+ * @typedef {Unifi} Unifi
+ */
+
 class Unifi {
   /**
    * Regex to check valid MAC address
