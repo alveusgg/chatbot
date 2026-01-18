@@ -36,7 +36,7 @@ let userPermissions = {
     commandAdmins: ["171828515" /*spacevoyage*/, "235835559" /*maya*/, "551538396" /*theconnorobrien*/ , "636587384" /*alveussanctuary*/],
     commandSuperUsers: ["555646161" /*ellaandalex*/, "442741947" /*dionysus1911*/, "189754522" /*dannydv*/, "431062664" /*maxzillajr*/, "400034678" /*illjx*/, "814245444" /*kayla_alveus*/, "599137366" /*alex_b_patrick*/, 
                         "936262698" /*lindsay_alveus*/, "460302677" /*tarantulizer*/,"159561333" /*spiderdaynightlive*/,"1089847926"/*srutiloops*/,"524563217" /*evantomology*/,"132830613" /*amandaexpress*/,
-                        "204799332" /*coltonactually*/,"946749672" /*tamarinsandjulie*/],
+                        "204799332" /*coltonactually*/,"946749672" /*tamarinsandjulie*/, "677405940" /*chandlerirs*/, "198484843" /*rocky539*/, "917822267" /*riskybiscuitsbaking*/],
     commandMods: [userRanks.mods],
     commandOperator: [],
     commandVips: [userRanks.vips],
