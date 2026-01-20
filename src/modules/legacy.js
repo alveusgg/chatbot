@@ -373,12 +373,6 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 
 	// logger.log("Valid Command",user,userCommand, tags.userInfo);
 
-	if (config.useNewCommandSystem.has(userCommand) && userCommand !== 'uselegacy') {
-		console.log("USE NEW COMMANDS",userCommand);
-		controller.commandManager.handleTwitchMessage(channel, user, message, tags);
-		return;
-	}
-
 	let accessProfile = helper.isAllowed(userCommand, tags.userInfo);
 	// if (accessProfile == null || !accessProfile.allowed) {
 	// 	//no permission
