@@ -102,6 +102,7 @@ let userPermissions = {
     commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick", 
                         "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology","amandaexpress",
                         "coltonactually","tamarinsandjulie","chandlerirs","rocky539","riskybiscuitsbaking"],
+                        "coltonactually","tamarinsandjulie","chandlerirs","rocky539","riskybiscuitsbaking"],
     commandMods: [userRanks.mods],
     commandOperator: [],
     commandVips: [userRanks.vips],
