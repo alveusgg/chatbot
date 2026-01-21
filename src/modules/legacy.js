@@ -771,7 +771,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 
 		let camName = helper.cleanName(currentScene);
 		let baseName = config.customCommandAlias[camName];
-		if (!checkLockoutPTZAccess(controller, baseName)) {
+		if (!checkLockoutPTZAccess(controller.connections.database, baseName)) {
 			//locked camera
 
 			let lockedCam = true;
@@ -3468,12 +3468,12 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 		}
 	}
 	for (let newLoc = 0; newLoc < camList.length; newLoc++) {
-		let cam = currentCamList[newLoc];
+		let cam = camList[newLoc];
 		// console.log("newLoc",newLoc, cam);
 		let camName = helper.cleanName(cam);
 		let baseName = config.customCommandAlias[camName];
 		if (!checkLockoutAccess(controller.connections.database, baseName)) {
-			//check if it exists and is in same slot of newlist
+			//check if it exists and is in same slot of current list
 
 			const currentLoc = currentCamList.indexOf(cam);
 			if (currentLoc == -1) {

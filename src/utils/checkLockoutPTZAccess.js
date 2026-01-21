@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = (controller, camera) => {
-	let camStatus = controller.connections.database.lockoutPTZ[camera];
+module.exports = (database, camera) => {
+	let camStatus = database.lockoutPTZ[camera];
 	if (camStatus) {
 		//permanent lockout
 		if (camStatus.duration == 0) {
@@ -15,7 +15,7 @@ module.exports = (controller, camera) => {
 			if (differenceMS < camStatus.duration * 1000) {
 				return false;
 			} else {
-				delete controller.connections.database.lockoutPTZ[camera];
+				delete database.lockoutPTZ[camera];
 				return true;
 			}
 		}
