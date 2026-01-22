@@ -27,7 +27,7 @@
     "on-change": "^4.0.2",
     "osc": "^2.4.4",
     "reconnecting-websocket": "^4.4.0",
-    "unifi-client": "^0.11.0",
+    "unifi-client": "^0.11.1",
     "ws": "^8.18.0"
   },
   "prettier": {
