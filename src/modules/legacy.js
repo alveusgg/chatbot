@@ -360,7 +360,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 	message = message.trim();
 	
 	//check if blacklisted from commands
-	if (config.userBlacklist.includes(user.toLowerCase())) {
+	if (config.userBlacklist.includes(tags.userInfo.userId)) {
 		return;
 	}
 
@@ -387,7 +387,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		if (status != null) {
 			//recheck if allowed with new status
 			let chatuser = {
-				displayName: tags.userInfo.displayName, isBroadcaster: tags.userInfo.isBroadcaster,
+				displayName: tags.userInfo.displayName, isBroadcaster: tags.userInfo.isBroadcaster, userId: tags.userInfo.userId,
 				isFounder: tags.userInfo.isFounder, isMod: tags.userInfo.isMod, isSubscriber: true,
 				isVip: tags.userInfo.isVip, userId: tags.userInfo.userId, userName: tags.userInfo.userName,
 				userType: tags.userInfo.userType, badges: tags.userInfo.badges, badgeInfo: tags.userInfo.badgeInfo
@@ -409,7 +409,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		return;
 	}
 
-	if (controller.connections.database["blockedUsers"][user]) {
+	if (controller.connections.database["blockedUsers"][tags.userInfo.userId]) {
 		//no permission
 		logger.log("Blocked User: ", user, userCommand);
 		return;
