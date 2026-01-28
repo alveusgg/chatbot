@@ -1766,7 +1766,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "resetlivecamf":
 		case "resetpcf":
 		case "resetphonef":
-		case "resetextra":
+		case "resetextraf":
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 1");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 2");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 3");
@@ -1774,6 +1774,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps SRT 2");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps SRT 3");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "RTMP FEED");
+			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "RTMP Live");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "RTMP Phone");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "RTMP Desktop");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "SRT FEED");
@@ -1801,6 +1802,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "RTMP FEED");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "RTMP Phone");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "RTMP Desktop");
+			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "RTMP Live");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "SRT FEED");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "SRT Phone");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "SRT Desktop");
@@ -1812,6 +1814,9 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "local ninja cam");
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "local rtmp desktop");
 			break
+		case "resetstaff":
+			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.local.currentScene, "staff stream");
+			break;
 		case "resetcam":
 			let camname = arg1Clean;
 			//remove possible cam wording
@@ -1889,6 +1894,10 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			if (!invalid) {
 				controller.connections.database.cloudServer = arg1;
 			}
+			break;
+		case "setstaffstream":
+			await controller.connections.obs.local.setBrowserSource("staff stream",`https://cloud1.archaicworks.com/bundles/twitchstreams/graphics/twitch.html?key=136c8205-b8e4-44a5-9bf3-db96cd412854&c=${arg1}`);
+			logger.log("Change Staff Channel: ", arg1);
 			break;
 		case "showchat":
 			await controller.connections.obs.local.setSceneItemEnabled(controller.connections.obs.local.currentScene, "Alveus Chat Overlay", true);
@@ -2688,20 +2697,22 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs);
 			}
 			
-			if (lockoutRemoveList.length > 0) {
-				fullArgs = lockoutRemoveList.join(', ');
-				logger.log(`Lock Cams - ${accessProfile.user}: ${fullArgs}`);
-				let now = new Date();
-				let lockoutTime = 0;
-				for (let cam of lockoutRemoveList) {
-					if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked){
-						controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+			setTimeout(()=>{
+				if (lockoutRemoveList.length > 0) {
+					fullArgs = lockoutRemoveList.join(', ');
+					logger.log(`Lock Cams - ${accessProfile.user}: ${fullArgs}`);
+					let now = new Date();
+					let lockoutTime = 0;
+					for (let cam of lockoutRemoveList) {
+						if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked){
+							controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+						}
+						// controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+						// controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutTime,timestamp:now};
 					}
-					// controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
-					// controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutTime,timestamp:now};
+					controller.connections.twitch.send(channel, `Removed and Locked Cams: ${fullArgs}`);
 				}
-				controller.connections.twitch.send(channel, `Removed and Locked Cams: ${fullArgs}`);
-			}
+			},2500)
 
 			break;
 		case "addcam":
@@ -2901,8 +2912,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			}
 
 			//get proper name and position for logging
-			cam1 = cam1.replaceAll(/(?:full)?cams?/g, "");
-			cam2 = cam2.replaceAll(/(?:full)?cams?/g, "");
+			cam1 = cam1.replaceAll(/(?:full)?cam/g, "");
+			cam2 = cam2.replaceAll(/(?:full)?cam/g, "");
 			pos1 = pos1 +1;
 			pos2 = pos2 +1;
 
@@ -3552,7 +3563,15 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 	let alveusggOverlay = "alveusgg overlay";
 	let border6cam = "https://www.alveussanctuary.org/stream/overlay?layout=6cam";
 	let border4cam = "https://www.alveussanctuary.org/stream/overlay?layout=4cam";
-	let border1cam = "https://www.alveussanctuary.org/stream/overlay?";
+	let border4bigcam = "https://www.alveussanctuary.org/stream/overlay?layout=4bigcam";
+	let border3cam = "https://www.alveussanctuary.org/stream/overlay?layout=3cam";
+	let border3bigcam = "https://www.alveussanctuary.org/stream/overlay?layout=3bigcam";
+	let border2cam = "https://www.alveussanctuary.org/stream/overlay?layout=2cam";
+	let borderpipbl = "https://www.alveussanctuary.org/stream/overlay?layout=pipbl";
+	let borderpipbr = "https://www.alveussanctuary.org/stream/overlay?layout=pipbr";
+	let borderpiptl = "https://www.alveussanctuary.org/stream/overlay?layout=piptl";
+	let borderpiptr = "https://www.alveussanctuary.org/stream/overlay?layout=piptr";
+	let border1cam = "https://www.alveussanctuary.org/stream/overlay";
 	let enableBorderChange = true;
 
 	let response = null;
@@ -3563,7 +3582,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 	} else if (camList.length >= 4 && userCommand == "customcamsbig") {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "4CamBigBorder" }, config.scenePositions["4boxbig"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border6cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border4bigcam);
 	} else if (camList.length >= 4) {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "4CamBorder" }, config.scenePositions["4box"]);
 		if (enableBorderChange)
@@ -3571,35 +3590,35 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 	} else if (camList.length >= 3 && userCommand == "customcamsbig") {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "4CamBigBorder" }, config.scenePositions["3boxbig"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border3bigcam);
 	} else if (camList.length >= 3) {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "3CamBorder" }, config.scenePositions["3box"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border3cam);
 	} else if (camList.length >= 2 && userCommand == "customcamsbig") {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "4CamBigBorder" }, config.scenePositions["2boxbig"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border4bigcam);
 	} else if (camList.length >= 2 && userCommand == "customcamstl") {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "2CamTopleftBorder" }, config.scenePositions["2boxtl"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,borderpiptl);
 	} else if (camList.length >= 2 && userCommand == "customcamstr") {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "2CamToprightBorder" }, config.scenePositions["2boxtr"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,borderpiptr);
 	} else if (camList.length >= 2 && userCommand == "customcamsbl") {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "2CamBottomleftBorder" }, config.scenePositions["2boxbl"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,borderpipbl);
 	} else if (camList.length >= 2 && userCommand == "customcamsbr") {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "2CamBottomrightBorder" }, config.scenePositions["2boxbr"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,borderpipbr);
 	} else if (camList.length >= 2) {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "2CamBorder" }, config.scenePositions["2box"]);
 		if (enableBorderChange)
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border1cam);
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,border2cam);
 	} else if (camList.length >= 1) {
 		response = await setCustomCams(controller, obsSources, "Custom Cams", camList, { "border": "1CamBorder" }, config.scenePositions["1box"]);
 		if (enableBorderChange)
