@@ -33,9 +33,9 @@ const userRanks = {
 let userPermissions = {
     commandPriority: ["commandAdmins", "commandSuperUsers", "commandMods", "commandOperator", "commandVips", "commandUsers"],
     commandAdmins: ["spacevoyage", "maya", "theconnorobrien", "alveussanctuary"],
-    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv", "maxzillajr", "illjx", "kayla_alveus", "alex_b_patrick", 
+    commandSuperUsers: ["ellaandalex", "dionysus1911", "dannydv","kayla_alveus",  
                         "lindsay_alveus", "strickknine","tarantulizer","spiderdaynightlive","srutiloops","evantomology","amandaexpress",
-                        "coltonactually","tamarinsandjulie","chandlerirs","rocky539","riskybiscuitsbaking"],
+                        "tamarinsandjulie","chandlerirs","rocky539","riskybiscuitsbaking","lindengrows"],
     commandMods: [userRanks.mods],
     commandOperator: [],
     commandVips: [userRanks.vips],
@@ -66,7 +66,7 @@ let unthrottledCommands = [];
 const commandPermissionsCustomCam = {
     commandAdmins: [],
     commandSuperUsers: ["nuthousecam", "localpccam", "backpackcam", "monitorcam","phonecam","phone2cam","phone3cam"],
-    commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","parrotcam","parrotmulticam","parrotmulti2cam",
+    commandMods: ["wolfcam","wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","parrotcam","parrotcam2","parrotcam3",
         "macawcam", "pasturecam","emucam","staffcam",
          "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "4camoutdoor", "marmosetcam", "marmosetcam3",
         "nightcams", "nightcamsbig","chickencam","chickencam3","gardencam","constructioncam","pasturecam2"],
@@ -101,7 +101,7 @@ let multiCommands = {
     wolf: ["wolfcam", "wolfcam2","wolfcam3","wolfcam4","wolfcam5","wolfcam6","wolfcam7","wolfcam8","wolfcam9","wolfcam10","wolfcam11"],
     marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
     pasture: ["pasturecam", "pasturecam2","gardencam"],
-    parrot: ["parrotcam", "parrotmulticam","parrotmulti2cam","macawcam"]
+    parrot: ["parrotcam", "parrotcam2","parrotcam3","macawcam"]
 }
 
 //Notification Swapping
@@ -367,7 +367,7 @@ const customCamCommandMapping = {
     "3cam": "georgie noodle toast",
     "4cam": "georgie noodle patchy toast",
     "4camoutdoor": "pasture parrot marmoset fox",
-    "nightcams": "wolf pasture fox crow parrot marmoset",
+    "nightcams": "wolf pasture fox crow macaw marmoset",
     "nightcamsbig": "wolf pasture fox crow parrot marmoset",
     "indoorcams": "georgie noodle toast chin patchy roach",
     "indoorcamsbig": "georgie noodle toast chin patchy roach",
@@ -507,8 +507,8 @@ const commandSceneAlias = {
     pasturecam2: ["pasturefeedercam","pasturefeedcam","pasturefcam","pasturecrunchcam"],
     emucam: ["emuscam","stompycam","noliecam"],
     parrotcam: ["littlescam","littlecam","miacam","parrotoutdoorcam","littlesoutdoorcam","parrotoutcam"],
-    parrotmulticam: ["macawparrotcam","macawmulticam"],
-    parrotmulti2cam: ["parrotmacawcam","macawmulti2cam"],
+    parrotcam2: ["macawparrotcam","macawmulticam","parrotmulticam"],
+    parrotcam3: ["parrotmacawcam","macawmulti2cam","parrotmulti2cam"],
     macawcam: ["bigscam","mileycam","ticocam","macawoutdoorcam","bigsoutdoorcam","macawoutcam"],
 }
 
