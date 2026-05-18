@@ -1895,7 +1895,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				controller.connections.database.cloudServer = arg1;
 			}
 			break;
-		case "setstaffstream":
+		case "setstaffcam":
 			await controller.connections.obs.local.setBrowserSource("staff stream",`https://cloud1.archaicworks.com/bundles/twitchstreams/graphics/twitch.html?key=136c8205-b8e4-44a5-9bf3-db96cd412854&c=${arg1}`);
 			logger.log("Change Staff Channel: ", arg1);
 			break;
@@ -1988,6 +1988,32 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			let feedresp = await controller.connections.feeder.feed();
 			let firstpart = feedresp.split("Current Tank") || [feedresp];
 			controller.connections.twitch.send(channel, `Pasture ${firstpart[0]}`);
+			break;
+		case "runtabletgame":
+			await controller.connections.tablet.startApplication();
+			await controller.connections.tablet.setVolume(0);
+			// controller.connections.twitch.send(channel, `Loading Game`);
+			break;
+		case "runtabletvideo":
+			await controller.connections.tablet.loadStartURL();
+			
+			await controller.connections.tablet.toForeground();
+			setTimeout(() => {
+				controller.connections.tablet.setVolume(55);
+			}, 1000)
+			// controller.connections.twitch.send(channel, `Loading Video`);
+			break;
+		case "settabletvolume":
+			let vol = arg1 || 0;
+			if (arg1 == "off" || arg1 == "0" || arg1 == "no") {
+				vol = 0;
+			}
+			await controller.connections.tablet.setVolume(arg1);
+			// controller.connections.twitch.send(channel, `Set Tablet Volume: ${arg1}`);
+			break;
+		case "unmutetablet":
+			await controller.connections.tablet.setVolume(55);
+			// controller.connections.twitch.send(channel, `Set Tablet Volume: 75`);
 			break;
 		case "blockuser":
 			controller.connections.database["blockedUsers"][arg1] = true;
@@ -2593,7 +2619,16 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				return false;
 			}
 
+			//access level VIP or USER
+			let regularUser = false;
+			if (config.userPermissions.commandPriority[4] == accessProfile.accessLevel || 
+				config.userPermissions.commandPriority[5] == accessProfile.accessLevel
+			) {
+				regularUser = true;
+			}
+
 			userCommand = controller.connections.database["customcamscommand"] ?? "customcams";
+
 
 			let newListRemovedCams = [];
 			let lockoutRemoveList = [];
@@ -2628,6 +2663,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 								}
 							}
 						}
+						lockoutRemoveList.push(camName);
 					} else {
 						//allow "all" to add all matching cam category
 						let match = camName.match(/(\w*?)all\W*/i);
@@ -2647,7 +2683,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					}
 					//camName = "fullcam"+camName;
 
-					lockoutRemoveList.push(camName);
+					//lockoutRemoveList.push(camName);
 				}
 			}
 			//remove cams
@@ -2682,7 +2718,12 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					}
 
 					if (replacementCam){
-						newListRemovedCams.push(replacementCam);
+						if (regularUser){
+							newListRemovedCams.push("blank");
+						}
+						else {
+							newListRemovedCams.push(replacementCam);
+						}
 					}
 				} else {
 					newListRemovedCams.push(currcam);
@@ -2697,23 +2738,24 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs);
 			}
 			
-			setTimeout(()=>{
-				if (lockoutRemoveList.length > 0) {
-					fullArgs = lockoutRemoveList.join(', ');
-					logger.log(`Lock Cams - ${accessProfile.user}: ${fullArgs}`);
-					let now = new Date();
-					let lockoutTime = 0;
-					for (let cam of lockoutRemoveList) {
-						if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked){
-							controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+			if (!regularUser){
+				setTimeout(()=>{
+					if (lockoutRemoveList.length > 0) {
+						fullArgs = lockoutRemoveList.join(', ');
+						logger.log(`Lock Cams - ${accessProfile.user}: ${fullArgs}`);
+						let now = new Date();
+						let lockoutTime = 0;
+						for (let cam of lockoutRemoveList) {
+							if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked){
+								controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+							}
+							// controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
+							// controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutTime,timestamp:now};
 						}
-						// controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
-						// controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutTime,timestamp:now};
+						controller.connections.twitch.send(channel, `Removed and Locked Cams: ${fullArgs}`);
 					}
-					controller.connections.twitch.send(channel, `Removed and Locked Cams: ${fullArgs}`);
-				}
-			},2500)
-
+				},2500)
+			}
 			break;
 		case "addcam":
 			// logger.log("addcam",currentCamList,argsList,currentScene)
@@ -3282,7 +3324,12 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 
 	let obsSources = await controller.connections.obs.local.getSceneItemList("Custom Cams") || [];  //controller.connections.obs.local.sceneList || [];
 	let obsList = [];
+	// let currentCamList = [];
+	let currentFullCamList = controller.connections.database["customcam"] ?? [];
 	let currentCamList = [];
+	for (let cam of currentFullCamList) {
+		currentCamList.push(helper.cleanName(cam));
+	}
 	for (let scene of obsSources) {
 		let name = scene.sourceName;
 		let enabled = scene.sceneItemEnabled;
@@ -3290,7 +3337,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 			let sceneName = helper.cleanName(name);
 			obsList.push(sceneName);
 			if (enabled) {
-				currentCamList.push(sceneName);
+				// currentCamList.push(sceneName);
 			}
 		}
 	}
@@ -3444,7 +3491,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 		if (!checkLockoutAccess(controller.connections.database, baseName)) {
 			//check if it exists and is in same slot of newlist
 
-			const newLoc = camListClean.indexOf(cam);
+			const newLoc = camListClean.indexOf(camName);
 			//-1 means removing cam-locked cam not found in new list
 			//locked cam not in same slot
 			if (newLoc == -1 || (camListClean.length > 1 && currentLoc != newLoc)) {
@@ -3452,8 +3499,8 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 				lockedCam = true;
 
 				//Override if high enough permission
-				let cam = controller.connections.database.lockoutCams[baseName] || {};
-				let camPermission = cam.accessLevel;
+				let camLock = controller.connections.database.lockoutCams[baseName] || {};
+				let camPermission = camLock.accessLevel;
 				let userPermission = accessProfile.accessLevel;
 				let permissionRanks = config.userPermissions.commandPriority;
 
@@ -3486,14 +3533,14 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 		if (!checkLockoutAccess(controller.connections.database, baseName)) {
 			//check if it exists and is in same slot of current list
 
-			const currentLoc = currentCamList.indexOf(cam);
+			const currentLoc = currentCamList.indexOf(camName);
 			if (currentLoc == -1) {
 				//adding cam-locked cam not found in new list
 				lockedCam = true;
 
 				//Override if high enough permission
-				let cam = controller.connections.database.lockoutCams[baseName] || {};
-				let camPermission = cam.accessLevel;
+				let camLock = controller.connections.database.lockoutCams[baseName] || {};
+				let camPermission = camLock.accessLevel;
 				let userPermission = accessProfile.accessLevel;
 				let permissionRanks = config.userPermissions.commandPriority;
 
@@ -3781,7 +3828,7 @@ async function setCustomCams(controller, obsSources, sceneName, camList, toggleM
 
 		if (!foundMic) {
 			//turn on music if no camera has a mic
-			controller.connections.obs.cloud.setMute(config.globalMusicSource, false);
+			//controller.connections.obs.cloud.setMute(config.globalMusicSource, false);
 		}
 		logger.log(`setCustomCams - ${sceneName} (${camList})`);
 		return true;
