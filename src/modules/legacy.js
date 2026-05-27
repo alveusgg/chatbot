@@ -353,14 +353,15 @@ const onFeederMessage = async (controller, message) => {
  * @param {Object} user
  * @param {string} message
  * @param {Object} tags
+ * @param {string[]} bannedUsers
  * @returns {Promise<void>}
  */
 let overlayswitch = false;
-const onTwitchMessage = async (controller, channel, user, message, tags) => {
+const onTwitchMessage = async (controller, channel, user, message, tags, bannedUsers) => {
 	message = message.trim();
 	
-	//check if blacklisted from commands
-	if (config.userBlacklist.includes(user.toLowerCase())) {
+	//check if blacklisted from commands or is banned from the alveus sanctuary channel
+	if (config.userBlacklist.includes(user.toLowerCase()) || bannedUsers.includes(user.toLowerCase())) {
 		return;
 	}
 
