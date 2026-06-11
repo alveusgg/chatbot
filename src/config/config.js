@@ -338,19 +338,19 @@ const commandPermissionsExtra = {
     commandAdmins: ["testadminextra"],
     commandSuperUsers: ["testsuperextra", "resetcloudsource", "resetcloudsourcef", "setalveusscene", "setcloudscene", "changeserver", "setmute", "camclear"],
     commandMods: ["testmodextra", "resetsource","resetsourcef","camload", "camlist", "camsave", "camrename", "campresetremove", "customcams", "customcamsbig", "customcamstl", "customcamstr", "customcamsbl", "customcamsbr",
-        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam", "runpasturefeeder","blockuser","unblockuser","listblocked",
+        "unmutecam", "unmuteallcams", "nightcams", "nightcamsbig", "indoorcams", "addcam", "runpasturefeeder","runemufeeder","blockuser","unblockuser","listblocked",
         "uselegacy","usenew","setstaffcam","runtabletgame","runtabletvideo","settabletvolume","unmutetablet","setoverridecam","getoverridecam"],
     commandOperator: ["showchat","hidechat","showmural","hidemural","raidvideo","stopraidvideo","showrounds","hiderounds", "disablesubs","enablesubs",
                  "resetvolume", "mutecam", "muteallcams", "musicvolume", "musicnext", "musicprev", 
                 "mutemusic", "unmutemusic", "mutemusiclocal", "unmutemusiclocal","crunchvideo",
                 "lockcam","unlockcam","lockptz","unlockptz","lockbothcam","unlockbothcam", "mutelivecams","unmutelivecams","mutetrack","unmutetrack"], //"checkmark","clearcheckmarks"
     commandVips: [],
-    commandUsers: ["pasturefeederstatus", "swapcam", "resetcam","getvolume", "setvolume", "scenecams","axislist","listlocked", "removecam",
+    commandUsers: ["pasturefeederstatus","emufeederstatus", "swapcam", "resetcam","getvolume", "setvolume", "scenecams","axislist","listlocked", "removecam",
                     "resetbackpack", "resetbackpack2", "resetbackpack3", "resetpc", "resetlivecam", 
                     "resetbackpackf", "resetpcf", "resetlivecamf", "resetextra","resetphone","resetphone2","resetphone3", "resetphonef","resetstaff","resetyoutube","resetyoutubef"]
 }
 timeRestrictedCommands = timeRestrictedCommands.concat(["unmutecam", "unmuteallcams"]);
-unthrottledCommands = unthrottledCommands.concat(["runpasturefeeder"]);
+unthrottledCommands = unthrottledCommands.concat(["runpasturefeeder","runemufeeder"]);
 
 //Unifi
 const commandPermissionsUnifi = {
@@ -619,6 +619,8 @@ const commandControlAlias = {
     // clearcheckmarks: ["clearmark","clearcheck","clearcheckmark","clearcheck"],
     pasturefeederstatus: ["pasturefeedinfo"],
     runpasturefeeder: ["runpasturefeed","feedwinnie"],
+    emufeederstatus: ["emufeedinfo"],
+    runemufeeder: ["runemufeed","feedemu","feedstompy","feednolie"],
     blockuser: ["blacklist","removeuser"],
     unblockuser: ["whitelist","adduser"],
     listblocked: ["listblock","listbanned","blockedlist","blocklist"],

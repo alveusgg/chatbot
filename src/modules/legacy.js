@@ -82,6 +82,7 @@ const main = async controller => {
 		logger.log(`[${timestamp}] OBS Keepalive: Local - ${localstatus}, Cloud - ${cloudstatus}`);
 	},600000);
 
+	
 	//set IR to auto. run at 5pm UTC
 	schedule(17, 0, () => {
 		let timestamp = new Date().toLocaleString("en-US", { timeZone: "America/Chicago" });
@@ -2016,6 +2017,24 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			let feedresp = await controller.connections.feeder.feed();
 			let firstpart = feedresp.split("Current Tank") || [feedresp];
 			controller.connections.twitch.send(channel, `Pasture ${firstpart[0]}`);
+			break;
+		case "emufeederstatus":
+			//let m = "Feed the animals in the emu by donating at least $5 through Streamelements (https://alveus.gg/go/feed-donate) or cheering 500 bits, while using !feed in your donation message. "
+			let feedinfo2 = await controller.connections.feeder2.getTank();
+			if (feedinfo2 && feedinfo2.includes("Level")){
+				feedinfo2 = "Emu Feeder Connected";
+			} else {
+				feedinfo2 = "Emu Feeder Disconnected";
+			}
+			controller.connections.twitch.send(channel, `${feedinfo2}`);
+			if (feedinfo2 == "Emu Feeder Disconnected"){
+				controller.connections.twitch.send(channel, `!disablemufeeder`);
+			}
+			break;
+		case "runemufeeder":
+			let feedresp2 = await controller.connections.feeder2.feed();
+			let firstpart2 = feedresp2.split("Current Tank") || [feedresp2];
+			controller.connections.twitch.send(channel, `Emu ${firstpart2[0]}`);
 			break;
 		case "runtabletgame":
 			await controller.connections.tablet.startApplication();

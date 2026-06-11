@@ -156,17 +156,27 @@ class Feeder {
  */
 module.exports = async (controller) => {
   const feederUrl = process.env.FEEDER_URL; // Get the Feeder Wifi URL
+  const feeder2Url = process.env.FEEDER2_URL; // Get the Feeder Wifi URL
 
   // Check if feederUrl is defined before instantiation
-  if (!feederUrl) {
-    console.error('FEEDER_URL is not defined in environment variables.');
-    process.exit(1);
+  if (feederUrl) {
+    try {
+      controller.connections.feeder = new Feeder (feederUrl); 
+    } catch (error) {
+      console.error('Failed to instantiate Feeder:', error.message);
+      controller.connections.feeder = null; // Set to null as a fallback indicator
+    }
   }
-
-  try {
-    controller.connections.feeder = new Feeder (feederUrl); 
-  } catch (error) {
-    console.error('Failed to instantiate Feeder:', error.message);
-    controller.connections.feeder = null; // Set to null as a fallback indicator
+  // Check if feederUrl is defined before instantiation
+  if (feeder2Url) {
+    try {
+      controller.connections.feeder2 = new Feeder (feeder2Url); 
+    } catch (error) {
+      console.error('Failed to instantiate Feeder2:', error.message);
+      controller.connections.feeder2 = null; // Set to null as a fallback indicator
+    }
   }
+  
+  // console.error('FEEDER_URL is not defined in environment variables.');
+  // process.exit(1);
 };
