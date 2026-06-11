@@ -49,6 +49,11 @@ const connections = {
     address: process.env.OBS_WS_HOST_CLOUD,
     password: process.env.OBS_KEY_HOST_CLOUD,
   },
+  cloudHost2: {
+    name: "CloudHost2Server",
+    address: process.env.OBS_WS_HOST2_CLOUD,
+    password: process.env.OBS_KEY_HOST2_CLOUD,
+  },
 };
 
 /**
@@ -888,6 +893,65 @@ class OBS {
 			return null;
 		}
 	}
+  async getAudioTracks(sourceName) {
+		let self = this;
+		let param = { inputName: sourceName };
+		try {
+			let response = null;
+			if (self.oldWS) {
+				// response = await self.client.send("getMute", {"source": sourceName});
+			} else {
+				response = await self.client.call("GetInputAudioTracks", param);
+			}
+			let tracks = response?.inputAudioTracks ?? null;
+			self.utils.log(`Get Audio Tracks: ${sourceName}-`,tracks);
+			return tracks;
+		} catch (e) {
+			self.utils.log(`Error Get Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
+			return null;
+		}
+	}
+  async setAudioTracks(sourceName,audioTracks) {
+    //audiotracks obj {'1': true,' 2': false,'3': true,'4': false,'5': false,'6': true} 
+		let self = this;
+		let param = { inputName: sourceName, inputAudioTracks: audioTracks };
+		try {
+			let response = null;
+			if (self.oldWS) {
+				// response = await self.client.send("getMute", {"source": sourceName});
+			} else {
+				response = await self.client.call("SetInputAudioTracks", param);
+			}
+			self.utils.log(`Set Audio Tracks: ${sourceName}-${audioTracks}`,response);
+			return true;
+		} catch (e) {
+			self.utils.log(`Error Get Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
+			return null;
+		}
+	}
+  async updateAudioTracks(sourceName,track,toggle) {
+    //audiotracks obj {'1': true,' 2': false,'3': true,'4': false,'5': false,'6': true} 
+		let self = this;
+		try {
+			let response = null;
+      let currentTracks = await self.getAudioTracks(sourceName);
+      if (currentTracks == null){
+        throw new Error(`Error Update-Get Audio Tracks (${sourceName}}): ${JSON.stringify(getresponse)}`);
+      }
+      let state = false;
+      if (toggle == true || toggle == "true" || toggle == 1){
+        state = true;
+      }
+      currentTracks[track] = state;
+      let param = { inputName: sourceName, inputAudioTracks: currentTracks };
+			response = await self.client.call("SetInputAudioTracks", param);
+			self.utils.log(`Update-Set Audio Tracks: ${sourceName}-${audioTracks}`,response);
+			return true;
+		} catch (e) {
+			self.utils.log(`Error Update Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
+			return null;
+		}
+	}
   async getInputSettings(sourceName) {
     let self = this;
     let param = { inputName: sourceName };
@@ -1375,6 +1439,7 @@ const create = async (connection) => {
 module.exports = async (controller) => {
   const local = await create("localAlveus");
   const cloud = await create("cloudHost");
+  const cloud2 = await create("cloudHost2");
 
-  controller.connections.obs = { local, cloud, create };
+  controller.connections.obs = { local, cloud, cloud2, create };
 };

@@ -37,7 +37,6 @@ class Feeder {
       const response = await fetch(
         `${this.#host}${endpoint}`,
       );
-      console.log("fetching",response);
       const data = await response.text();
 
       // If we got data, return the data
