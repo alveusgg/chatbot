@@ -75,26 +75,26 @@ const main = async controller => {
 	// }
 
 	//keep obs connected
-	setInterval(async ()=>{
+	setInterval(async () => {
 		let timestamp = new Date().toLocaleString("en-US", { timeZone: "America/Chicago" });
 		let localstatus = await controller.connections.obs.local.isLive();
 		let cloudstatus = await controller.connections.obs.cloud.isLive();
 		logger.log(`[${timestamp}] OBS Keepalive: Local - ${localstatus}, Cloud - ${cloudstatus}`);
-	},600000);
+	}, 600000);
 
-	
+
 	//set IR to auto. run at 5pm UTC
 	schedule(17, 0, () => {
 		let timestamp = new Date().toLocaleString("en-US", { timeZone: "America/Chicago" });
 		let i = 0;
-		for (let cam of config.axisCameras){
-			setTimeout(()=>{
+		for (let cam of config.axisCameras) {
+			setTimeout(() => {
 				try {
 					controller.connections.cameras[cam].setIRCutFilter("auto");
-				} catch (e){
+				} catch (e) {
 					logger.log(`[${timestamp}] Cam Auto IR Error (${cam}): ${e}`);
 				}
-			},i*1000);
+			}, i * 1000);
 			i++;
 		}
 		logger.log(`[${timestamp}] Setting All Cam IR to Auto`);
@@ -359,7 +359,7 @@ const onFeederMessage = async (controller, message) => {
 let overlayswitch = false;
 const onTwitchMessage = async (controller, channel, user, message, tags) => {
 	message = message.trim();
-	
+
 	//check if blacklisted from commands
 	if (config.userBlacklist.includes(user.toLowerCase())) {
 		return;
@@ -372,7 +372,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		return;
 	}
 
-	logger.log("Valid Command",user,userCommand, tags.userInfo);
+	logger.log("Valid Command", user, userCommand, tags.userInfo);
 
 	let accessProfile = helper.isAllowed(userCommand, tags.userInfo);
 	// if (accessProfile == null || !accessProfile.allowed) {
@@ -616,15 +616,15 @@ async function checkCustomSceneCommand(controller, userCommand, accessProfile, c
 	if (!config.customSceneCommands.includes(userCommand)) {
 		return;
 	}
-	
+
 	userCommand = helper.cleanName(userCommand);
 	let overrideArgs = config.customCommandAlias[userCommand];
 	if (overrideArgs != null) {
 		fullArgs = overrideArgs;
 	}
-	
+
 	let allowCloudSceneChange = true;
-	switchToCustomCams(controller, channel, accessProfile, "customcamsbig", fullArgs,allowCloudSceneChange)
+	switchToCustomCams(controller, channel, accessProfile, "customcamsbig", fullArgs, allowCloudSceneChange)
 	return true;
 }
 
@@ -652,9 +652,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 
 	//console.log("ptzcommand",userCommand,currentScene,"base",baseName,"cam",ptzcamName);
 	if (userCommand == "ptzplayaudio") {
-		let speaker = controller.connections.cameras[ptzcamName] ?? controller.connections.cameras[ptzcamName+"speaker"];
+		let speaker = controller.connections.cameras[ptzcamName] ?? controller.connections.cameras[ptzcamName + "speaker"];
 		let audioclip = "alarm";
-		if (arg2 == ""){
+		if (arg2 == "") {
 			//default pasture speaker
 			audioclip = arg1;
 			speaker = controller.connections.cameras["pasturespeaker"];
@@ -689,8 +689,8 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		speaker.playAudioClip(clip);
 		return;
 	} else if (userCommand == "ptzstopaudio") {
-		let speaker = controller.connections.cameras[ptzcamName] ?? controller.connections.cameras[ptzcamName+"speaker"];
-		if (arg2 == ""){
+		let speaker = controller.connections.cameras[ptzcamName] ?? controller.connections.cameras[ptzcamName + "speaker"];
+		if (arg2 == "") {
 			//default pasture speaker
 			speaker = controller.connections.cameras["pasturespeaker"];
 		}
@@ -793,7 +793,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			}
 
 			if (camIndex !== -1 && userIndex !== -1) {
-				if (userIndex <= 1 && userIndex <= camIndex){
+				if (userIndex <= 1 && userIndex <= camIndex) {
 					//have permission
 					lockedCam = false;
 				} else if (userIndex < camIndex) {
@@ -880,7 +880,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			break;
 		case "ptzzoom":
 			camera.ptz({ areazoom: `960,540,${arg1}` });
-			if (arg2 != 'off'){
+			if (arg2 != 'off') {
 				camera.enableAutoFocus();
 			}
 			break;
@@ -970,7 +970,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		case "ptzareazoom":
 			//x-cord y-cord zoom 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
-			camera.enableAutoFocus();
+			if (arg4 != 'off') {
+				camera.enableAutoFocus();
+			}
 			if (channel === 'ptzapi') {
 				controller.connections.twitch.send(channel, `${user}: Clicked on ${ptzcamName}`, true);
 			}
@@ -1787,12 +1789,6 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "SRT Desktop");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Space RTMP Backpack");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "irlhost srt drone");
-			controller.connections.obs.local.restartSource(controller.connections.obs.local.currentScene, "maya rtmp 1");
-			controller.connections.obs.local.restartSource(controller.connections.obs.local.currentScene, "maya rtmp 2");
-			controller.connections.obs.local.restartSource(controller.connections.obs.local.currentScene, "maya rtmp 3");
-			controller.connections.obs.local.restartSource(controller.connections.obs.local.currentScene, "space rtmp backpack");
-			controller.connections.obs.local.restartSource(controller.connections.obs.local.currentScene, "local ninja cam");
-			controller.connections.obs.local.restartSource(controller.connections.obs.local.currentScene, "local rtmp desktop");
 			break;
 		case "resetyoutubef":
 			controller.connections.obs.cloud2.restartSource(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
@@ -1819,12 +1815,6 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "SRT Desktop");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Space RTMP Backpack");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "irlhost srt drone");
-			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "maya rtmp 1");
-			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "maya rtmp 2");
-			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "maya rtmp 3");
-			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "space rtmp backpack");
-			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "local ninja cam");
-			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "local rtmp desktop");
 			break
 		case "resetyoutube":
 			controller.connections.obs.cloud2.restartSceneItem(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
@@ -1832,13 +1822,30 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.local.currentScene, "staff stream");
 			break;
 		case "resetcam":
+			//reset fullcam name
 			let camname = arg1Clean;
-			//remove possible cam wording
 			camname = config.customCommandAlias[camname] || camname; // allow for cam name aliases
-			camname = "fullcam " + camname;
+			camname = "fullcam" + camname;
+			//find matching camslot number based on name
+			let camnum = null;
+			for (let i = 0; i < currentCamList.length; i++){
+				if (camname == currentCamList[i]){
+					camnum = i+1;
+					break;
+				}
+			}
+			//reset based on number
+			let slotname = arg1;
+			slotname = slotname.replace(/\D/g, "");
+			let num = parseInt(slotname);
+			if (!isNaN(num)){
+				slotname = "camslot"+num;
+				controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, slotname);
+			}
 			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, camname);
+			controller.connections.obs.local.restartSceneItem(controller.connections.obs.local.currentScene, "camslot"+camnum);
 			if (channel === 'ptzapi') {
-				controller.connections.twitch.send(channel, `${user}: resetcam ${camname}`, true);
+				controller.connections.twitch.send(channel, `${user}: resetcam ${slotname}`, true);
 			}
 			break;
 		case "raidvideo":
@@ -1854,8 +1861,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			// controller.connections.obs.local.stopSource("raidvideo");
 			break;
 		case "crunchvideo":
-			await controller.connections.obs.local.setSceneItemEnabled("fullcam pushpopcrunch", "crunchCamVideo", true);
-			setTimeout(() => controller.connections.obs.local.setSceneItemEnabled("fullcam pushpopcrunch", "crunchCamVideo", false), 15000)
+			await controller.connections.obs.local.setSceneItemEnabled("Custom Cams", "crunchCamVideo", true);
+			setTimeout(() => controller.connections.obs.local.setSceneItemEnabled("Custom Cams", "crunchCamVideo", false), 15000)
 			if (channel === 'ptzapi') {
 				controller.connections.twitch.send(channel, `${user} started the CrunchCam video`, true);
 			}
@@ -1910,12 +1917,12 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			}
 			break;
 		case "setstaffcam":
-			await controller.connections.obs.local.setBrowserSource("staff stream",`https://cloud1.archaicworks.com/bundles/twitchstreams/graphics/twitch.html?key=136c8205-b8e4-44a5-9bf3-db96cd412854&c=${arg1}`);
+			await controller.connections.obs.local.setBrowserSource("staff stream", `https://cloud1.archaicworks.com/bundles/twitchstreams/graphics/twitch.html?key=136c8205-b8e4-44a5-9bf3-db96cd412854&c=${arg1}`);
 			logger.log("Change Staff Channel: ", arg1);
 			break;
 		case "setoverridecam":
 			let overridecam = "";
-			if (!(arg1 == null || arg1 == "" || arg1 == "clear" || arg1 == "remove" || arg1 == "blank")){
+			if (!(arg1 == null || arg1 == "" || arg1 == "clear" || arg1 == "remove" || arg1 == "blank")) {
 				overridecam = helper.cleanName(arg1);
 				overridecam = config.customCommandAlias[overridecam] || overridecam;
 			}
@@ -1923,7 +1930,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.database["overridecam"] = overridecam;
 			fullArgs = currentCamList.join(' ');
 			let sendChatMessage = `Set Override Cam ${overridecam}`;
-			switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs,false,sendChatMessage);
+			switchToCustomCams(controller, channel, accessProfile, controller.connections.database["customcamscommand"], fullArgs, false, sendChatMessage);
 			break;
 		case "getoverridecam":
 			controller.connections.twitch.send(channel, `Override cam: ${controller.connections.database["overridecam"]}`);
@@ -2003,13 +2010,13 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "pasturefeederstatus":
 			//let m = "Feed the animals in the pasture by donating at least $5 through Streamelements (https://alveus.gg/go/feed-donate) or cheering 500 bits, while using !feed in your donation message. "
 			let feedinfo = await controller.connections.feeder.getTank();
-			if (feedinfo && feedinfo.includes("Level")){
+			if (feedinfo && feedinfo.includes("Level")) {
 				feedinfo = "Pasture Feeder Connected";
 			} else {
 				feedinfo = "Pasture Feeder Disconnected";
 			}
 			controller.connections.twitch.send(channel, `${feedinfo}`);
-			if (feedinfo == "Pasture Feeder Disconnected"){
+			if (feedinfo == "Pasture Feeder Disconnected") {
 				controller.connections.twitch.send(channel, `!disablepasturefeeder`);
 			}
 			break;
@@ -2021,13 +2028,13 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "emufeederstatus":
 			//let m = "Feed the animals in the emu by donating at least $5 through Streamelements (https://alveus.gg/go/feed-donate) or cheering 500 bits, while using !feed in your donation message. "
 			let feedinfo2 = await controller.connections.feeder2.getTank();
-			if (feedinfo2 && feedinfo2.includes("Level")){
+			if (feedinfo2 && feedinfo2.includes("Level")) {
 				feedinfo2 = "Emu Feeder Connected";
 			} else {
 				feedinfo2 = "Emu Feeder Disconnected";
 			}
 			controller.connections.twitch.send(channel, `${feedinfo2}`);
-			if (feedinfo2 == "Emu Feeder Disconnected"){
+			if (feedinfo2 == "Emu Feeder Disconnected") {
 				controller.connections.twitch.send(channel, `!disablemufeeder`);
 			}
 			break;
@@ -2043,7 +2050,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			break;
 		case "runtabletvideo":
 			await controller.connections.tablet.loadStartURL();
-			
+
 			await controller.connections.tablet.toForeground();
 			setTimeout(() => {
 				controller.connections.tablet.setVolume(55);
@@ -2086,7 +2093,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			let lockoutTime = 0;
 			if (arg1 == "all") {
 				argsList = config.axisCameras.slice();
-			} 
+			}
 			for (let arg of argsList) {
 				if (arg != null && arg != "") {
 
@@ -2117,11 +2124,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					} else {
 						//allow "all" to add all matching cams
 						let match = camName.match(/(\w*?)all\W*/i);
-						if (match){
+						if (match) {
 							let basename = helper.cleanName(match[1]);
 							let convertedbasename = config.customCommandAlias[basename];
 							let matchingcams = config.multiCommands[convertedbasename];
-							if (matchingcams && matchingcams.length > 0){
+							if (matchingcams && matchingcams.length > 0) {
 								for (let newarg of matchingcams) {
 									if (newarg != "") {
 										argsList.push(newarg);
@@ -2139,13 +2146,13 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				logger.log(`Lock Cams - ${accessProfile.user}(${lockoutTime}s): ${fullArgs}`);
 				let now = new Date();
 				for (let cam of lockoutList) {
-					if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked){
+					if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked) {
 						controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
 						// controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutTime,timestamp:now};
 					}
 				}
 			}
-			await getLockedCams(controller,channel);
+			await getLockedCams(controller, channel);
 			break;
 		case "unlockcam":
 			let unlockList = [];
@@ -2157,10 +2164,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 
 						//check for cam name
 						let camName = helper.cleanName(arg);
-						console.log("unlock cam",camName);
-						
+
 						let overrideArgs = config.customCommandAlias[camName];
-						console.log("unlock overrideArgs",overrideArgs);
 						if (overrideArgs != null) {
 							//allow alias to change entire argument
 							let newArgs = overrideArgs.split(" ");
@@ -2173,21 +2178,16 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 								continue;
 							}
 							unlockList.push(overrideArgs);
-						}  else {
+						} else {
 							//allow "all" to add all matching cams
 							let match = camName.match(/(\w*?)(?:all|both)\W*/i);
-							console.log("unlock match",match);
-							if (match){
+							if (match) {
 								let basename = helper.cleanName(match[1]);
-								console.log("unlock basename",basename);
 								let convertedbasename = config.customCommandAlias[basename];
-								console.log("unlock convertedbasename",convertedbasename);
 								let matchingcams = config.multiCommands[convertedbasename];
-								console.log("unlock matchingcams",matchingcams);
-								if (matchingcams && matchingcams.length > 0){
+								if (matchingcams && matchingcams.length > 0) {
 									for (let newarg of matchingcams) {
 										if (newarg != "") {
-											console.log("unlock newarg",newarg);
 											argsList.push(newarg);
 										}
 									}
@@ -2199,7 +2199,6 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					}
 				}
 			}
-			console.log('unlock list',unlockList);
 			if (unlockList.length > 0) {
 				// logger.log(`Unlock Cams (${accessProfile.user}-${accessProfile.accessLevel}): ${unlockList}`);
 				for (let camName of unlockList) {
@@ -2228,14 +2227,14 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					}
 				}
 			}
-			await getLockedCams(controller,channel);
+			await getLockedCams(controller, channel);
 			break;
 		case "lockptz":
 			let lockoutPTZList = [];
 			let lockoutPTZTime = 0;
 			if (arg1 == "all") {
 				argsList = config.axisCameras.slice();
-			} 
+			}
 			for (let arg of argsList) {
 				if (arg != null && arg != "") {
 
@@ -2266,11 +2265,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					} else {
 						//allow "all" to add all matching cams
 						let match = camName.match(/(\w*?)all\W*/i);
-						if (match){
+						if (match) {
 							let basename = helper.cleanName(match[1]);
 							let convertedbasename = config.customCommandAlias[basename];
 							let matchingcams = config.multiCommands[convertedbasename];
-							if (matchingcams && matchingcams.length > 0){
+							if (matchingcams && matchingcams.length > 0) {
 								for (let newarg of matchingcams) {
 									if (newarg != "") {
 										argsList.push(newarg);
@@ -2289,12 +2288,12 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				logger.log(`Lock Cams - ${accessProfile.user}(${lockoutPTZTime}s): ${fullArgs}`);
 				let now = new Date();
 				for (let cam of lockoutPTZList) {
-					if (controller.connections.database.lockoutPTZ[cam] == null || !controller.connections.database.lockoutPTZ[cam].locked){
-						controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutPTZTime,timestamp:now};
+					if (controller.connections.database.lockoutPTZ[cam] == null || !controller.connections.database.lockoutPTZ[cam].locked) {
+						controller.connections.database.lockoutPTZ[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutPTZTime, timestamp: now };
 					}
 				}
 			}
-			await getLockedCams(controller,channel);
+			await getLockedCams(controller, channel);
 			break;
 		case "unlockptz":
 			let unlockPTZList = [];
@@ -2324,11 +2323,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 						} else {
 							//allow "all" to add all matching cams
 							let match = camName.match(/(\w*?)all\W*/i);
-							if (match){
+							if (match) {
 								let basename = helper.cleanName(match[1]);
 								let convertedbasename = config.customCommandAlias[basename];
 								let matchingcams = config.multiCommands[convertedbasename];
-								if (matchingcams && matchingcams.length > 0){
+								if (matchingcams && matchingcams.length > 0) {
 									for (let newarg of matchingcams) {
 										if (newarg != "") {
 											argsList.push(newarg);
@@ -2370,14 +2369,14 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					}
 				}
 			}
-			await getLockedCams(controller,channel);
+			await getLockedCams(controller, channel);
 			break;
 		case "lockbothcam":
 			let lockoutallList = [];
 			let lockoutAllTime = 0;
 			if (arg1 == "all") {
 				argsList = config.axisCameras.slice();
-			} 
+			}
 			for (let arg of argsList) {
 				if (arg != null && arg != "") {
 
@@ -2409,11 +2408,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					} else {
 						//allow "all" to add all matching cams
 						let match = camName.match(/(\w*?)all\W*/i);
-						if (match){
+						if (match) {
 							let basename = helper.cleanName(match[1]);
 							let convertedbasename = config.customCommandAlias[basename];
 							let matchingcams = config.multiCommands[convertedbasename];
-							if (matchingcams && matchingcams.length > 0){
+							if (matchingcams && matchingcams.length > 0) {
 								for (let newarg of matchingcams) {
 									if (newarg != "") {
 										argsList.push(newarg);
@@ -2432,15 +2431,15 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				// logger.log(`Lock Cams - ${accessProfile.user}(${lockoutAllTime}s): ${fullArgs}`);
 				let now = new Date();
 				for (let cam of lockoutallList) {
-					if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked){
+					if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked) {
 						controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutAllTime, timestamp: now };
 					}
-					if (controller.connections.database.lockoutPTZ[cam] == null || !controller.connections.database.lockoutPTZ[cam].locked){
-						controller.connections.database.lockoutPTZ[cam] = {user: accessProfile.user, accessLevel:accessProfile.accessLevel,locked: true,duration:lockoutAllTime,timestamp:now};
+					if (controller.connections.database.lockoutPTZ[cam] == null || !controller.connections.database.lockoutPTZ[cam].locked) {
+						controller.connections.database.lockoutPTZ[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutAllTime, timestamp: now };
 					}
 				}
 			}
-			await getLockedCams(controller,channel);
+			await getLockedCams(controller, channel);
 			break;
 		case "unlockbothcam":
 			let unlockallList = [];
@@ -2449,10 +2448,10 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			} else {
 				for (let arg of argsList) {
 					if (arg != null && arg != "") {
-	
+
 						//check for cam name
 						let camName = helper.cleanName(arg);
-	
+
 						let overrideArgs = config.customCommandAlias[camName];
 						if (overrideArgs != null) {
 							//allow alias to change entire argument
@@ -2470,11 +2469,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 						} else {
 							//allow "all" to add all matching cams
 							let match = camName.match(/(\w*?)all\W*/i);
-							if (match){
+							if (match) {
 								let basename = helper.cleanName(match[1]);
 								let convertedbasename = config.customCommandAlias[basename];
 								let matchingcams = config.multiCommands[convertedbasename];
-								if (matchingcams && matchingcams.length > 0){
+								if (matchingcams && matchingcams.length > 0) {
 									for (let newarg of matchingcams) {
 										if (newarg != "") {
 											argsList.push(newarg);
@@ -2484,7 +2483,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 								}
 							}
 						}
-	
+
 					}
 				}
 			}
@@ -2531,13 +2530,13 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							}
 						}
 					}
-					
+
 				}
 			}
-			await getLockedCams(controller,channel);
+			await getLockedCams(controller, channel);
 			break;
 		case "listlocked":
-			await getLockedCams(controller,channel);
+			await getLockedCams(controller, channel);
 			break;
 		case "enablesubs":
 			controller.connections.database.enabledSubs = true;
@@ -2663,27 +2662,27 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			break;
 		case "mutelivecams":
 			for (const source in config.micGroups["livecams"]) {
-				controller.connections.obs.local.updateAudioTracks(config.micGroups["livecams"][source].name, 1,false);
+				controller.connections.obs.local.updateAudioTracks(config.micGroups["livecams"][source].name, 1, false);
 			}
 			break;
 		case "unmutelivecams":
 			for (const source in config.micGroups["livecams"]) {
-				controller.connections.obs.local.updateAudioTracks(config.micGroups["livecams"][source].name, 1,true);
+				controller.connections.obs.local.updateAudioTracks(config.micGroups["livecams"][source].name, 1, true);
 			}
 			break;
 		case "mutetrack":
-				audioSource = config.sceneAudioSource[arg1Clean] || config.sceneAudioSource[arg1Base];
-				if (audioSource == null || audioSource == "") {
-					audioSource = arg1;
-				}
-			controller.connections.obs.local.updateAudioTracks(audioSource, 1,false);
+			audioSource = config.sceneAudioSource[arg1Clean] || config.sceneAudioSource[arg1Base];
+			if (audioSource == null || audioSource == "") {
+				audioSource = arg1;
+			}
+			controller.connections.obs.local.updateAudioTracks(audioSource, 1, false);
 			break;
 		case "unmutetrack":
-				audioSource = config.sceneAudioSource[arg1Clean] || config.sceneAudioSource[arg1Base];
-				if (audioSource == null || audioSource == "") {
-					audioSource = arg1;
-				}
-			controller.connections.obs.local.updateAudioTracks(audioSource, 1,true);
+			audioSource = config.sceneAudioSource[arg1Clean] || config.sceneAudioSource[arg1Base];
+			if (audioSource == null || audioSource == "") {
+				audioSource = arg1;
+			}
+			controller.connections.obs.local.updateAudioTracks(audioSource, 1, true);
 			break;
 		case "removecam":
 			// if (currentScene != "custom") {
@@ -2692,7 +2691,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 
 			//access level VIP or USER
 			let regularUser = false;
-			if (config.userPermissions.commandPriority[4] == accessProfile.accessLevel || 
+			if (config.userPermissions.commandPriority[4] == accessProfile.accessLevel ||
 				config.userPermissions.commandPriority[5] == accessProfile.accessLevel
 			) {
 				regularUser = true;
@@ -2722,11 +2721,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 							continue;
 						}
 						camName = overrideArgs;
-						
+
 						//removes all matching cam category
 						let baseCamName = config.multiCustomCamScenesConverted[overrideArgs] || overrideArgs;
 						let matchingcams = config.multiCommands[baseCamName];
-						if (matchingcams && matchingcams.length > 0){
+						if (matchingcams && matchingcams.length > 0) {
 							for (let newarg of matchingcams) {
 								if (newarg != "" && newarg != arg && newarg != baseCamName && newarg != overrideArgs
 									&& !argsList.includes(newarg)) {
@@ -2738,11 +2737,11 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 					} else {
 						//allow "all" to add all matching cam category
 						let match = camName.match(/(\w*?)all\W*/i);
-						if (match){
+						if (match) {
 							let basename = helper.cleanName(match[1]);
 							let convertedbasename = config.customCommandAlias[basename];
 							let matchingcams = config.multiCommands[convertedbasename];
-							if (matchingcams && matchingcams.length > 0){
+							if (matchingcams && matchingcams.length > 0) {
 								for (let newarg of matchingcams) {
 									if (newarg != "") {
 										argsList.push(newarg);
@@ -2762,34 +2761,34 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				let currcam = currentCamList[i];
 				currcam = helper.cleanName(currcam);
 				let remove = false;
-				for (let removedcam of lockoutRemoveList){
-					if (currcam == removedcam){
+				for (let removedcam of lockoutRemoveList) {
+					if (currcam == removedcam) {
 						remove = true;
 					} else {
 						let camMapping = config.customCamCommandMapping[removedcam];
-						if (currcam == camMapping){
+						if (currcam == camMapping) {
 							remove = true;
 						}
 					}
-				} 
-				if (remove){
+				}
+				if (remove) {
 					//
 					let replacementCam = null;
-					for (let replace of safeCams){
+					for (let replace of safeCams) {
 						let camName = helper.cleanName(replace);
 						let baseName = config.customCommandAlias[camName];
-						if (currentCamList.includes("fullcam"+replace) || currentCamList.includes("fullcam"+baseName)){
+						if (currentCamList.includes("fullcam" + replace) || currentCamList.includes("fullcam" + baseName)) {
 							continue;
 						}
-						if (newListRemovedCams.includes(baseName)){
+						if (newListRemovedCams.includes(baseName)) {
 							continue;
 						}
 						replacementCam = baseName;
 						break;
 					}
 
-					if (replacementCam){
-						if (regularUser){
+					if (replacementCam) {
+						if (regularUser) {
 							newListRemovedCams.push("blank");
 						}
 						else {
@@ -2808,16 +2807,16 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 				logger.log(`Remove Cams: ${argsList} - new fullargs: ${fullArgs}`);
 				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs);
 			}
-			
-			if (!regularUser){
-				setTimeout(()=>{
+
+			if (!regularUser) {
+				setTimeout(() => {
 					if (lockoutRemoveList.length > 0) {
 						fullArgs = lockoutRemoveList.join(', ');
 						logger.log(`Lock Cams - ${accessProfile.user}: ${fullArgs}`);
 						let now = new Date();
 						let lockoutTime = 0;
 						for (let cam of lockoutRemoveList) {
-							if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked){
+							if (controller.connections.database.lockoutCams[cam] == null || !controller.connections.database.lockoutCams[cam].locked) {
 								controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
 							}
 							// controller.connections.database.lockoutCams[cam] = { user: accessProfile.user, accessLevel: accessProfile.accessLevel, locked: true, duration: lockoutTime, timestamp: now };
@@ -2825,7 +2824,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 						}
 						controller.connections.twitch.send(channel, `Removed and Locked Cams: ${fullArgs}`);
 					}
-				},2500)
+				}, 2500)
 			}
 			break;
 		case "addcam":
@@ -3027,8 +3026,8 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			//get proper name and position for logging
 			cam1 = cam1.replaceAll(/(?:full)?cam/g, "");
 			cam2 = cam2.replaceAll(/(?:full)?cam/g, "");
-			pos1 = pos1 +1;
-			pos2 = pos2 +1;
+			pos1 = pos1 + 1;
+			pos2 = pos2 + 1;
 
 			// if (!hasAccess) {
 			// 	    //Admin
@@ -3069,10 +3068,10 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 
 				logger.log(`Swap Cam ${cam1} to ${cam2} - fullargs: ${fullArgs}`);
 				let sendChatMessage = `Swapped ${cam1}(${pos1}) ${cam2}(${pos2})`;
-				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs,false,sendChatMessage);
+				switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs, false, sendChatMessage);
 
 				// if (channel === 'ptzapi') {
-					//controller.connections.twitch.send(channel, `Swapped ${cam1}(${pos1}) ${cam2}(${pos2})`, true);
+				//controller.connections.twitch.send(channel, `Swapped ${cam1}(${pos1}) ${cam2}(${pos2})`, true);
 				// }
 			}
 			break;
@@ -3273,7 +3272,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 		case "resetvolume":
 			for (const source in config.micGroups["livecams"]) {
 				if (checkLockoutAccess(controller.connections.database, config.micGroups["livecams"][source].name)) {
-					controller.connections.obs.local.setInputVolume(config.micGroups["livecams"][source].name, config.micGroups["livecams"][source].volume);
+					controller.connections.obs.local.setInputVolume(config.micGroups["livecams"][source].name, -10);
 				}
 			}
 			break;
@@ -3284,7 +3283,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 	return true;
 }
 
-async function getLockedCams(controller,channel){
+async function getLockedCams(controller, channel) {
 	const lockedcamlist = [...new Set([...Object.keys(controller.connections.database.lockoutCams), ...Object.keys(controller.connections.database.lockoutPTZ)])]
 	let lockedouput = "";
 	for (let camName of lockedcamlist) {
@@ -3392,7 +3391,6 @@ function clearCustomCamsDB(controller) {
 
 async function switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs, allowCloudSceneChange, sendChatMessage) {
 	// console.log("switch", channel, accessProfile, userCommand, fullArgs);
-	console.log('usercommand switching',userCommand,fullArgs);
 	let obsSources = await controller.connections.obs.local.getSceneItemList("Custom Cams") || [];  //controller.connections.obs.local.sceneList || [];
 	let obsSources2 = await controller.connections.obs.local.getSceneItemList("Custom Cams2") || [];  //controller.connections.obs.local.sceneList || [];
 	let obsList = [];
@@ -3401,17 +3399,6 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 	let currentCamList = [];
 	for (let cam of currentFullCamList) {
 		currentCamList.push(helper.cleanName(cam));
-	}
-	for (let scene of obsSources) {
-		let name = scene.sourceName;
-		let enabled = scene.sceneItemEnabled;
-		if (name.includes("fullcam")) {
-			let sceneName = helper.cleanName(name);
-			obsList.push(sceneName);
-			if (enabled) {
-				// currentCamList.push(sceneName);
-			}
-		}
 	}
 
 	// let currentCamList = controller.connections.database["customcam"];
@@ -3428,7 +3415,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 
 	let newArgList = [];
 	//!nightcams !livecams multiple overrides
-	let multiSceneCommand = false; 
+	let multiSceneCommand = false;
 	//convert to basenames
 	for (let arg of argsList) {
 		if (arg != null && arg != "") {
@@ -3461,13 +3448,6 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 		let fullCamName = "fullcam" + camName;
 
 		// logger.log("arg",arg,camName,fullCamName);
-		//check if valid source
-		if (!obsList.includes(camName)) {
-			if (camName != "empty" && camName != "blank") {
-				validCommand = false;
-				break;
-			}
-		}
 
 		let hasAccess = false;
 		if (currentCamList.includes(camName) || camName == "empty" || camName == "blank") {
@@ -3583,9 +3563,9 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 				if (camIndex == 0) {
 					camIndex = camIndex + 1;
 				}
-				
+
 				if (camIndex !== -1 && userIndex !== -1) {
-					if (userIndex <= 1 && userIndex <= camIndex){
+					if (userIndex <= 1 && userIndex <= camIndex) {
 						//have admin/superuser permission
 						lockedSuperUserCam = true;
 						lockedCam = false;
@@ -3625,7 +3605,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 				}
 
 				if (camIndex !== -1 && userIndex !== -1) {
-					if (userIndex <= 1 && userIndex <= camIndex){
+					if (userIndex <= 1 && userIndex <= camIndex) {
 						//have Admin/superuser permission
 						lockedCam = false;
 						lockedSuperUserCam = true;
@@ -3649,7 +3629,7 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 	// 	for (let camName of camListClean) {
 
 	// 	}
-		
+
 	// 	let replacementCam = null;
 	// 	for (let replace of safeCams){
 	// 		let camName = helper.cleanName(replace);
@@ -3680,17 +3660,18 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 
 	//border layout
 	let alveusggOverlay = "alveusgg overlay";
-	let border6cam = "https://www.alveussanctuary.org/stream/overlay?layout=6cam";
-	let border4cam = "https://www.alveussanctuary.org/stream/overlay?layout=4cam";
-	let border4bigcam = "https://www.alveussanctuary.org/stream/overlay?layout=4bigcam";
-	let border3cam = "https://www.alveussanctuary.org/stream/overlay?layout=3cam";
-	let border3bigcam = "https://www.alveussanctuary.org/stream/overlay?layout=3bigcam";
-	let border2cam = "https://www.alveussanctuary.org/stream/overlay?layout=2cam";
-	let borderpipbl = "https://www.alveussanctuary.org/stream/overlay?layout=pipbl";
-	let borderpipbr = "https://www.alveussanctuary.org/stream/overlay?layout=pipbr";
-	let borderpiptl = "https://www.alveussanctuary.org/stream/overlay?layout=piptl";
-	let borderpiptr = "https://www.alveussanctuary.org/stream/overlay?layout=piptr";
-	let border1cam = "https://www.alveussanctuary.org/stream/overlay";
+	let extraParams = "hide=socials,event";
+	let border6cam = `https://www.alveussanctuary.org/stream/overlay?layout=6cam&${extraParams}`;
+	let border4cam = `https://www.alveussanctuary.org/stream/overlay?layout=4cam&${extraParams}`;
+	let border4bigcam = `https://www.alveussanctuary.org/stream/overlay?layout=4bigcam&${extraParams}`;
+	let border3cam = `https://www.alveussanctuary.org/stream/overlay?layout=3cam&${extraParams}`;
+	let border3bigcam = `https://www.alveussanctuary.org/stream/overlay?layout=3bigcam&${extraParams}`;
+	let border2cam = `https://www.alveussanctuary.org/stream/overlay?layout=2cam&${extraParams}`;
+	let borderpipbl = `https://www.alveussanctuary.org/stream/overlay?layout=pipbl&${extraParams}`;
+	let borderpipbr = `https://www.alveussanctuary.org/stream/overlay?layout=pipbr&${extraParams}`;
+	let borderpiptl = `https://www.alveussanctuary.org/stream/overlay?layout=piptl&${extraParams}`;
+	let borderpiptr = `https://www.alveussanctuary.org/stream/overlay?layout=piptr&${extraParams}`;
+	let border1cam = `https://www.alveussanctuary.org/stream/overlay?${extraParams}`;
 	let enableBorderChange = true;
 
 	let response = null;
@@ -3749,8 +3730,8 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 	await setCustomCams(controller, obsSources2, "Custom Cams2", camList, { "border": border }, config.scenePositions[position]);
 
 	if (response) {
-		if (enableBorderChange){
-			await controller.connections.obs.local.setBrowserSource(alveusggOverlay,overlayBorder);
+		if (enableBorderChange) {
+			await controller.connections.obs.local.setBrowserSource(alveusggOverlay, overlayBorder);
 		}
 
 		await controller.connections.obs.local.setScene("Custom Cams");
@@ -3775,88 +3756,150 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 	};
 	// controller.connections.api.sendBroadcastMessage(broadcastMessage);
 
-	if (sendChatMessage){
+	if (sendChatMessage) {
 		controller.connections.twitch.send(channel, sendChatMessage, true);
 	}
 }
 
-async function setCustomCams(controller, obsSources, sceneName, camList, toggleMap, positions) {
+async function setCustomCams(controller,obsSources, sceneName, camList, toggleMap, positions) {
 	//skip disabling anything with "overlay" in name
 	//toggle anything inside toggleMap off except the value
 	try {
-		let sceneItems = obsSources; //controller.connections.obs.local.sceneList || [];
-		let sceneMap = {};
-		for (let item of sceneItems) {
-			let sourceName = item.sourceName || '';
-			sourceName = sourceName.replaceAll(" ", "");
-			sourceName = sourceName.toLowerCase();
-			let sourceId = item.sceneItemId;
-			let visibility = item.sceneItemEnabled;
-			let index = item.sceneItemIndex;
-			let type = item.sourceType; //'OBS_SOURCE_TYPE_SCENE'
-			sceneMap[sourceName] = { sourceName, sourceId, index, visibility, type };
-		}
-		let indexOrder = [];
-
+		//override with safe cams
+		let ytCamList = [];
+		let ytCamSlots = [];
 		if (config.useOverrideCam && sceneName == "Custom Cams2"){
-			let replacementCamList = [];
 			let newCamList = [];
+			let replacementCamList = [];
 			let overridecam = controller.connections.database["overridecam"] || "";
 			const safecamList = [overridecam, ...config.safecams];
-			// console.log("Override cam",overridecam,safecamList)
 			for (let i = 0; i < camList.length; i++) {
 				let cam = camList[i] || "";
 				cam = cam.replaceAll(" ", "");
 				cam = cam.toLowerCase();
-				if (config.overrideCamList.includes(cam)){
-					// console.log("cam",cam)
-					for (let replace of safecamList){
-						// console.log("replace",replace)
-						if (replace == null || replace == ""){
+				if (config.overrideCamList.includes(cam)) {
+					for (let replace of safecamList) {
+						if (replace == null || replace == "") {
 							continue;
 						}
 						let camName = helper.cleanName(replace);
-						let baseName = config.customCommandAlias[camName];
-						if (camList.includes("fullcam"+replace) || camList.includes("fullcam"+baseName)){
+						let baseName = config.customCommandAlias[camName] || "";
+						baseName = "fullcam"+baseName;
+						if (camList.includes("fullcam" + replace) || camList.includes(baseName)) {
 							continue;
 						}
-						if (replacementCamList.includes("fullcam"+baseName)){
+						if (replacementCamList.includes(baseName)) {
 							continue;
 						}
-						replacementCamList.push("fullcam"+baseName);
+						replacementCamList.push(baseName);
 						break;
 					}
 				} else {
-					newCamList.push(cam);
+					newCamList.push({name:cam,slotnum:i});
+					ytCamSlots.push(i);
 				}
 			}
-			console.log("newcamlist",newCamList,"replacementCamList",replacementCamList)
-			camList = [...newCamList,...replacementCamList];
-		}
-		// console.log("camlist",camList)
-		for (let i = 0; i < camList.length; i++) {
-			let pos = positions[i + 1];
-			if (pos == null) {
-				continue;
-			}
-			let cam = camList[i] || "";
-			cam = cam.replaceAll(" ", "");
-			cam = cam.toLowerCase();
-			if (cam == "") {
-				continue;
+
+			//setup camslot7+ urls with replacements
+			for (let i =0; i < replacementCamList.length;i++){
+				let name = replacementCamList[i];
+				let slotnum = i+6;
+				let sourceName = `cam${slotnum+1}media`;
+				newCamList.push({name,slotnum:slotnum})
+				ytCamSlots.push(slotnum);
+				let ptzcamName = helper.cleanName(name);
+				let baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+				ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+				let host = process.env[`AXIS_${ptzcamName.toUpperCase()}_IP`];
+				let url = `rtsp://${process.env.AXIS_USERNAME}:${process.env.AXIS_PASSWORD}@${host}/axis-media/media.amp?video=1&audio=0&resolution=1920x1080&fps=30&compression=40&overlays=off`;
+				let currentURL = await controller.connections.obs.local.getMediaSource(sourceName, url);
+				if (url != currentURL){
+					controller.connections.obs.local.setMediaSource(sourceName, url);
+				}
 			}
 
-			camList[i] = cam;
-
-			let camInfo = sceneMap[cam] || {};
-			let sourceId = camInfo.sourceId || "";
-			let index = camInfo.index || 0;
-			if (sourceId == "") {
-				continue;
-			}
-			indexOrder.push(index);
-			await controller.connections.obs.local.setSceneItemIdTransform(sceneName, sourceId, pos);
+			ytCamList = newCamList;
 		}
+
+		if (sceneName != "Custom Cams2"){
+			//change cam sources
+			for (let i = 0; i < 6; i++) {
+				let sourceName = `cam${i + 1}media`;
+				let camName = camList[i];
+				let url = ``;
+				
+				if (!config.nonaxisCamList.includes(camName)){
+					if (i < camList.length) {
+						let ptzcamName = helper.cleanName(camName);
+						let baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+						ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+						let host = process.env[`AXIS_${ptzcamName.toUpperCase()}_IP`];
+						
+						url = `rtsp://${process.env.AXIS_USERNAME}:${process.env.AXIS_PASSWORD}@${host}/axis-media/media.amp?video=1&audio=0&resolution=1920x1080&fps=30&compression=40&overlays=off`;
+					}
+				}
+
+				let currentURL = await controller.connections.obs.local.getMediaSource(sourceName, url);
+				if (url != currentURL){
+					controller.connections.obs.local.setMediaSource(sourceName, url);
+				}
+			}
+
+			//set positions for cams
+			for (let i = 0; i < 6; i++) {
+				let slotname = `camslot${i + 1}`;
+				let camName = camList[i];
+				let transform = positions[i + 1];
+				if (config.nonaxisCamList.includes(camName)){
+					controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, false);
+					controller.connections.obs.local.setSceneItemTransform(sceneName, camName, transform);
+					controller.connections.obs.local.setSceneItemEnabled(sceneName, camName, true);
+				} else if (i < camList.length) {
+					controller.connections.obs.local.setSceneItemTransform(sceneName, slotname, transform);
+					controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, true);
+				} else {
+					//toggle off any cams not used
+					controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, false);
+				}
+
+			}
+		} else {
+			//youtube cams
+
+			//disable unused
+			for (let i = 0; i < 9; i++) {
+				if (!ytCamSlots.includes(i)){
+					let slotname = `camslot${i + 1}`;
+					controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, false);
+				}
+			}
+			//enable and position based on order
+			for (let i = 0; i < ytCamList.length; i++) {
+				let camName = ytCamList[i].name;
+				let camSlot = ytCamList[i].slotnum;
+				let slotname = `camslot${camSlot + 1}`;
+				controller.connections.obs.local.setSceneItemTransform(sceneName, slotname, positions[i + 1]);
+				controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, true);
+			}
+		}
+		
+		//Change Names
+		for (let i = 0; i < ytCamList.length; i++) {
+			let camName = ytCamList[i].name;
+			let camSlot = ytCamList[i].slotnum;
+			let slotname = `cam${camSlot + 1}text`;
+			let scenename = `camslot${camSlot + 1}`;
+			let ptzcamName = helper.cleanName(camName);
+			let baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+			let text = config.axisCameraTextMapping[ptzcamName] || "";
+			controller.connections.obs.local.setText(slotname, text);
+			controller.connections.obs.local.centerHorizontally(scenename, slotname);
+			
+		}
+
+		//Toggle Map
+		let sceneItems = obsSources; //controller.connections.obs.local.sceneList || [];
 		for (let item of sceneItems) {
 			let sourceName = item.sourceName || '';
 			sourceName = sourceName.replaceAll(" ", "");
@@ -3882,70 +3925,51 @@ async function setCustomCams(controller, obsSources, sceneName, camList, toggleM
 					}
 				}
 			}
-
-			//only toggle cam scenes
-			if (!sourceName.includes("fullcam")) {
-				continue;
-			}
-
-			//OBS Type SCENE
-			if (camList.includes(sourceName) && visibility != true) {
-				//enable if its in the list
-				await controller.connections.obs.local.setSceneItemIdEnabled(sceneName, sourceId, true);
-			} else if (!camList.includes(sourceName) && visibility != false) {
-				//disable
-				await controller.connections.obs.local.setSceneItemIdEnabled(sceneName, sourceId, false);
-			}
-
 		}
-		// logger.log("sceneMap",sceneMap);
-		//order the cam's
-		// indexOrder.reverse();
-		// OBS Higher number = Top of list. 0 is bottom
-		//sort ascending  order
-		indexOrder.sort(function (a, b) { return a - b });
-		let lastindex = 0;
+		//toggle mics and music based on cameras
+		let usedMics = [];
 		for (let i = 0; i < camList.length; i++) {
-			let name = camList[i];
-			let camInfo = sceneMap[name] || {};
-			let sourceId = camInfo.sourceId || "";
-			if (sourceId == "") {
-				continue;
-			}
-			lastindex = indexOrder[i] ?? lastindex;
-			if (lastindex < 7) {
-				lastindex = 7;
-			}
-			await controller.connections.obs.local.setSceneItemIndex(sceneName, sourceId, lastindex);
-		}
-
-		//toggle music based on cameras
-		let foundMic = false;
-		for (const grp in config.micGroups) {
-			for (const source in config.micGroups[grp]) {
-				if (source == "fox") {
-					continue;
-				}
-				let micName = source || "";
-				micName = micName.toLowerCase();
-				for (let i = 0; i < camList.length; i++) {
-					let camName = camList[i] || "";
-					camName = camName.toLowerCase();
-					if (micName != "" && camName != "" && camName.includes(micName)) {
-						foundMic = true;
+			let camName = helper.cleanName(camList[i]);
+			let mic = null;
+			for (const grp in config.micGroups) {
+				for (const source in config.micGroups[grp]) {
+					if (camName == source){
+						//specific mic matched
+						mic = source;
 						break;
 					}
 				}
-				if (foundMic) {
-					break;
+			}
+			if (mic == null){
+				//search for a matching base
+				let baseName = camName.replaceAll(/cam|outdoor|indoor|lower|inside|cover|wideangle|corner|den/g, "");
+				for (const grp in config.micGroups) {
+					for (const source in config.micGroups[grp]) {
+						if (baseName == source){
+							//specific mic matched
+							mic = source;
+							break;
+						}
+					}
 				}
 			}
-			if (foundMic) {
-				break;
+			if (mic != null){
+				usedMics.push(mic);
 			}
 		}
-
-		if (!foundMic) {
+		for (const grp in config.micGroups) {
+			for (const source in config.micGroups[grp]) {
+				let micname = config.micGroups[grp][source].name;
+				if (usedMics.includes(source)) {
+					//enable
+					await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, true);
+				} else {
+					//disable
+					await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, false);
+				}
+			}
+		}
+		if (usedMics.length == 0) {
 			//turn on music if no camera has a mic
 			//controller.connections.obs.cloud.setMute(config.globalMusicSource, false);
 		}

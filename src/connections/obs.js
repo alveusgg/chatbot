@@ -4,7 +4,7 @@ const OBSWebSocketOld = require("obs-websocket-js-27"); // npm i obs-websocket-j
 const utilsModule = require("../utils/utilsModule");
 
 /**
- * @typedef {{
+ * @typedef {{w
  *  local: OBS
  *  cloud: OBS
  *  create: create
@@ -79,6 +79,8 @@ class OBS {
   utils = null;
   connected = false;
   enableReconnect = true;
+  canvasWidth = 0;
+  canvasHeight = 0;
 
   constructor(name, ipAddress, password, oldWS) {
     this.name = name;
@@ -138,6 +140,7 @@ class OBS {
           self.getCurrentSceneList();
           self.fetchStudioMode();
           self.fetchStreamStatus();
+          self.getCanvasSize();
         });
         self.client.on("AuthenticationFailure", (error) => {
           self.connected = false;
@@ -264,6 +267,7 @@ class OBS {
           self.getCurrentSceneList();
           self.fetchStudioMode();
           self.fetchStreamStatus();
+          self.getCanvasSize();
         });
       }
       self.connect();
@@ -635,7 +639,7 @@ class OBS {
       } else {
         response = await self.client.call("GetInputSettings", param);
       }
-      if (response && response.inputKind == "browser_source"){
+      if (response && response.inputKind == "browser_source") {
         let url = response.inputSettings?.url;
         return url;
       }
@@ -649,7 +653,7 @@ class OBS {
     }
   }
 
-  async setBrowserSource(sourceName,url) {
+  async setBrowserSource(sourceName, url) {
     let self = this;
     let param = { url: url };
     try {
@@ -669,6 +673,88 @@ class OBS {
     } catch (e) {
       self.utils.log(
         `Error BrowserSource URL (${sourceName}:${url}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
+
+  async getMediaSource(sourceName) {
+    let self = this;
+    let param = { inputName: sourceName };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        self.utils.log(`Old OBS Not Setup`);
+        return null;
+      } else {
+        response = await self.client.call("GetInputSettings", param);
+      }
+      if (response && response.inputKind == "ffmpeg_source") {
+        let url = response.inputSettings?.input;
+        return url;
+      }
+      self.utils.log(`get MediaSource: ${sourceName}`, response);
+      return response;
+    } catch (e) {
+      self.utils.log(
+        `Error get MediaSource (${sourceName}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
+
+  async setMediaSource(sourceName, url) {
+    let self = this;
+    let param = {
+      "is_local_file": false,
+      "input": url,
+      //close_when_inactive: true,
+      //reconnect_delay_sec: 4,
+    };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        self.utils.log(`Old OBS Not Setup`);
+        return null;
+      } else {
+        response = await self.client.call("SetInputSettings", {
+          inputName: sourceName,
+          inputSettings: param,
+        });
+      }
+      //no result
+      self.utils.log(`Set MediaSource URL: ${sourceName}: ${url}`);
+      return true;
+    } catch (e) {
+      self.utils.log(
+        `Error MediaSource URL (${sourceName}:${url}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
+
+  async setText(sourceName, text) {
+    let self = this;
+    let param = {
+      "text": text
+    };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        self.utils.log(`Old OBS Not Setup`);
+        return null;
+      } else {
+        response = await self.client.call("SetInputSettings", {
+          inputName: sourceName,
+          inputSettings: param,
+        });
+      }
+      //no result
+      // self.utils.log(`Set Text Message: ${sourceName}: ${text}`);
+      return true;
+    } catch (e) {
+      self.utils.log(
+        `Error SetText (${sourceName}:${text}): ${JSON.stringify(e)}`,
       );
       return null;
     }
@@ -803,23 +889,23 @@ class OBS {
     }
   }
   async getMute(sourceName) {
-		let self = this;
-		let param = { inputName: sourceName };
-		try {
-			let response = null;
-			if (self.oldWS) {
-				response = await self.client.send("getMute", {"source": sourceName});
-			} else {
-				response = await self.client.call("GetInputMute", param);
-			}
-			let booleanStatus = response?.inputMuted ?? null;
-			self.utils.log(`Get Mute: ${sourceName}-`,response);
-			return booleanStatus;
-		} catch (e) {
-			self.utils.log(`Error Get Mute (${sourceName}}): ${JSON.stringify(e)}`);
-			return null;
-		}
-	}
+    let self = this;
+    let param = { inputName: sourceName };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        response = await self.client.send("getMute", { "source": sourceName });
+      } else {
+        response = await self.client.call("GetInputMute", param);
+      }
+      let booleanStatus = response?.inputMuted ?? null;
+      self.utils.log(`Get Mute: ${sourceName}-`, response);
+      return booleanStatus;
+    } catch (e) {
+      self.utils.log(`Error Get Mute (${sourceName}}): ${JSON.stringify(e)}`);
+      return null;
+    }
+  }
   async setMute(sourceName, booleanStatus) {
     let self = this;
     let param = { inputName: sourceName, inputMuted: booleanStatus };
@@ -871,87 +957,87 @@ class OBS {
     }
   }
   async getInputVolume(sourceName) {
-		let self = this;
-		//inputVolumeDb >= -100, <= 26
-		//inputVolumeMul >= 0, <= 20
-		let param = { inputName: sourceName };
-		try {
-			let response = null;
-			if (self.oldWS) {
-				// response = await self.client.send("SetMute", {
-				// 	"source": sourceName,
-				// 	"mute":booleanStatus
-				// });
-			} else {
-				response = await self.client.call("GetInputVolume", param);
-			}
-			let dbVolume = response.inputVolumeDb;
-			self.utils.log(`GetInputVolume: ${sourceName}-`,response);
-			return dbVolume;
-		} catch (e) {
-			self.utils.log(`Error GetInputVolume (${sourceName}): ${JSON.stringify(e)}`);
-			return null;
-		}
-	}
+    let self = this;
+    //inputVolumeDb >= -100, <= 26
+    //inputVolumeMul >= 0, <= 20
+    let param = { inputName: sourceName };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        // response = await self.client.send("SetMute", {
+        // 	"source": sourceName,
+        // 	"mute":booleanStatus
+        // });
+      } else {
+        response = await self.client.call("GetInputVolume", param);
+      }
+      let dbVolume = response.inputVolumeDb;
+      self.utils.log(`GetInputVolume: ${sourceName}-`, response);
+      return dbVolume;
+    } catch (e) {
+      self.utils.log(`Error GetInputVolume (${sourceName}): ${JSON.stringify(e)}`);
+      return null;
+    }
+  }
   async getAudioTracks(sourceName) {
-		let self = this;
-		let param = { inputName: sourceName };
-		try {
-			let response = null;
-			if (self.oldWS) {
-				// response = await self.client.send("getMute", {"source": sourceName});
-			} else {
-				response = await self.client.call("GetInputAudioTracks", param);
-			}
-			let tracks = response?.inputAudioTracks ?? null;
-			self.utils.log(`Get Audio Tracks: ${sourceName}-`,tracks);
-			return tracks;
-		} catch (e) {
-			self.utils.log(`Error Get Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
-			return null;
-		}
-	}
-  async setAudioTracks(sourceName,audioTracks) {
+    let self = this;
+    let param = { inputName: sourceName };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        // response = await self.client.send("getMute", {"source": sourceName});
+      } else {
+        response = await self.client.call("GetInputAudioTracks", param);
+      }
+      let tracks = response?.inputAudioTracks ?? null;
+      self.utils.log(`Get Audio Tracks: ${sourceName}-`, tracks);
+      return tracks;
+    } catch (e) {
+      self.utils.log(`Error Get Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
+      return null;
+    }
+  }
+  async setAudioTracks(sourceName, audioTracks) {
     //audiotracks obj {'1': true,' 2': false,'3': true,'4': false,'5': false,'6': true} 
-		let self = this;
-		let param = { inputName: sourceName, inputAudioTracks: audioTracks };
-		try {
-			let response = null;
-			if (self.oldWS) {
-				// response = await self.client.send("getMute", {"source": sourceName});
-			} else {
-				response = await self.client.call("SetInputAudioTracks", param);
-			}
-			self.utils.log(`Set Audio Tracks: ${sourceName}-${audioTracks}`,response);
-			return true;
-		} catch (e) {
-			self.utils.log(`Error Get Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
-			return null;
-		}
-	}
-  async updateAudioTracks(sourceName,track,toggle) {
+    let self = this;
+    let param = { inputName: sourceName, inputAudioTracks: audioTracks };
+    try {
+      let response = null;
+      if (self.oldWS) {
+        // response = await self.client.send("getMute", {"source": sourceName});
+      } else {
+        response = await self.client.call("SetInputAudioTracks", param);
+      }
+      self.utils.log(`Set Audio Tracks: ${sourceName}-${audioTracks}`, response);
+      return true;
+    } catch (e) {
+      self.utils.log(`Error Get Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
+      return null;
+    }
+  }
+  async updateAudioTracks(sourceName, track, toggle) {
     //audiotracks obj {'1': true,' 2': false,'3': true,'4': false,'5': false,'6': true} 
-		let self = this;
-		try {
-			let response = null;
+    let self = this;
+    try {
+      let response = null;
       let currentTracks = await self.getAudioTracks(sourceName);
-      if (currentTracks == null){
+      if (currentTracks == null) {
         throw new Error(`Error Update-Get Audio Tracks (${sourceName}}): ${JSON.stringify(getresponse)}`);
       }
       let state = false;
-      if (toggle == true || toggle == "true" || toggle == 1){
+      if (toggle == true || toggle == "true" || toggle == 1) {
         state = true;
       }
       currentTracks[track] = state;
       let param = { inputName: sourceName, inputAudioTracks: currentTracks };
-			response = await self.client.call("SetInputAudioTracks", param);
-			self.utils.log(`Update-Set Audio Tracks: ${sourceName}-${audioTracks}`,response);
-			return true;
-		} catch (e) {
-			self.utils.log(`Error Update Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
-			return null;
-		}
-	}
+      response = await self.client.call("SetInputAudioTracks", param);
+      self.utils.log(`Update-Set Audio Tracks: ${sourceName}-${audioTracks}`, response);
+      return true;
+    } catch (e) {
+      self.utils.log(`Error Update Audio Tracks (${sourceName}}): ${JSON.stringify(e)}`);
+      return null;
+    }
+  }
   async getInputSettings(sourceName) {
     let self = this;
     let param = { inputName: sourceName };
@@ -1090,10 +1176,10 @@ class OBS {
           "GetSceneItemTransform",
           param,
         );
-        self.utils.log(
-          `getSceneItemTransform (${sceneName},${sourceName},${sceneItemId}): ${responseTransform}`,
-        );
-        return responseTransform;
+        // self.utils.log(
+        //   `getSceneItemTransform (${sceneName},${sourceName},${sceneItemId}): ${responseTransform.sceneItemTransform}`,
+        // );
+        return responseTransform.sceneItemTransform;
       }
     } catch (e) {
       self.utils.log(
@@ -1121,11 +1207,11 @@ class OBS {
           "SetSceneItemTransform",
           param,
         );
-        self.utils.log(
-          `SetSceneItemTransform (${sceneName},${sourceName},${sceneItemId}): ${JSON.stringify(
-            transform,
-          )}`,
-        );
+        // self.utils.log(
+        //   `SetSceneItemTransform (${sceneName},${sourceName},${sceneItemId}): ${JSON.stringify(
+        //     transform,
+        //   )}`,
+        // );
         return responseTransform;
       }
     } catch (e) {
@@ -1159,6 +1245,45 @@ class OBS {
     } catch (e) {
       self.utils.log(
         `Error setSceneItemIdTransform (${sceneName},${sceneItemId}): ${JSON.stringify(
+          e,
+        )}`,
+      );
+      return null;
+    }
+  }
+  async centerHorizontally(sceneName, sourceName) {
+    let self = this;
+    try {
+      if (self.oldWS) {
+        self.utils.log(`Old OBS Not Setup`);
+        return null;
+      } else {
+        let currentTransform = await self.getSceneItemTransform(sceneName, sourceName);
+        let textWidth = currentTransform.width;
+        let textScaleX = currentTransform.scaleX;
+        let newXpos = (self.canvasWidth - (textWidth*textScaleX)) / 2
+        let transform = {
+          "positionX": newXpos,
+          "positionY": 42
+        }
+        // let param = {
+        //   "alignment": 5, "boundsAlignment": 0, "boundsHeight": 0,
+        //   "boundsType": "OBS_BOUNDS_NONE", "boundsWidth": 0, "cropBottom": 0, "cropLeft": 0,
+        //   "cropRight": 0, "cropToBounds": false, "cropTop": 0, "height": 78, "positionX": 0,
+        //   "positionY": 0, "rotation": 0, "scaleX": 1, "scaleY": 1, "sourceHeight": 78,
+        //   "sourceWidth": 540, "width": 540
+        // }
+        let response = await self.setSceneItemTransform(sceneName, sourceName,transform);
+        // self.utils.log(
+        //   `centerHorizontally (${sceneName},${sourceName}): ${JSON.stringify(
+        //     currentTransform,
+        //   )}`,
+        // );
+        return true;
+      }
+    } catch (e) {
+      self.utils.log(
+        `Error centerHorizontally (${sceneName},${sourceName}): ${JSON.stringify(
           e,
         )}`,
       );
@@ -1407,6 +1532,80 @@ class OBS {
       return null;
     }
   }
+
+  //get base canvas size
+  async getCanvasSize() {
+    let self = this;
+    try {
+      if (self.oldWS) {
+        self.utils.log(`Old OBS Not Setup`);
+        return null;
+      } else {
+        let res = await self.client.call("GetVideoSettings");
+        let basewidth = res?.baseWidth;
+        let baseheight = res.baseHeight;
+        console.log("getCanvasSize", res);
+        if (basewidth && baseheight) {
+          self.canvasWidth = basewidth;
+          self.canvasHeight = baseheight;
+          return { width: basewidth, height: baseheight };
+        } else {
+          throw ERROR("invalid size response")
+        }
+      }
+    } catch (e) {
+      self.utils.log(
+        `Error getCanvasSize (${sceneName}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
+
+  async setPip(sceneName, sourceName, position, scale) {
+    let self = this;
+    scale = scale || 0.3333333;
+    let transform = { //fullscreen
+      cropBottom: 0,
+      cropLeft: 0,
+      cropRight: 0,
+      cropTop: 0,
+      height: self.canvasHeight * scale,
+      positionX: 0,
+      positionY: 0,
+      rotation: 0,
+      scaleX: scale,
+      scaleY: scale,
+      sourceHeight: self.canvasHeight,
+      sourceWidth: self.canvasWidth,
+      width: self.canvasWidth * scale
+    }
+    if (position == "topleft") {
+      //no changes needed
+    } else if (position == "topright") {
+      transform.positionX = self.canvasWidth - transform.width;
+    } else if (position == "bottomleft") {
+      transform.positionY = self.canvasHeight - transform.height;
+    } else if (position == "bottomright") {
+      transform.positionX = self.canvasWidth - transform.width;
+      transform.positionY = self.canvasHeight - transform.height;
+    }
+    try {
+      let response = null;
+      if (self.oldWS) {
+        //
+      } else {
+        response = self.setSceneItemTransform(sceneName, sourceName, transform);
+      }
+      // self.utils.log(`Set PIP: ${sceneName}-${sourceName}-${response}`);
+      return true;
+    } catch (e) {
+      self.utils.log(
+        `Error Set PIP (${sceneName}-${sourceName}): ${JSON.stringify(e)}`,
+      );
+      return null;
+    }
+  }
+
 }
 
 /**
