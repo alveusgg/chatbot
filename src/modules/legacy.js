@@ -3768,6 +3768,7 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 		//override with safe cams
 		let ytCamList = [];
 		let ytCamSlots = [];
+		let mergedCamList = [...camList];
 		if (config.useOverrideCam && sceneName == "Custom Cams2"){
 			let newCamList = [];
 			let replacementCamList = [];
@@ -3882,20 +3883,81 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 				controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, true);
 			}
 		}
+
+		//disable unused nonaxis cams
+		for (let i = 0; i < config.nonaxisCamList.length; i++) {
+			let camName = config.nonaxisCamList[i];
+			if (!camList.includes(camName)){
+				controller.connections.obs.local.setSceneItemEnabled(sceneName, camName, false);
+			}
+		}
 		
 		//Change Names
-		for (let i = 0; i < ytCamList.length; i++) {
-			let camName = ytCamList[i].name;
-			let camSlot = ytCamList[i].slotnum;
-			let slotname = `cam${camSlot + 1}text`;
-			let scenename = `camslot${camSlot + 1}`;
-			let ptzcamName = helper.cleanName(camName);
-			let baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
-			ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
-			let text = config.axisCameraTextMapping[ptzcamName] || "";
-			controller.connections.obs.local.setText(slotname, text);
-			controller.connections.obs.local.centerHorizontally(scenename, slotname);
-			
+		if (sceneName == "Custom Cams2"){
+			for (let i = 0; i < ytCamList.length; i++) {
+				let camName = ytCamList[i].name;
+				let camSlot = ytCamList[i].slotnum;
+				let slotname = `cam${camSlot + 1}text`;
+				let scenename = `camslot${camSlot + 1}`;
+				let ptzcamName = helper.cleanName(camName);
+				let baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+				ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+				let text = config.axisCameraTextMapping[ptzcamName] || "";
+				controller.connections.obs.local.setText(slotname, text);
+				controller.connections.obs.local.centerHorizontally(scenename, slotname);
+				mergedCamList.push(camName);
+			}
+
+				//toggle mics and music based on cameras
+			let usedMics = [];
+			for (let i = 0; i < mergedCamList.length; i++) {
+				console.log("merged",mergedCamList[i])
+				let camName = helper.cleanName(mergedCamList[i]);
+				let mic = null;
+				for (const grp in config.micGroups) {
+					for (const source in config.micGroups[grp]) {
+						if (camName == source){
+							//specific mic matched
+							mic = source;
+							break;
+						}
+					}
+				}
+				if (mic == null){
+					//search for a matching base
+					let baseName = camName.replaceAll(/cam|outdoor|indoor|lower|inside|cover|wideangle|corner|den/g, "");
+					for (const grp in config.micGroups) {
+						for (const source in config.micGroups[grp]) {
+							if (baseName == source){
+								//specific mic matched
+								mic = source;
+								break;
+							}
+						}
+					}
+				}
+				if (mic != null){
+					usedMics.push(mic);
+				}
+			}
+			for (const grp in config.micGroups) {
+				for (const source in config.micGroups[grp]) {
+					let micname = config.micGroups[grp][source].name;
+					if (usedMics.includes(source)) {
+						//enable
+						await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, true);
+					} else {
+						//disable
+						await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, false);
+					}
+				}
+			}
+			if (usedMics.length == 0) {
+				//turn on music if no camera has a mic
+				controller.connections.obs.cloud2.setMute(config.globalMusicSource, false);
+			} else {
+				controller.connections.obs.cloud2.setMute(config.globalMusicSource, true);
+			}
 		}
 
 		//Toggle Map
@@ -3926,53 +3988,7 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 				}
 			}
 		}
-		//toggle mics and music based on cameras
-		let usedMics = [];
-		for (let i = 0; i < camList.length; i++) {
-			let camName = helper.cleanName(camList[i]);
-			let mic = null;
-			for (const grp in config.micGroups) {
-				for (const source in config.micGroups[grp]) {
-					if (camName == source){
-						//specific mic matched
-						mic = source;
-						break;
-					}
-				}
-			}
-			if (mic == null){
-				//search for a matching base
-				let baseName = camName.replaceAll(/cam|outdoor|indoor|lower|inside|cover|wideangle|corner|den/g, "");
-				for (const grp in config.micGroups) {
-					for (const source in config.micGroups[grp]) {
-						if (baseName == source){
-							//specific mic matched
-							mic = source;
-							break;
-						}
-					}
-				}
-			}
-			if (mic != null){
-				usedMics.push(mic);
-			}
-		}
-		for (const grp in config.micGroups) {
-			for (const source in config.micGroups[grp]) {
-				let micname = config.micGroups[grp][source].name;
-				if (usedMics.includes(source)) {
-					//enable
-					await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, true);
-				} else {
-					//disable
-					await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, false);
-				}
-			}
-		}
-		if (usedMics.length == 0) {
-			//turn on music if no camera has a mic
-			//controller.connections.obs.cloud.setMute(config.globalMusicSource, false);
-		}
+		
 		logger.log(`setCustomCams - ${sceneName} (${camList})`);
 		return true;
 	} catch (e) {

@@ -723,7 +723,7 @@ class OBS {
         });
       }
       //no result
-      self.utils.log(`Set MediaSource URL: ${sourceName}: ${url}`);
+      // self.utils.log(`Set MediaSource URL: ${sourceName}: ${url}`);
       return true;
     } catch (e) {
       self.utils.log(
