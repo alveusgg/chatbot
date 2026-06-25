@@ -72,7 +72,7 @@ const commandPermissionsCustomCam = {
     commandMods: ["wolfcam", "wolfcam2", "wolfcam3", "wolfcam4", "wolfcam5", "wolfcam6", "wolfcam7", "wolfcam8", "wolfcam9", "wolfcam10", "wolfcam11", "parrotcam", "parrotcam2", "parrotcam3",
         "macawcam", "pasturecam", "emucovercam", "emucam", "emupondcam", "emucam3", "emucam4", "staffcam", "naturecam", "sleepcam", "eventcam", "servalcam",
         "crowcam", "crowcam2", "crowcam3", "crowcam4", "foxcam", "foxcam2", "foxcam3", "foxcam4", "foxcam5", "foxcam6", "foxcam7", "4camoutdoor", "marmosetcam", "marmosetcam3",
-        "nightcams", "nightcamsbig", "chickencam", "chickencam3", "gardencam", "constructioncam", "pasturecam2"],
+        "nightcams", "nightcamsbig", "chickencam", "chickencam3", "gardencam", "constructioncam", "pasturecam2","pasturecam3"],
     commandOperator: ["georgiecam", "noodlecam", "patchycam", "toastcam", "toastcam2", "tarantulacam", "tarantulacam2", "pushpopcam", "pushpopcam2", "pushpopcam3", "puppycam", "hankcam", "hankcam2",
         "hankcam3", "hankmulti", "roachcam", "isopodcam", "noodlehidecam", "georgiecam2", "georgiecam3", "indoorcams", "indoorcamsbig", "chincam", "chincam2",
         "chincam3", "chincam4", "orangeisopodcam", "chickencam2", "marmosetcam2"],
@@ -86,7 +86,7 @@ let safecams = ["georgie", "noodle", "toast", "patchy", "hank", "roach", "isopod
 //One Direction, If on OBS Scene, allow subscenes commands
 //scene names are lowercase, no spaces, no s/es
 let onewayCommands = {
-    "4camoutdoor": ["foxcam", "foxcam2", "foxcam3", "foxcam4", "pasturecam", "pasturecam2"]
+    "4camoutdoor": ["foxcam", "foxcam2", "foxcam3", "foxcam4", "pasturecam", "pasturecam2","pasturecam3"]
 }
 
 //Chat Command Swapping
@@ -104,7 +104,7 @@ let multiCommands = {
     pushpop: ["pushpopcam", "pushpopcam2", "pushpopcam3"],
     wolf: ["wolfcam", "wolfcam2", "wolfcam3", "wolfcam4", "wolfcam5", "wolfcam6", "wolfcam7", "wolfcam8", "wolfcam9", "wolfcam10", "wolfcam11"],
     marmoset: ["marmosetcam", "marmosetcam2", "marmosetcam3"],
-    pasture: ["pasturecam", "pasturecam2", "gardencam"],
+    pasture: ["pasturecam", "pasturecam2","gardencam","pasturecam3"],
     parrot: ["parrotcam", "parrotcam2", "parrotcam3", "macawcam"]
 }
 
@@ -260,6 +260,7 @@ const axisCameras = ["pasture", "pasturefeeder", "parrot", "macaw", "wolf", "wol
 const axisCameraCommandMapping = {
     "pasture": "pasture",
     "pasturecam2": "pasturefeeder",
+    "pasturecam3": "pasturelower",
     "emu": "emu",
     "emucover": "emucover",
     "emucam3": "emu",
@@ -482,6 +483,7 @@ const customCamCommandMapping = {
     "chickencam3": "chickenmulti",
     "pasturecam": "pasture",
     "pasturecam2": "pasturefeeder",
+    "pasturecam3":"pasturelower",
     "emucovercam": "emucover",
     "emucam": "emu",
     "emupondcam": "emupond",
@@ -597,6 +599,7 @@ const commandSceneAlias = {
     chickencam3: ["chickenmulticam"],
     monitorcam: ["monitorcam", "atomoscam", "ndicam"],
     pasturecam2: ["pasturefeedercam", "pasturefeedcam", "pasturefcam", "pasturecrunchcam"],
+    pasturecam3: ["pasturelowercam","pasturebottomcam","pasturelcam","pasturebotcam","pasturebcam"],
     parrotcam: ["littlescam", "littlecam", "miacam", "parrotoutdoorcam", "littlesoutdoorcam", "parrotoutcam"],
     parrotcam2: ["macawparrotcam", "macawmulticam", "parrotmulticam", "macawslittlescam"],
     parrotcam3: ["parrotmacawcam", "macawmulti2cam", "parrotmulti2cam", "littlesmulticam", "littlesmacawscam"],
