@@ -970,7 +970,9 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		case "ptzareazoom":
 			//x-cord y-cord zoom 
 			camera.ptz({ areazoom: `${arg1},${arg2},${arg3}` });
-			camera.enableAutoFocus();
+			if (arg4 != 'off'){
+				camera.enableAutoFocus();
+			}
 			if (channel === 'ptzapi') {
 				controller.connections.twitch.send(channel, `${user}: Clicked on ${ptzcamName}`, true);
 			}
@@ -1923,7 +1925,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.database["overridecam"] = overridecam;
 			fullArgs = currentCamList.join(' ');
 			let sendChatMessage = `Set Override Cam ${overridecam}`;
-			switchToCustomCams(controller, channel, accessProfile, userCommand, fullArgs,false,sendChatMessage);
+			switchToCustomCams(controller, channel, accessProfile, controller.connections.database["customcamscommand"], fullArgs, false, sendChatMessage);
 			break;
 		case "getoverridecam":
 			controller.connections.twitch.send(channel, `Override cam: ${controller.connections.database["overridecam"]}`);
@@ -3680,17 +3682,18 @@ async function switchToCustomCams(controller, channel, accessProfile, userComman
 
 	//border layout
 	let alveusggOverlay = "alveusgg overlay";
-	let border6cam = "https://www.alveussanctuary.org/stream/overlay?layout=6cam";
-	let border4cam = "https://www.alveussanctuary.org/stream/overlay?layout=4cam";
-	let border4bigcam = "https://www.alveussanctuary.org/stream/overlay?layout=4bigcam";
-	let border3cam = "https://www.alveussanctuary.org/stream/overlay?layout=3cam";
-	let border3bigcam = "https://www.alveussanctuary.org/stream/overlay?layout=3bigcam";
-	let border2cam = "https://www.alveussanctuary.org/stream/overlay?layout=2cam";
-	let borderpipbl = "https://www.alveussanctuary.org/stream/overlay?layout=pipbl";
-	let borderpipbr = "https://www.alveussanctuary.org/stream/overlay?layout=pipbr";
-	let borderpiptl = "https://www.alveussanctuary.org/stream/overlay?layout=piptl";
-	let borderpiptr = "https://www.alveussanctuary.org/stream/overlay?layout=piptr";
-	let border1cam = "https://www.alveussanctuary.org/stream/overlay";
+	let extraParams = "hide=socials,event";
+	let border6cam = `https://www.alveussanctuary.org/stream/overlay?layout=6cam&${extraParams}`;
+	let border4cam = `https://www.alveussanctuary.org/stream/overlay?layout=4cam&${extraParams}`;
+	let border4bigcam = `https://www.alveussanctuary.org/stream/overlay?layout=4bigcam&${extraParams}`;
+	let border3cam = `https://www.alveussanctuary.org/stream/overlay?layout=3cam&${extraParams}`;
+	let border3bigcam = `https://www.alveussanctuary.org/stream/overlay?layout=3bigcam&${extraParams}`;
+	let border2cam = `https://www.alveussanctuary.org/stream/overlay?layout=2cam&${extraParams}`;
+	let borderpipbl = `https://www.alveussanctuary.org/stream/overlay?layout=pipbl&${extraParams}`;
+	let borderpipbr = `https://www.alveussanctuary.org/stream/overlay?layout=pipbr&${extraParams}`;
+	let borderpiptl = `https://www.alveussanctuary.org/stream/overlay?layout=piptl&${extraParams}`;
+	let borderpiptr = `https://www.alveussanctuary.org/stream/overlay?layout=piptr&${extraParams}`;
+	let border1cam = `https://www.alveussanctuary.org/stream/overlay?${extraParams}`;
 	let enableBorderChange = true;
 
 	let response = null;
