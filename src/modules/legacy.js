@@ -3904,14 +3904,15 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 				ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
 				let text = config.axisCameraTextMapping[ptzcamName] || "";
 				controller.connections.obs.local.setText(slotname, text);
-				controller.connections.obs.local.centerHorizontally(scenename, slotname);
+				setTimeout(()=>{
+					controller.connections.obs.local.centerHorizontally(scenename, slotname);
+				},200)
 				mergedCamList.push(camName);
 			}
 
-				//toggle mics and music based on cameras
+			//toggle mics and music based on cameras
 			let usedMics = [];
 			for (let i = 0; i < mergedCamList.length; i++) {
-				console.log("merged",mergedCamList[i])
 				let camName = helper.cleanName(mergedCamList[i]);
 				let mic = null;
 				for (const grp in config.micGroups) {

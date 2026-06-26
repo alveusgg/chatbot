@@ -359,7 +359,7 @@ const axisCameraTextMapping = {
     "marty": "Marty (Zebra Isopod)",
     "bb": "BB (Spanish Orange Isopod)",
     "construction": "",
-    "nature": "",
+    "nature": "Nature",
     "sleep": "Connor (Human)",
     "serval": "Kasi (Serval) Temporary Enclosure",
     "event": "",
