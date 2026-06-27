@@ -1638,7 +1638,7 @@ const create = async (connection) => {
 module.exports = async (controller) => {
   const local = await create("localAlveus");
   const cloud = await create("cloudHost");
-  const cloud2 = await create("cloudHost2");
+  // const cloud2 = await create("cloudHost2");
 
-  controller.connections.obs = { local, cloud, cloud2, create };
+  controller.connections.obs = { local, cloud, create };
 };

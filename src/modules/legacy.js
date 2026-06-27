@@ -372,7 +372,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		return;
 	}
 
-	logger.log("Valid Command", user, userCommand, tags.userInfo);
+	// logger.log("Valid Command", user, userCommand, tags.userInfo);
 
 	let accessProfile = helper.isAllowed(userCommand, tags.userInfo);
 	// if (accessProfile == null || !accessProfile.allowed) {
@@ -1775,7 +1775,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 2");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 3");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 4");
-			controller.connections.obs.cloud2.restartSource(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
+			// controller.connections.obs.cloud2.restartSource(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 5");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps SRT 1");
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "Psynaps SRT 2");
@@ -1791,7 +1791,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSource(controller.connections.obs.cloud.currentScene, "irlhost srt drone");
 			break;
 		case "resetyoutubef":
-			controller.connections.obs.cloud2.restartSource(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
+			// controller.connections.obs.cloud2.restartSource(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
 		case "resetbackpack":
 		case "resetlivecam":
 		case "resetpc":
@@ -1801,7 +1801,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 2");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 3");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 4");
-			controller.connections.obs.cloud2.restartSceneItem(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
+			// controller.connections.obs.cloud2.restartSceneItem(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Psynaps RTMP 5");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Psynaps SRT 1");
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "Psynaps SRT 2");
@@ -1817,7 +1817,7 @@ async function checkExtraCommand(controller, userCommand, accessProfile, channel
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.cloud.currentScene, "irlhost srt drone");
 			break
 		case "resetyoutube":
-			controller.connections.obs.cloud2.restartSceneItem(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
+			// controller.connections.obs.cloud2.restartSceneItem(controller.connections.obs.cloud2.currentScene, "Psynaps RTMP 4");
 		case "resetstaff":
 			controller.connections.obs.cloud.restartSceneItem(controller.connections.obs.local.currentScene, "staff stream");
 			break;
@@ -3769,6 +3769,7 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 		let ytCamList = [];
 		let ytCamSlots = [];
 		let mergedCamList = [...camList];
+		//make youtubelist
 		if (config.useOverrideCam && sceneName == "Custom Cams2"){
 			let newCamList = [];
 			let replacementCamList = [];
@@ -3822,6 +3823,7 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 			ytCamList = newCamList;
 		}
 
+		//set url and positions
 		if (sceneName != "Custom Cams2"){
 			//change cam sources
 			for (let i = 0; i < 6; i++) {
@@ -3862,7 +3864,6 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 					//toggle off any cams not used
 					controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, false);
 				}
-
 			}
 		} else {
 			//youtube cams
@@ -3883,17 +3884,53 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 				controller.connections.obs.local.setSceneItemEnabled(sceneName, slotname, true);
 			}
 		}
-
-		//disable unused nonaxis cams
-		for (let i = 0; i < config.nonaxisCamList.length; i++) {
-			let camName = config.nonaxisCamList[i];
-			if (!camList.includes(camName)){
-				controller.connections.obs.local.setSceneItemEnabled(sceneName, camName, false);
-			}
-		}
 		
-		//Change Names
+		//only run once
+		console.log("ytCamList",JSON.stringify(ytCamList))
 		if (sceneName == "Custom Cams2"){
+
+			//disable unused nonaxis cams
+			for (let i = 0; i < config.nonaxisCamList.length; i++) {
+				let camName = config.nonaxisCamList[i];
+				if (!camList.includes(camName)){
+					controller.connections.obs.local.setSceneItemEnabled("Custom Cams", camName, false);
+				}
+			}
+
+			//set name text
+			for (let i = 0; i < 9; i++) {
+				let camName = camList[i];
+				let camSlot = i;
+				if (camName == null){
+					for (let source in ytCamList){
+						let name = ytCamList[source].name;
+						let slot = ytCamList[source].slotnum;
+						if (slot == camSlot){
+							camName = name;
+							break;
+						}
+					}
+				}
+				let slotname = `cam${camSlot + 1}text`;
+				if (camName != null){
+					let scenename = `camslot${camSlot + 1}`;
+					let ptzcamName = helper.cleanName(camName);
+					let baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+					ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+					let text = config.axisCameraTextMapping[ptzcamName] || "";
+					controller.connections.obs.local.setText(slotname, text);
+					setTimeout(()=>{
+						controller.connections.obs.local.centerHorizontally(scenename, slotname);
+					},100+(70*i))
+					if (!mergedCamList.includes(camName)){
+						mergedCamList.push(camName);
+					}
+				} else {
+					controller.connections.obs.local.setText(slotname, "");
+				}
+			
+			}
+			//set name for youtube
 			for (let i = 0; i < ytCamList.length; i++) {
 				let camName = ytCamList[i].name;
 				let camSlot = ytCamList[i].slotnum;
@@ -3906,59 +3943,88 @@ async function setCustomCams(controller,obsSources, sceneName, camList, toggleMa
 				controller.connections.obs.local.setText(slotname, text);
 				setTimeout(()=>{
 					controller.connections.obs.local.centerHorizontally(scenename, slotname);
-				},200)
-				mergedCamList.push(camName);
+				},100+(70*i))
+				if (!mergedCamList.includes(camName)){
+					mergedCamList.push(camName);
+				}
 			}
 
-			//toggle mics and music based on cameras
+			//determine microphones
 			let usedMics = [];
 			for (let i = 0; i < mergedCamList.length; i++) {
-				let camName = helper.cleanName(mergedCamList[i]);
-				let mic = null;
-				for (const grp in config.micGroups) {
-					for (const source in config.micGroups[grp]) {
-						if (camName == source){
-							//specific mic matched
-							mic = source;
-							break;
-						}
-					}
-				}
-				if (mic == null){
-					//search for a matching base
-					let baseName = camName.replaceAll(/cam|outdoor|indoor|lower|inside|cover|wideangle|corner|den/g, "");
-					for (const grp in config.micGroups) {
-						for (const source in config.micGroups[grp]) {
-							if (baseName == source){
-								//specific mic matched
-								mic = source;
-								break;
-							}
-						}
-					}
-				}
-				if (mic != null){
-					usedMics.push(mic);
-				}
-			}
-			for (const grp in config.micGroups) {
-				for (const source in config.micGroups[grp]) {
-					let micname = config.micGroups[grp][source].name;
-					if (usedMics.includes(source)) {
-						//enable
-						await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, true);
-					} else {
-						//disable
-						await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, false);
+				let camName = mergedCamList[i];
+				let ptzcamName = helper.cleanName(camName);
+				let baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
+				ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
+				let mics = config.cameraMicMapping[ptzcamName] || [];
+				for (let m of mics){
+					if (!usedMics.includes(m)){
+						usedMics.push(m);
 					}
 				}
 			}
+
+			for (let m of config.microphoneList){
+				if (usedMics.includes(m)){
+					//enable
+					await controller.connections.obs.local.setSceneItemEnabled("microphones", m, true);
+				} else {
+					await controller.connections.obs.local.setSceneItemEnabled("microphones", m, false);
+				}
+			}
+			
 			if (usedMics.length == 0) {
 				//turn on music if no camera has a mic
-				controller.connections.obs.cloud2.setMute(config.globalMusicSource, false);
+				// controller.connections.obs.cloud2.setMute(config.globalMusicSource, false);
 			} else {
-				controller.connections.obs.cloud2.setMute(config.globalMusicSource, true);
+				// controller.connections.obs.cloud2.setMute(config.globalMusicSource, true);
 			}
+
+			// //toggle mics and music based on cameras
+			// for (let i = 0; i < mergedCamList.length; i++) {
+			// 	let camName = helper.cleanName(mergedCamList[i]);
+			// 	console.log("mic cam",mergedCamList[i],camName);
+			// 	let mic = null;
+			// 	for (const grp in config.micGroups) {
+			// 		for (const source in config.micGroups[grp]) {
+			// 			if (camName == source){
+			// 				//specific mic matched
+			// 				mic = source;
+			// 				break;
+			// 			}
+			// 		}
+			// 	}
+			// 	if (mic == null){
+			// 		//search for a matching base
+			// 		let baseName = camName.replaceAll(/cam|outdoor|indoor|lower|inside|cover|wideangle|corner|den/g, "");
+			// 		for (const grp in config.micGroups) {
+			// 			for (const source in config.micGroups[grp]) {
+			// 				if (baseName == source){
+			// 					//specific mic matched
+			// 					mic = source;
+			// 					break;
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// 	console.log("mic",mic);
+			// 	if (mic != null && !usedMics.includes(mic)){
+			// 		usedMics.push(mic);
+			// 	}
+			// }
+			// for (const grp in config.micGroups) {
+			// 	for (const source in config.micGroups[grp]) {
+			// 		let micname = config.micGroups[grp][source].name;
+			// 		if (usedMics.includes(source)) {
+			// 			//enable
+			// 			await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, true);
+			// 		} else {
+			// 			//disable
+			// 			await controller.connections.obs.local.setSceneItemEnabled("microphones", micname, false);
+			// 		}
+			// 	}
+			// }
+			
 		}
 
 		//Toggle Map

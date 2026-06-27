@@ -17,7 +17,8 @@ const pauseCloudSceneChange = true;
 const announceChatSceneChange = false;
 const useOverrideCam = true; //replaces overridden cams with db.overridecam or a safe replacement
 const overrideCamList = ["fullcampc", "fullcamphone", "fullcambackpack", "fullcamstaff", "fullcammonitor", "fullcambarn", "fullcamdrone", "fullcamchandler", "fullcamsleep"];
-const nonaxisCamList = ["fullcampc", "fullcamphone", "fullcambackpack", "fullcamstaff", "fullcamdrone", "fullcamchandler"];
+const nonaxisCamList = ["fullcampc", "fullcamphone", "fullcambackpack", "fullcamstaff", "fullcamdrone", "fullcamchandler","fullcambarn"];
+const restrictedMicList = ["georgiemic","barncam"]
 //UTC TIME
 const notifyHours = { start: 14, end: 23 };
 const restrictedHours = { start: 14, end: 23 };
@@ -218,7 +219,7 @@ const micGroups = {
         marmosetindoor: { name: sceneAudioSource.marmosetindoor, volume: -10 },
         wolf: { name: sceneAudioSource.wolf, volume: -10 }, wolfden2: { name: sceneAudioSource.wolfden2, volume: -10 },
         wolfindoor: { name: sceneAudioSource.wolfindoor, volume: -10 }, pushpop: { name: sceneAudioSource.pushpop, volume: -10 },
-        pushpopcrunch: { name: sceneAudioSource.pushpopcrunch, volume: -10 },
+        wolfswitch: { name: sceneAudioSource.wolfswitch, volume: -10 }, pushpopcrunch: { name: sceneAudioSource.pushpopcrunch, volume: -10 },
         chicken: { name: sceneAudioSource.chicken, volume: -10 }, chickenindoor: { name: sceneAudioSource.chickenindoor, volume: -10 },
         macaw: { name: sceneAudioSource.macaw, volume: -10 },
         pasturefeeder: { name: sceneAudioSource.pasturefeeder, volume: -10 }, parrotspeaker: { name: sceneAudioSource.parrotspeaker, volume: -10 },
@@ -250,7 +251,7 @@ const micGroups = {
 //ADD IP INFO IN ENV
 //Scene Names in OBS
 //lowercase, no spaces, no s/es
-const axisCameras = ["pasture", "pasturefeeder", "parrot", "macaw", "wolf", "wolfindoor", "wolfcorner", "wolfswitch", "wolfden2", "wolfden", "georgie", "georgiewater",
+const axisCameras = ["pasture", "pasturefeeder","pasturelower", "parrot", "macaw", "wolf", "wolfindoor", "wolfcorner", "wolfswitch", "wolfden2", "wolfden", "georgie", "georgiewater",
     "noodle", "patchy", "toast", "toastcrunch", "tarantula", "tarantulaptz", "roach", "crow", "crowindoor", "fox", "foxindoor", "foxcovered", "hank", "hankcorner", "marmoset",
     "marmosetindoor", "chin", "pushpop", "pushpopindoor", "pushpopcrunch", "marty", "bb", "construction", "nature", "sleep", "serval", "event", "eventspeaker",
     "chicken", "chickenindoor", "garden", "pasturespeaker", "parrotspeaker", "emucover", "emu", "emupond", "wolfspeaker", "purplemartinspeaker"];
@@ -324,6 +325,7 @@ const axisCameraCommandMapping = {
 const axisCameraTextMapping = {
     "pasture": "Pasture",
     "pasturefeeder": "Pasture",
+    "pasturelower": "Pasture",
     "parrot": "Mia (African Grey)",
     "macaw": "Tico & Miley (Macaw)",
     "wolf": "Awa & Akela (Wolf Hybrid)",
@@ -375,6 +377,65 @@ const axisCameraTextMapping = {
     "wolfspeaker": "",
     "purplemartinspeaker": ""
 };
+
+//Camera Mic Mapping
+const cameraMicMapping = {
+    "pasture": ["pasturespeaker"],
+    "pasturefeeder": ["pasturefeedermic"],
+    "pasturelower": ["pasturespeaker"],
+    "parrot": ["parrotmic","parrotspeaker"],
+    "macaw": ["macawmic","parrotspeaker"],
+    "wolf": ["wolfspeaker"],
+    "wolfindoor": ["wolfindoormic"],
+    "wolfcorner": ["wolfspeaker"],
+    "wolfswitch": ["wolfspeaker"],
+    "wolfden2": ["wolfspeaker","wolfden2mic"],
+    "wolfden": ["wolfspeaker"],
+    "georgie": ["georgiemic"],
+    "georgiewater": ["georgiemic"],
+    "noodle": [],
+    "patchy": [],
+    "toast": [],
+    "toastcrunch": [],
+    "tarantula": [],
+    "tarantulaptz": [],
+    "roach": [],
+    "crow": ["crowmic"],
+    "crowindoor": ["crowmic"],
+    "fox": ["foxmic"],
+    "foxindoor": ["foxmic","foxindoormic"],
+    "foxcovered": ["foxmic"],
+    "hank": [],
+    "hankcorner": [],
+    "marmoset": ["marmosetspeaker"],
+    "marmosetindoor": ["marmosetspeaker","marmosetindoormic"],
+    "chin": [],
+    "chin2": [],
+    "chin3": [],
+    "pushpop": ["pushpopmic"],
+    "pushpopindoor": ["pushpopmic"],
+    "pushpopcrunch": ["pushpopcrunchmic"],
+    "marty": [],
+    "bb": [],
+    "construction": [],
+    "nature": [],
+    "sleep": [],
+    "serval": ["eventspeaker"],
+    "event": ["eventspeaker"],
+    "eventspeaker": ["eventspeaker"],
+    "chicken": ["chickenmic"],
+    "chickenindoor": ["chickenindoormic"],
+    "garden": ["pasturespeaker"],
+    "pasturespeaker": ["pasturespeaker"],
+    "parrotspeaker": ["parrotspeaker"],
+    "emucover": ["emuspeaker","emucovermic"],
+    "emu": ["emuspeaker"],
+    "emupond": ["emuspeaker"],
+    "wolfspeaker": ["wolfspeaker"],
+    "purplemartinspeaker": ["purplemartinspeaker"],
+    "barn":["barncam"],
+};
+
 //Camera Commands
 const ptzPrefix = "ptz";
 const commandPermissionsCamera = {
@@ -802,6 +863,7 @@ const commandAliasConverted = setupCommandAliasConversion(commandAlias);
 const multiCustomCamScenesConverted = setupMultiCustomCamConversion(multiCommands);
 const customCommandAlias = setupCustomCamAlias(commandSceneAlias);
 const customSceneCommands = getCommandList(commandPermissionsCustomCam, commandSceneAlias);
+const microphoneList = setupMicrophones(cameraMicMapping);
 
 userBlacklist.forEach(user => {
     user = user.toLowerCase().trim();
@@ -975,6 +1037,19 @@ function setupCustomCamAlias(aliasList) {
     }
 
     return convertedList;
+}
+
+function setupMicrophones(micList) {
+    let list = [];
+    for (let source in micList){
+        let mics = micList[source] || [];
+        for (let m of mics){
+            if (!list.includes(m)){
+                list.push(m);
+            }
+        }
+    }
+    return list;
 }
 
 const scenePositions = {
@@ -1546,5 +1621,8 @@ module.exports = {
     useOverrideCam,
     overrideCamList,
     nonaxisCamList,
-    axisCameraTextMapping
+    axisCameraTextMapping,
+    cameraMicMapping,
+    restrictedMicList,
+    microphoneList
 };
