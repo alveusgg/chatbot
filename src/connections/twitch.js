@@ -18,6 +18,7 @@ class Twitch {
   #client;
   #chat;
   #channels;
+  #bannedUsers;
   #level = "WARNING"; // CRITICAL, ERROR, WARNING, INFO, DEBUG = 4, TRACE = 7
 
   /**
@@ -55,10 +56,10 @@ class Twitch {
 
     // Connect to chat in the specified channels
     try{
-      let scopes = this.#auth.getAccessTokenForIntent("chat",["chat:read","chat:edit"])
+      let scopes = this.#auth.getAccessTokenForIntent("chat",["chat:read","chat:edit","moderation:read"])
       console.log(`Twitch client (${name}) has these scopes: ${scopes}`);
     } catch(e){
-      throw new Error(`Twitch client (${name}) is missing chat scopes`);
+      throw new Error(`Twitch client (${name}) is missing chat or moderation scopes`);
     }
     this.#channels = new Set(channels);
     this.#chat = new ChatClient({
@@ -68,6 +69,20 @@ class Twitch {
         minLevel: this.#level,
       },
     });
+
+    // Init the list of banned users
+    // We init to an empty list to avoid downstream issues
+    this.#bannedUsers = []
+
+    // Get list of banned users every 5min
+    setInterval(async () => {
+      try {
+        this.#bannedUsers = await this.#client.moderation.getBannedUsers(twitchId).then(connection => connection.data.map((d) => d.userName.toLowerCase()));
+      } catch(e){
+        this.#logger.warn(`Failed to get banned users for twitchId ${twitchId}: ${e}`);
+      }
+      // 5min in milliseconds
+    }, 300000);
 
     // Register standard chat events
     this.#chat.onConnect(() => {
@@ -119,7 +134,7 @@ class Twitch {
    */
   onMessage(func) {
     this.#chat.onMessage((channel, user, message, msg) =>
-      func(channel.toLowerCase(), user, message.trim(), msg),
+      func(channel.toLowerCase(), user, message.trim(), msg, this.#bannedUsers),
     );
   }
 
