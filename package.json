@@ -8,6 +8,7 @@
     "dev": "cross-env NODE_ENV=development node src/index.js",
     "dev2": "nodemon --inspect=0.0.0.0:9229 -L src/index.js",
     "test": "node src/test.js",
+    "test:presets": "node --test test/presets*.test.js",
     "start": "node src/index.js"
   },
   "author": "SpaceVoyage",

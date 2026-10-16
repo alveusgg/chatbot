@@ -4,10 +4,10 @@ const schedule = require("../utils/schedule");
 const Logger = require("../utils/logger");
 const checkLockoutAccess = require('../utils/checkLockoutAccess');
 const checkLockoutPTZAccess = require('../utils/checkLockoutPTZAccess');
+const { ignoreLegacyPresetCommand, disableLegacyPresetRoaming } = require('../utils/preset-cutover');
 
 const logger = new Logger("modules/legacy");
 
-let roamTimeout = null;
 let timeSinceThrottled = {};
 let timeSinceThrottledPTZ = {};
 
@@ -17,6 +17,7 @@ let timeSinceThrottledPTZ = {};
  * @param {import("../controller")} controller
  */
 const main = async controller => {
+	disableLegacyPresetRoaming(controller.connections.database);
 	// Bind event handlers
 	if (controller.connections.obs?.local) {
 		controller.connections.obs.local.sceneChange(onSceneChange.bind(null, controller));
@@ -39,12 +40,6 @@ const main = async controller => {
 	// Log the current scene in OBS
 	const currentScene = helper.cleanName(controller.connections.obs?.local?.currentScene || "");
 	logger.log("Starting up... Current scene:", currentScene);
-
-	// Restore PTZ roaming status
-	if (controller.connections.database?.[currentScene]?.isRoaming) {
-		clearTimeout(roamTimeout);
-		setPTZRoamMode(controller, currentScene);
-	}
 
 	// schedule(config.restrictedHours.start - 1, 55, () => {
 	// 	try {
@@ -372,6 +367,9 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		return;
 	}
 
+	// The monorepo chatbot owns preset commands; this bot silently ignores them.
+	if (ignoreLegacyPresetCommand(userCommand)) return true;
+
 	logger.log("Valid Command",user,userCommand, tags.userInfo);
 
 	let accessProfile = helper.isAllowed(userCommand, tags.userInfo);
@@ -629,6 +627,7 @@ async function checkCustomSceneCommand(controller, userCommand, accessProfile, c
 }
 
 async function checkPTZCommand(controller, userCommand, accessProfile, channel, message, currentScene, user) {
+	if (ignoreLegacyPresetCommand(userCommand)) return true;
 	//check if PTZ command
 	if (!userCommand.startsWith(config.ptzPrefix)) {
 		return false;
@@ -817,16 +816,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	// }
 
 	controller.connections.database[currentScene] = controller.connections.database[currentScene] || {};
-	controller.connections.database[currentScene].presets = controller.connections.database[currentScene].presets || {};
-
-	//roamstatus
-	//roamlist
-	//speed
-
-	//Doing Any PTZ Command disables roaming
-	if (userCommand != "ptzroaminfo") {
-		controller.connections.database[currentScene].isRoaming = false;
-	}
 
 	let zoom = 100;
 
@@ -924,20 +913,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				camera.disableAutoTracking();
 				camera.enableAutoFocus();
 			}
-			break;
-		case "ptzpreset":
-			if (specificCamera != "") {
-				//used camera name
-				if (arg1 != "") {
-					//2nd argument provided
-					camera.goToPreset(arg1);
-				} else {
-					camera.goToPreset(specificCamera);
-				}
-			} else {
-				camera.goToPreset(arg1);
-			}
-			camera.enableAutoFocus();
 			break;
 		case "ptzmove":
 			camera.moveCamera(arg1);
@@ -1173,192 +1148,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 
 			}
 			break;
-		case "ptzsave":
-			let currentPosition = await camera.getPosition();
-			if (currentPosition && currentPosition.pan != null) {
-				if (specificCamera != "") {
-					//used camera name
-					if (arg1 != "") {
-						//2nd argument provided
-						controller.connections.database[specificCamera].presets[arg1] = currentPosition;
-					} else {
-						controller.connections.database[currentScene].presets[specificCamera] = currentPosition;
-					}
-				} else {
-					if (arg1 != "") {
-						//save named preset
-						controller.connections.database[currentScene].presets[arg1] = currentPosition;
-					} else {
-						controller.connections.database[currentScene].lastKnownPosition = currentPosition;
-					}
-				}
-				// controller.connections.api.sendBroadcastMessage(`ptzsave ${specificCamera} ${arg1}`, 'backend');
-
-				// Fetch the screenshot after saving the preset
-				// const imageBase64 = await camera.fetchImage();
-				// if (imageBase64) {
-				// 	// Prepare the message
-				// 	const message = {
-				// 		image: imageBase64,
-				// 		camera: specificCamera || currentScene,
-				// 		preset: arg1 // Include preset name
-				// 	};
-
-				// 	// Send the message to the API websocket. 
-				// 	controller.connections.api.sendBroadcastMessage(message, 'image');
-				// } else {
-				// 	logger.log("Failed to fetch image after saving preset");
-				// }
-
-			} else {
-				logger.log("Failed to get ptz position");
-			}
-			break;
-		case "ptzhomeold":
-			camera.goHome();
-			camera.enableAutoFocus();
-			break;
-		case "ptzhome":
-		case "ptzload":
-			if (userCommand == "ptzhome") {
-				arg1 = "home";
-			}
-			if (arg2 == "all") {
-				for (let cam of currentCamList) {
-					let preset = controller.connections.database[cam].presets["home"];
-					if (preset != null) {
-						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-					}
-				}
-			} else if (specificCamera != "") {
-				//used camera name
-				if (arg1 != "") {
-					//2nd argument provided
-					let preset = controller.connections.database[specificCamera].presets[arg1];
-					if (preset != null) {
-						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-					} else if (controller.connections.database[specificCamera].lastKnownPosition != null) {
-						let previous = controller.connections.database[specificCamera].lastKnownPosition;
-						camera.ptz({ pan: previous.pan, tilt: previous.tilt, zoom: previous.zoom });
-					}
-
-				} else {
-					let preset = controller.connections.database[currentScene].presets[specificCamera];
-					if (preset != null) {
-						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-					} else if (controller.connections.database[currentScene].lastKnownPosition != null) {
-						let previous = controller.connections.database[currentScene].lastKnownPosition;
-						camera.ptz({ pan: previous.pan, tilt: previous.tilt, zoom: previous.zoom });
-					}
-				}
-			} else {
-				let preset = controller.connections.database[currentScene].presets[arg1];
-				if (preset != null) {
-					camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-				} else if (controller.connections.database[currentScene].lastKnownPosition != null) {
-					let previous = controller.connections.database[currentScene].lastKnownPosition;
-					camera.ptz({ pan: previous.pan, tilt: previous.tilt, zoom: previous.zoom });
-				}
-			}
-			if (channel === 'ptzapi') {
-				controller.connections.twitch.send(channel, `${user}: ptzload ${specificCamera} ${arg1}`, true);
-			}
-			break;
-		case "ptzremove":
-			if (specificCamera != "") {
-				//used camera name
-				if (arg1 != "") {
-					//2nd argument provided
-					if (controller.connections.database[specificCamera].presets[arg1] != null) {
-						let response = delete controller.connections.database[specificCamera].presets[arg1];
-						if (response === true) {
-							// controller.connections.api.sendBroadcastMessage(`ptzremove ${specificCamera} ${arg1}`, 'backend');
-						}
-						if (response != true) {
-							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
-						}
-					}
-				} else {
-					controller.connections.database[currentScene].presets[specificCamera] = currentPosition;
-				}
-			} else {
-				if (controller.connections.database[currentScene].presets[arg1] != null) {
-					let response = delete controller.connections.database[currentScene].presets[arg1];
-					if (response != true) {
-						logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[currentScene]}`);
-					}
-				}
-			}
-			break;
-		case "ptzrename":
-			if (specificCamera != "") {
-				//used camera name
-				if (arg1 != "" && arg2 != "") {
-					//2nd argument provided
-					if (controller.connections.database[specificCamera].presets[arg1] != null) {
-						controller.connections.database[specificCamera].presets[arg2] = controller.connections.database[specificCamera].presets[arg1];
-						let response = delete controller.connections.database[specificCamera].presets[arg1];
-						if (response === true) {
-							// controller.connections.api.sendBroadcastMessage(`ptzrename ${specificCamera} ${arg1} ${arg2}`, 'backend');
-						}
-						if (response != true) {
-							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
-						}
-					}
-				} else {
-					if (controller.connections.database[currentScene].presets[specificCamera] != null) {
-						controller.connections.database[currentScene].presets[arg1] = controller.connections.database[currentScene].presets[specificCamera];
-						let response = delete controller.connections.database[currentScene].presets[specificCamera];
-						if (response != true) {
-							logger.log(`Failed to remove preset ${specificCamera}: ${response} ${controller.connections.database[currentScene]}`);
-						}
-					}
-				}
-			} else {
-				if (controller.connections.database[currentScene].presets[arg1] != null) {
-					controller.connections.database[currentScene].presets[arg2] = controller.connections.database[currentScene].presets[arg1];
-					let response = delete controller.connections.database[currentScene].presets[arg1];
-					if (response != true) {
-						logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[currentScene]}`);
-					}
-				}
-			}
-			break;
-		case "ptzclear":
-			if (specificCamera) {
-				controller.connections.database[specificCamera].presets = {};
-			} else {
-				controller.connections.database[currentScene].presets = {};
-			}
-			break;
-		case "ptzlist":
-			logger.log("ptzlist", specificCamera, arg1);
-			if (specificCamera && !noSpecificCam) {
-				if (channel === 'ptzapi') {
-					controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
-				} else {
-					controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
-				}
-			} else {
-				// if (channel === 'ptzapi') {
-				// 	controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
-				// } else {
-				// 	controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
-				// }
-				let output = "";
-				for (let i = 0; i < currentCamList.length; i++) {
-					ptzcamName = helper.cleanName(currentCamList[i]);
-					baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
-					ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
-					output = `${output}${i + 1}: ${ptzcamName}`;
-					if (i != currentCamList.length - 1) {
-						output = `${output}, `;
-					}
-				}
-				const formattedOutput = `Current Scene: ${parentScene.toLowerCase()} \nCams: ${output}`;
-				controller.connections.twitch.send(channel, formattedOutput);
-			}
-			break;
 		case "ptzgetfocus":
 			let pos = await camera.getPosition();
 			let currentFocus = parseFloat(pos.focus);
@@ -1369,74 +1158,6 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				} catch (e) {
 					//logger.log("Error getting focus")
 				}
-			}
-			break;
-		case "ptzroam":
-			let currentSpeed = await camera.getSpeed();
-			if (messageArgs.length == 2 && (arg1 == "on" || arg1 == "1" || arg1 == "yes")) {
-				//start roaming
-				controller.connections.database[currentScene].isRoaming = true;
-				if (currentSpeed != null) {
-					controller.connections.database[currentScene].speed = currentSpeed;
-				}
-				clearTimeout(roamTimeout);
-				setPTZRoamMode(controller, currentScene);
-				break;
-			} else if (messageArgs.length == 2 && (arg1 == "off" || arg1 == "0" || arg1 == "no")) {
-				//stop roaming
-				controller.connections.database[currentScene].isRoaming = false;
-				break;
-			} else if (messageArgs.length < 4) {
-				//invalid command
-				break;
-			}
-			//ptzroam on/off
-			//ptzroam 10s 20 fence barn trailer
-			//ptzroam 10 fence barn trailer
-			//ptzroam fence barn trailer
-
-			let startingListPos = 0;
-			if (!isNaN(parseInt(arg1))) {
-				//length of time
-				controller.connections.database[currentScene].roamTime = arg1;
-				startingListPos = 2;
-			} else {
-				//invalid command
-				break;
-			}
-			if (!isNaN(parseFloat(arg2))) {
-				//speed given
-				controller.connections.database[currentScene].roamSpeed = arg2;
-				startingListPos = 3;
-			}
-			let ptzRoamList = [];
-			for (let i = startingListPos; i < messageArgs.length; i++) {
-				let position = messageArgs[i];
-				if (controller.connections.database[currentScene].presets[position] != null) {
-					ptzRoamList.push(position);
-				}
-			}
-			controller.connections.database[currentScene].roamIndex = -1;
-			controller.connections.database[currentScene].roamDirection = "forward";
-			controller.connections.database[currentScene].roamList = JSON.parse(JSON.stringify(ptzRoamList));
-			controller.connections.database[currentScene].isRoaming = true;
-
-			if (currentSpeed != null) {
-				controller.connections.database[currentScene].speed = currentSpeed;
-			}
-
-			clearTimeout(roamTimeout);
-			setPTZRoamMode(controller, currentScene);
-			break;
-		case "ptzroaminfo":
-			try {
-				let isEnabled = "Disabled";
-				if (controller.connections.database[currentScene].isRoaming) {
-					isEnabled = "Enabled";
-				}
-				controller.connections.twitch.send(channel, `PTZ Roam: ${isEnabled} ${controller.connections.database[currentScene].roamTime} ${controller.connections.database[currentScene].roamSpeed} ${controller.connections.database[currentScene].roamList}`)
-			} catch (e) {
-				logger.log("Error sending ptzroaminfo")
 			}
 			break;
 		default:
@@ -1611,20 +1332,6 @@ async function checkNuthouseCommand(controller, userCommand, accessProfile, chan
 			break;
 		case "ptztracking":
 			controller.connections.obsBot.setTracking(arg1);
-			break;
-		case "ptzhome":
-			controller.connections.obsBot.resetPosition();
-			break;
-		case "ptzpreset":
-			let num = 1;
-			if (arg1 == "counter") {
-				num = 1;
-			} else if (arg1 == "table" || arg1 == "bench") {
-				num = 2;
-			} else if (arg1 == "room") {
-				num = 3;
-			}
-			controller.connections.obsBot.setPreset(num);
 			break;
 		case "ptzstop":
 			controller.connections.obsBot.stop();
@@ -3960,76 +3667,4 @@ async function setCustomCams(controller, obsSources, sceneName, camList, toggleM
 	}
 }
 
-async function setPTZRoamMode(controller, scene) {
-	if (controller.connections.database[scene] == null) {
-		//invalid scene
-		return;
-	}
-	let length = controller.connections.database[scene].roamTime;
-	let speed = controller.connections.database[scene].roamSpeed;
-	let list = controller.connections.database[scene].roamList;
-	if (length == null || isNaN(parseInt(length)) || list == null || list.length <= 1) {
-		//do nothing if only 1 position or less
-		return;
-	}
-	let camera = controller.connections.cameras[scene] || null;
-	if (camera == null) {
-		//cant find camera client
-		return;
-	}
-	if (!isNaN(parseFloat(speed))) {
-		//set speed
-		camera.setSpeed(speed);
-	}
-
-	if (!controller.connections.database[scene].isRoaming) {
-		//stop roaming
-		let currentSpeed = await camera.getSpeed();
-		let oldSpeed = controller.connections.database[scene].speed;
-		if (oldSpeed != currentSpeed) {
-			camera.setSpeed(oldSpeed);
-		}
-		return;
-	}
-
-
-	let currentIndex = controller.connections.database[scene].roamIndex;
-	if (currentIndex == null) {
-		currentIndex = -1;
-	}
-	let currentDirection = controller.connections.database[scene].roamDirection || "forward";
-
-	if (currentDirection == "forward") {
-		//increment forward
-		currentIndex++;
-		if (currentIndex >= list.length) {
-			currentDirection = "reverse";
-			currentIndex = list.length - 2 || 0;
-		}
-	} else if (currentDirection == "reverse") {
-		//increment reverse
-		currentIndex--;
-		if (currentIndex < 0) {
-			currentDirection = "forward";
-			if (currentIndex < -1) {
-				currentIndex = 0;
-			} else {
-				currentIndex = 1;
-			}
-
-		}
-	}
-	controller.connections.database[scene].roamIndex = currentIndex;
-	controller.connections.database[scene].roamDirection = currentDirection;
-
-	//change position
-	let newPosition = list[currentIndex];
-	let preset = controller.connections.database[scene].presets[newPosition];
-	// logger.log("Roam preset",list,currentIndex,newPosition);
-	if (preset != null) {
-		camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-	}
-	roamTimeout = setTimeout(setPTZRoamMode, length * 1000, controller, scene);
-}
-
-module.exports = Object.assign(main, { onTwitchMessage });
+module.exports = Object.assign(main, { onTwitchMessage, checkPTZCommand });
