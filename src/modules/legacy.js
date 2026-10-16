@@ -4,10 +4,14 @@ const schedule = require("../utils/schedule");
 const Logger = require("../utils/logger");
 const checkLockoutAccess = require('../utils/checkLockoutAccess');
 const checkLockoutPTZAccess = require('../utils/checkLockoutPTZAccess');
+const { serviceFor, actorFor, loadPreset, feedback, isLoadablePreset } = require('../services/ptz-presets');
+const { PresetServiceError } = require('../services/website-presets');
 
 const logger = new Logger("modules/legacy");
 
 let roamTimeout = null;
+let roamRequest = 0;
+const ptzRequests = new Map();
 let timeSinceThrottled = {};
 let timeSinceThrottledPTZ = {};
 
@@ -475,7 +479,7 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		let unifiCommand = await checkUnifiCommand(controller, userCommand, accessProfile, channel, message, currentScene);
 		*/
 		let valid = await checkCustomSceneCommand(...Object.values(parameters)) ||
-			await checkPTZCommand(...Object.values(parameters)) ||
+			await checkPTZCommand(...Object.values(parameters), { id: String(tags.userInfo.userId ?? user), name: tags.userInfo.displayName ?? user }) ||
 			await checkNuthouseCommand(...Object.values(parameters)) ||
 			await checkCustomCamCommand(...Object.values(parameters)) ||
 			await checkExtraCommand(...Object.values(parameters)) ||
@@ -628,7 +632,7 @@ async function checkCustomSceneCommand(controller, userCommand, accessProfile, c
 	return true;
 }
 
-async function checkPTZCommand(controller, userCommand, accessProfile, channel, message, currentScene, user) {
+async function checkPTZCommand(controller, userCommand, accessProfile, channel, message, currentScene, user, actor = user) {
 	//check if PTZ command
 	if (!userCommand.startsWith(config.ptzPrefix)) {
 		return false;
@@ -771,41 +775,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 		userCommand == "ptzroaminfo" || userCommand == "ptzrename" || userCommand == "ptzsave" ||
 		userCommand == "ptzdry" || userCommand == "ptzgetcam" || userCommand == "ptzgetspeed")) {
 
-		let camName = helper.cleanName(currentScene);
-		let baseName = config.customCommandAlias[camName];
-		if (!checkLockoutPTZAccess(controller.connections.database, baseName)) {
-			//locked camera
-
-			let lockedCam = true;
-
-			//Override if high enough permission
-			let cam = controller.connections.database.lockoutPTZ[baseName] || {};
-			let camPermission = cam.accessLevel;
-			let userPermission = accessProfile.accessLevel;
-			let permissionRanks = config.userPermissions.commandPriority;
-
-			let camIndex = permissionRanks.indexOf(camPermission);
-			let userIndex = permissionRanks.indexOf(userPermission);
-
-			//combine admin and superuser access
-			if (camIndex == 0) {
-				camIndex++;
-			}
-
-			if (camIndex !== -1 && userIndex !== -1) {
-				if (userIndex <= 1 && userIndex <= camIndex){
-					//have permission
-					lockedCam = false;
-				} else if (userIndex < camIndex) {
-					//have permission
-					lockedCam = false;
-				}
-			}
-			if (lockedCam) {
-				logger.log("PTZ Locked Camera", camName)
-				return;
-			}
-		}
+		if (!canControlPTZCamera(controller, currentScene, accessProfile)) return;
 	}
 
 
@@ -817,14 +787,15 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 	// }
 
 	controller.connections.database[currentScene] = controller.connections.database[currentScene] || {};
-	controller.connections.database[currentScene].presets = controller.connections.database[currentScene].presets || {};
 
 	//roamstatus
 	//roamlist
 	//speed
 
-	//Doing Any PTZ Command disables roaming
+	// Supersede pending roam configuration reads as well as active roaming.
+	let commandRequest = ptzRequests.get(currentScene) ?? 0;
 	if (userCommand != "ptzroaminfo") {
+		ptzRequests.set(currentScene, ++commandRequest);
 		controller.connections.database[currentScene].isRoaming = false;
 	}
 
@@ -1173,187 +1144,83 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 
 			}
 			break;
-		case "ptzsave":
-			let currentPosition = await camera.getPosition();
-			if (currentPosition && currentPosition.pan != null) {
-				if (specificCamera != "") {
-					//used camera name
-					if (arg1 != "") {
-						//2nd argument provided
-						controller.connections.database[specificCamera].presets[arg1] = currentPosition;
-					} else {
-						controller.connections.database[currentScene].presets[specificCamera] = currentPosition;
-					}
+		case "ptzsave": {
+			if (specificCamera == "" && arg1 == "") {
+				// Unnamed temporary position remains local non-preset state.
+				let currentPosition = await camera.getPosition();
+				if (currentPosition && currentPosition.pan != null) {
+					controller.connections.database[currentScene].lastKnownPosition = currentPosition;
 				} else {
-					if (arg1 != "") {
-						//save named preset
-						controller.connections.database[currentScene].presets[arg1] = currentPosition;
-					} else {
-						controller.connections.database[currentScene].lastKnownPosition = currentPosition;
-					}
+					logger.log("Failed to get ptz position");
 				}
-				// controller.connections.api.sendBroadcastMessage(`ptzsave ${specificCamera} ${arg1}`, 'backend');
-
-				// Fetch the screenshot after saving the preset
-				// const imageBase64 = await camera.fetchImage();
-				// if (imageBase64) {
-				// 	// Prepare the message
-				// 	const message = {
-				// 		image: imageBase64,
-				// 		camera: specificCamera || currentScene,
-				// 		preset: arg1 // Include preset name
-				// 	};
-
-				// 	// Send the message to the API websocket. 
-				// 	controller.connections.api.sendBroadcastMessage(message, 'image');
-				// } else {
-				// 	logger.log("Failed to fetch image after saving preset");
-				// }
-
 			} else {
-				logger.log("Failed to get ptz position");
+				await runWebsitePreset(controller, channel, service => service.command({
+					action: "save", camera: specificCamera || currentScene,
+					name: arg1 || specificCamera, actor: actorFor(actor)
+				}));
 			}
 			break;
+		}
 		case "ptzhomeold":
 			camera.goHome();
 			camera.enableAutoFocus();
 			break;
 		case "ptzhome":
-		case "ptzload":
-			if (userCommand == "ptzhome") {
-				arg1 = "home";
-			}
-			if (arg2 == "all") {
-				for (let cam of currentCamList) {
-					let preset = controller.connections.database[cam].presets["home"];
-					if (preset != null) {
-						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-					}
+		case "ptzload": {
+			if (userCommand == "ptzhome") arg1 = "home";
+			let targets = arg2 == "all" ? currentCamList.map(cam => {
+				let clean = helper.cleanName(cam);
+				let base = config.customCommandAlias[clean] ?? clean;
+				return config.axisCameraCommandMapping[base] ?? base;
+			}) : [specificCamera || currentScene];
+			for (const target of [...new Set(targets)]) {
+				if (!canControlPTZCamera(controller, target, accessProfile)) continue;
+				const result = await runWebsitePreset(controller, channel, service => loadPreset({
+					service, cameraName: target, name: arg2 == "all" ? "home" : arg1 || specificCamera,
+					actor: actorFor(actor), camera: controller.connections.cameras[target],
+					lastKnownPosition: arg2 == "all" ? null : controller.connections.database[target]?.lastKnownPosition
+				}));
+				if (result.status === "completed" && channel === 'ptzapi') {
+					controller.connections.twitch.send(channel, `${user}: ptzload ${target} ${arg1}`, true);
 				}
-			} else if (specificCamera != "") {
-				//used camera name
-				if (arg1 != "") {
-					//2nd argument provided
-					let preset = controller.connections.database[specificCamera].presets[arg1];
-					if (preset != null) {
-						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-					} else if (controller.connections.database[specificCamera].lastKnownPosition != null) {
-						let previous = controller.connections.database[specificCamera].lastKnownPosition;
-						camera.ptz({ pan: previous.pan, tilt: previous.tilt, zoom: previous.zoom });
-					}
-
-				} else {
-					let preset = controller.connections.database[currentScene].presets[specificCamera];
-					if (preset != null) {
-						camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-					} else if (controller.connections.database[currentScene].lastKnownPosition != null) {
-						let previous = controller.connections.database[currentScene].lastKnownPosition;
-						camera.ptz({ pan: previous.pan, tilt: previous.tilt, zoom: previous.zoom });
-					}
-				}
-			} else {
-				let preset = controller.connections.database[currentScene].presets[arg1];
-				if (preset != null) {
-					camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
-				} else if (controller.connections.database[currentScene].lastKnownPosition != null) {
-					let previous = controller.connections.database[currentScene].lastKnownPosition;
-					camera.ptz({ pan: previous.pan, tilt: previous.tilt, zoom: previous.zoom });
-				}
-			}
-			if (channel === 'ptzapi') {
-				controller.connections.twitch.send(channel, `${user}: ptzload ${specificCamera} ${arg1}`, true);
 			}
 			break;
+		}
 		case "ptzremove":
-			if (specificCamera != "") {
-				//used camera name
-				if (arg1 != "") {
-					//2nd argument provided
-					if (controller.connections.database[specificCamera].presets[arg1] != null) {
-						let response = delete controller.connections.database[specificCamera].presets[arg1];
-						if (response === true) {
-							// controller.connections.api.sendBroadcastMessage(`ptzremove ${specificCamera} ${arg1}`, 'backend');
-						}
-						if (response != true) {
-							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
-						}
-					}
-				} else {
-					controller.connections.database[currentScene].presets[specificCamera] = currentPosition;
-				}
-			} else {
-				if (controller.connections.database[currentScene].presets[arg1] != null) {
-					let response = delete controller.connections.database[currentScene].presets[arg1];
-					if (response != true) {
-						logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[currentScene]}`);
-					}
-				}
-			}
+			await runWebsitePreset(controller, channel, service => service.command({
+				action: "remove", camera: specificCamera || currentScene,
+				name: arg1 || specificCamera, actor: actorFor(actor)
+			}));
 			break;
 		case "ptzrename":
-			if (specificCamera != "") {
-				//used camera name
-				if (arg1 != "" && arg2 != "") {
-					//2nd argument provided
-					if (controller.connections.database[specificCamera].presets[arg1] != null) {
-						controller.connections.database[specificCamera].presets[arg2] = controller.connections.database[specificCamera].presets[arg1];
-						let response = delete controller.connections.database[specificCamera].presets[arg1];
-						if (response === true) {
-							// controller.connections.api.sendBroadcastMessage(`ptzrename ${specificCamera} ${arg1} ${arg2}`, 'backend');
-						}
-						if (response != true) {
-							logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[specificCamera]}`);
-						}
-					}
-				} else {
-					if (controller.connections.database[currentScene].presets[specificCamera] != null) {
-						controller.connections.database[currentScene].presets[arg1] = controller.connections.database[currentScene].presets[specificCamera];
-						let response = delete controller.connections.database[currentScene].presets[specificCamera];
-						if (response != true) {
-							logger.log(`Failed to remove preset ${specificCamera}: ${response} ${controller.connections.database[currentScene]}`);
-						}
-					}
-				}
-			} else {
-				if (controller.connections.database[currentScene].presets[arg1] != null) {
-					controller.connections.database[currentScene].presets[arg2] = controller.connections.database[currentScene].presets[arg1];
-					let response = delete controller.connections.database[currentScene].presets[arg1];
-					if (response != true) {
-						logger.log(`Failed to remove preset ${arg1}: ${response} ${controller.connections.database[currentScene]}`);
-					}
-				}
-			}
+			await runWebsitePreset(controller, channel, service => service.command({
+				action: "rename", camera: specificCamera || currentScene,
+				name: specificCamera && !arg2 ? specificCamera : arg1,
+				newName: specificCamera && !arg2 ? arg1 : arg2, actor: actorFor(actor)
+			}));
 			break;
 		case "ptzclear":
-			if (specificCamera) {
-				controller.connections.database[specificCamera].presets = {};
-			} else {
-				controller.connections.database[currentScene].presets = {};
-			}
+			await runWebsitePreset(controller, channel, service => service.command({
+				action: "clear", camera: specificCamera || currentScene, actor: actorFor(actor)
+			}));
 			break;
 		case "ptzlist":
-			logger.log("ptzlist", specificCamera, arg1);
 			if (specificCamera && !noSpecificCam) {
-				if (channel === 'ptzapi') {
-					controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
-				} else {
-					controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[specificCamera].presets).sort().toString()}`);
-				}
+				await runWebsitePreset(controller, channel, async service => {
+					const presets = await service.catalog(specificCamera);
+					const output = `PTZ Presets: ${presets.map(preset => preset.name).sort().toString()}`;
+					if (channel === 'ptzapi') controller.connections.api.sendAPI(output);
+					else controller.connections.twitch.send(channel, output);
+					return { status: "completed" };
+				});
 			} else {
-				// if (channel === 'ptzapi') {
-				// 	controller.connections.api.sendAPI(`PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
-				// } else {
-				// 	controller.connections.twitch.send(channel, `PTZ Presets: ${Object.keys(controller.connections.database[currentScene].presets).sort().toString()}`);
-				// }
 				let output = "";
 				for (let i = 0; i < currentCamList.length; i++) {
 					ptzcamName = helper.cleanName(currentCamList[i]);
 					baseName = config.customCommandAlias[ptzcamName] ?? ptzcamName;
 					ptzcamName = config.axisCameraCommandMapping[baseName] ?? baseName;
 					output = `${output}${i + 1}: ${ptzcamName}`;
-					if (i != currentCamList.length - 1) {
-						output = `${output}, `;
-					}
+					if (i != currentCamList.length - 1) output = `${output}, `;
 				}
 				const formattedOutput = `Current Scene: ${parentScene.toLowerCase()} \nCams: ${output}`;
 				controller.connections.twitch.send(channel, formattedOutput);
@@ -1373,6 +1240,7 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 			break;
 		case "ptzroam":
 			let currentSpeed = await camera.getSpeed();
+			if (commandRequest !== ptzRequests.get(currentScene)) break;
 			if (messageArgs.length == 2 && (arg1 == "on" || arg1 == "1" || arg1 == "yes")) {
 				//start roaming
 				controller.connections.database[currentScene].isRoaming = true;
@@ -1409,10 +1277,14 @@ async function checkPTZCommand(controller, userCommand, accessProfile, channel, 
 				controller.connections.database[currentScene].roamSpeed = arg2;
 				startingListPos = 3;
 			}
+			const roamCatalog = await runWebsitePreset(controller, channel, async service => ({
+				status: "completed", presets: await service.catalog(currentScene)
+			}));
+			if (roamCatalog.status !== "completed" || commandRequest !== ptzRequests.get(currentScene)) break;
 			let ptzRoamList = [];
 			for (let i = startingListPos; i < messageArgs.length; i++) {
 				let position = messageArgs[i];
-				if (controller.connections.database[currentScene].presets[position] != null) {
+				if (roamCatalog.presets.some(preset => preset.name === position && isLoadablePreset(preset))) {
 					ptzRoamList.push(position);
 				}
 			}
@@ -3961,6 +3833,7 @@ async function setCustomCams(controller, obsSources, sceneName, camList, toggleM
 }
 
 async function setPTZRoamMode(controller, scene) {
+	const request = ++roamRequest;
 	if (controller.connections.database[scene] == null) {
 		//invalid scene
 		return;
@@ -3977,11 +3850,6 @@ async function setPTZRoamMode(controller, scene) {
 		//cant find camera client
 		return;
 	}
-	if (!isNaN(parseFloat(speed))) {
-		//set speed
-		camera.setSpeed(speed);
-	}
-
 	if (!controller.connections.database[scene].isRoaming) {
 		//stop roaming
 		let currentSpeed = await camera.getSpeed();
@@ -3992,6 +3860,21 @@ async function setPTZRoamMode(controller, scene) {
 		return;
 	}
 
+
+	let presets;
+	try {
+		presets = await serviceFor(controller).catalog(scene);
+	} catch {
+		if (request !== roamRequest) return;
+		controller.connections.database[scene].isRoaming = false;
+		logger.log("PTZ roam paused: website presets unavailable.");
+		// Restore the original speed through the existing stopped-roaming path.
+		await setPTZRoamMode(controller, scene);
+		return;
+	}
+	// A chat command may have stopped roaming while the catalog was being read.
+	if (request !== roamRequest || !controller.connections.database[scene].isRoaming) return;
+	if (!isNaN(parseFloat(speed))) camera.setSpeed(speed);
 
 	let currentIndex = controller.connections.database[scene].roamIndex;
 	if (currentIndex == null) {
@@ -4024,12 +3907,45 @@ async function setPTZRoamMode(controller, scene) {
 
 	//change position
 	let newPosition = list[currentIndex];
-	let preset = controller.connections.database[scene].presets[newPosition];
+	let preset = presets.find(preset => preset.name === newPosition && isLoadablePreset(preset))?.position;
 	// logger.log("Roam preset",list,currentIndex,newPosition);
 	if (preset != null) {
-		camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, focus: preset.focus, autofocus: preset.autofocus });
+		camera.ptz({ pan: preset.pan, tilt: preset.tilt, zoom: preset.zoom, ...(preset.focus != null && { focus: preset.focus }), ...(preset.autofocus != null && { autofocus: preset.autofocus }) });
 	}
 	roamTimeout = setTimeout(setPTZRoamMode, length * 1000, controller, scene);
 }
 
-module.exports = Object.assign(main, { onTwitchMessage });
+function canControlPTZCamera(controller, scene, accessProfile) {
+	const camName = helper.cleanName(scene);
+	const baseName = config.customCommandAlias[camName];
+	if (checkLockoutPTZAccess(controller.connections.database, baseName)) return true;
+	// Preserve the existing lockout hierarchy, including the admin/superuser equivalence.
+	const cam = controller.connections.database.lockoutPTZ[baseName] || {};
+	const ranks = config.userPermissions.commandPriority;
+	let camIndex = ranks.indexOf(cam.accessLevel);
+	const userIndex = ranks.indexOf(accessProfile.accessLevel);
+	if (camIndex == 0) camIndex++;
+	if (camIndex !== -1 && userIndex !== -1 && ((userIndex <= 1 && userIndex <= camIndex) || userIndex < camIndex)) return true;
+	logger.log("PTZ Locked Camera", camName);
+	return false;
+}
+
+async function runWebsitePreset(controller, channel, operation) {
+	try {
+		const result = await operation(serviceFor(controller));
+		const message = feedback(result);
+		if (message) {
+			if (channel === 'ptzapi') controller.connections.api.sendAPI(message);
+			else controller.connections.twitch.send(channel, message);
+		}
+		return result;
+	} catch (error) {
+		const message = error instanceof PresetServiceError ? error.message : "Website presets unavailable.";
+		logger.log("Website preset command unavailable.");
+		if (channel === 'ptzapi') controller.connections.api.sendAPI(message);
+		else controller.connections.twitch.send(channel, message);
+		return { status: "failed" };
+	}
+}
+
+module.exports = Object.assign(main, { onTwitchMessage, checkPTZCommand, setPTZRoamMode });
