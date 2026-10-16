@@ -4,7 +4,7 @@ const config = require('../src/config/config');
 const helper = require('../src/utils/helper');
 const legacy = require('../src/modules/legacy');
 const {
-    redirectPresetCommand,
+    ignoreLegacyPresetCommand,
     disableLegacyPresetRoaming,
 } = require('../src/utils/preset-cutover');
 
@@ -50,7 +50,7 @@ function disconnected() {
 }
 
 for (const command of retired) {
-    test(`${command} redirects before OBS/camera/database/authentication lookup`, async () => {
+    test(`${command} is silently ignored before OBS/camera/database/authentication lookup`, async () => {
         const { controller, messages } = disconnected();
         for (const spelling of [command, command.toUpperCase()]) {
             const result = await legacy.onTwitchMessage(
@@ -62,16 +62,11 @@ for (const command of retired) {
             );
             assert.equal(result, true);
         }
-        assert.equal(messages.length, 2);
-        for (const [, text] of messages)
-            assert.match(
-                text,
-                /https:\/\/www\.alveussanctuary\.org\/about\/tech\/presets/,
-            );
+        assert.deepEqual(messages, []);
     });
 }
 
-test('API and direct PTZ entry points also redirect while disconnected', async () => {
+test('API and direct PTZ entry points also silently ignore while disconnected', async () => {
     const { controller, messages } = disconnected();
     await legacy.onTwitchMessage(
         controller,
@@ -80,7 +75,7 @@ test('API and direct PTZ entry points also redirect while disconnected', async (
         `${config.commandPrefix}ptzload garden home`,
         undefined,
     );
-    assert.equal(messages[0][0], 'api');
+    assert.deepEqual(messages, []);
     assert.equal(
         await legacy.checkPTZCommand(
             controller,
@@ -90,7 +85,7 @@ test('API and direct PTZ entry points also redirect while disconnected', async (
         ),
         true,
     );
-    assert.equal(messages[1][0], 'api');
+    assert.deepEqual(messages, []);
 });
 
 test('the existing alias parser is applied before retirement and OBS layout aliases remain available', async (t) => {
@@ -110,7 +105,7 @@ test('the existing alias parser is applied before retirement and OBS layout alia
         `${config.commandPrefix}cutoverloadtest garden home`,
         undefined,
     );
-    assert.equal(messages.length, 1);
+    assert.deepEqual(messages, []);
     for (const [alias, target] of Object.entries(
         config.commandAliasConverted,
     )) {
@@ -124,6 +119,7 @@ test('the existing alias parser is applied before retirement and OBS layout alia
             );
         }
     }
+    assert.deepEqual(messages, []);
     assert.equal(
         helper.commandCheck(`${config.commandPrefix}loadpreset`),
         'camload',
@@ -132,11 +128,8 @@ test('the existing alias parser is applied before retirement and OBS layout alia
         helper.commandCheck(`${config.commandPrefix}removepreset`),
         'campresetremove',
     );
-    assert.equal(redirectPresetCommand(controller, 'mock', 'camload'), false);
-    assert.equal(
-        redirectPresetCommand(controller, 'mock', 'campresetremove'),
-        false,
-    );
+    assert.equal(ignoreLegacyPresetCommand('camload'), false);
+    assert.equal(ignoreLegacyPresetCommand('campresetremove'), false);
 });
 
 test('manual camera controls retain their existing parsing, movements and focus behavior', async () => {

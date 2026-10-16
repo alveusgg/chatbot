@@ -12,17 +12,8 @@ const retiredPresetCommands = new Set([
     'ptzroaminfo',
 ]);
 
-const presetCutoverMessage =
-    'Camera preset commands and roaming are disabled in chat. Use https://www.alveussanctuary.org/about/tech/presets for camera presets.';
-
-function redirectPresetCommand(controller, channel, command) {
-    if (!retiredPresetCommands.has(command)) return false;
-    if (channel === 'ptzapi' && controller.connections.api?.sendAPI) {
-        controller.connections.api.sendAPI(presetCutoverMessage);
-    } else {
-        controller.connections.twitch?.send(channel, presetCutoverMessage);
-    }
-    return true;
+function ignoreLegacyPresetCommand(command) {
+    return retiredPresetCommands.has(command);
 }
 
 function disableLegacyPresetRoaming(database) {
@@ -40,4 +31,4 @@ function disableLegacyPresetRoaming(database) {
     }
 }
 
-module.exports = { redirectPresetCommand, disableLegacyPresetRoaming };
+module.exports = { ignoreLegacyPresetCommand, disableLegacyPresetRoaming };

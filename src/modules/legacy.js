@@ -4,7 +4,7 @@ const schedule = require("../utils/schedule");
 const Logger = require("../utils/logger");
 const checkLockoutAccess = require('../utils/checkLockoutAccess');
 const checkLockoutPTZAccess = require('../utils/checkLockoutPTZAccess');
-const { redirectPresetCommand, disableLegacyPresetRoaming } = require('../utils/preset-cutover');
+const { ignoreLegacyPresetCommand, disableLegacyPresetRoaming } = require('../utils/preset-cutover');
 
 const logger = new Logger("modules/legacy");
 
@@ -367,8 +367,8 @@ const onTwitchMessage = async (controller, channel, user, message, tags) => {
 		return;
 	}
 
-	// Retired preset commands never need OBS, cameras, permissions or remote lookups.
-	if (redirectPresetCommand(controller, channel, userCommand)) return true;
+	// The monorepo chatbot owns preset commands; this bot silently ignores them.
+	if (ignoreLegacyPresetCommand(userCommand)) return true;
 
 	logger.log("Valid Command",user,userCommand, tags.userInfo);
 
@@ -627,7 +627,7 @@ async function checkCustomSceneCommand(controller, userCommand, accessProfile, c
 }
 
 async function checkPTZCommand(controller, userCommand, accessProfile, channel, message, currentScene, user) {
-	if (redirectPresetCommand(controller, channel, userCommand)) return true;
+	if (ignoreLegacyPresetCommand(userCommand)) return true;
 	//check if PTZ command
 	if (!userCommand.startsWith(config.ptzPrefix)) {
 		return false;
